@@ -13,6 +13,93 @@
 
   <artifactId>backend-end2endTests</artifactId>
 
+  <properties>
+    <server.host>localhost</server.host>
+    <server.port>8083</server.port>
+  </properties>
+
+  <!-- ************************************************ -->
+  <!-- *~~~~~~~~~~~~~~~DEPENDENCIES~~~~~~~~~~~~~~~~~~~* -->
+  <!-- ************************************************ -->
+  <dependencies>
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~COMMONS~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~jackson~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~~HTTP~~~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~~~Test~~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- https://github.com/alexruiz/fest-assert-2.x/wiki -->
+    <dependency>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <!-- ************************************************ -->
+  <!-- *~~~~~~~~~~~~~~~~~~~BUILD~~~~~~~~~~~~~~~~~~~~~~* -->
+  <!-- ************************************************ -->
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**/*</include>
+        </includes>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+
+    <plugins>
+      <!-- Don't use integration test in test phase @see profile#end2end -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.2</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <!-- ************************************************ -->
   <!-- *~~~~~~~~~~~~~~~~~PROFILES~~~~~~~~~~~~~~~~~~~~~* -->
   <!-- ************************************************ -->
@@ -27,10 +114,9 @@
           <type>war</type>
         </dependency>
       </dependencies>
-      
+
       <build>
         <plugins>
-
           <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
@@ -47,6 +133,21 @@
             </executions>
           </plugin>
 
+          <!-- Only use integration test in phase @see profile#end2end -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.12.1</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
           <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
           <!-- Jetty -->
           <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -54,6 +155,17 @@
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
             <version>${jetty-maven-plugin.version}</version>
+            <configuration>
+              <connectors>
+                <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+                  <port>${server.port}</port>
+                  <maxIdleTime>60000</maxIdleTime>
+                </connector>
+              </connectors>
+              <scanIntervalSeconds>10</scanIntervalSeconds>
+              <stopKey>foo</stopKey>
+              <stopPort>9999</stopPort>
+            </configuration>
             <executions>
               <execution>
                 <id>start-jetty</id>
@@ -62,7 +174,8 @@
                   <goal>run-war</goal>
                 </goals>
                 <configuration>
-                  <webApp>${project.build.directory}/dependencies/backend-webapp-springmvc-${project.version}.war</webApp>
+                  <webApp>${project.build.directory}/dependencies/backend-webapp-springmvc-${project.version}.war
+                  </webApp>
                   <daemon>true</daemon>
                 </configuration>
               </execution>
