@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>arollavengers</groupId>
+    <artifactId>backend-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../backend-parent</relativePath>
+  </parent>
+
+  <artifactId>backend-end2endTests</artifactId>
+
+  <!-- ************************************************ -->
+  <!-- *~~~~~~~~~~~~~~~~~PROFILES~~~~~~~~~~~~~~~~~~~~~* -->
+  <!-- ************************************************ -->
+  <profiles>
+    <profile>
+      <id>end2end</id>
+      <dependencies>
+        <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>backend-webapp-springmvc</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+        </dependency>
+      </dependencies>
+      
+      <build>
+        <plugins>
+
+          <plugin>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <phase>process-resources</phase>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+                  <excludeTypes>jar,zip</excludeTypes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+          <!-- Jetty -->
+          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+          <plugin>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>${jetty-maven-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>start-jetty</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>run-war</goal>
+                </goals>
+                <configuration>
+                  <webApp>${project.build.directory}/dependencies/backend-webapp-springmvc-${project.version}.war</webApp>
+                  <daemon>true</daemon>
+                </configuration>
+              </execution>
+              <execution>
+                <id>stop-jetty</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
