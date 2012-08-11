@@ -11,7 +11,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectWriter;
 import org.junit.Before;
 import org.junit.Test;
 import java.io.IOException;
@@ -27,14 +26,15 @@ public class PingIT {
     private ObjectMapper mapper;
 
     @Before
-    public void setUp () throws IOException {
+    public void setUp() throws IOException {
         httpclient = new DefaultHttpClient();
         settings = new TestSettings();
         mapper = new ObjectMapper();
 
     }
+
     @Test
-    public void pong () throws IOException {
+    public void pong() throws IOException {
         HttpGet httpGet = new HttpGet(settings.getBaseURL() + "/rest/ping/Travis");
 
         long before = System.currentTimeMillis();
@@ -60,7 +60,8 @@ public class PingIT {
             //System.out.println(writer.writeValueAsString(node));
 
             EntityUtils.consume(entity);
-        } finally {
+        }
+        finally {
             httpGet.releaseConnection();
         }
     }

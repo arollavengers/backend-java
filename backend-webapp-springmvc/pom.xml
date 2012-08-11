@@ -14,6 +14,10 @@
   <artifactId>backend-webapp-springmvc</artifactId>
   <packaging>war</packaging>
 
+  <properties>
+    <server.port>8081</server.port>
+  </properties>
+
   <!-- ************************************************ -->
   <!-- *~~~~~~~~~~~~~~~~DEPENDENCIES~~~~~~~~~~~~~~~~~~* -->
   <!-- ************************************************ -->
@@ -142,6 +146,17 @@
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
         <version>${jetty-maven-plugin.version}</version>
+        <configuration>
+          <connectors>
+            <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+              <port>${server.port}</port>
+              <maxIdleTime>60000</maxIdleTime>
+            </connector>
+          </connectors>
+          <scanIntervalSeconds>10</scanIntervalSeconds>
+          <stopKey>foo</stopKey>
+          <stopPort>9999</stopPort>
+        </configuration>
       </plugin>
     </plugins>
   </build>
