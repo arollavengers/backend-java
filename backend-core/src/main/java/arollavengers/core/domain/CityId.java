@@ -8,7 +8,8 @@ import static arollavengers.core.domain.Disease.Yellow;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public enum City {
+@SuppressWarnings("UnusedDeclaration")
+public enum CityId {
     Algiers(Black),
     Baghdad(Black),
     Cairo(Black),
@@ -63,7 +64,7 @@ public enum City {
     ;
 
     private final Disease disease;
-    City(Disease disease) {
+    CityId(Disease disease) {
         this.disease = disease;
     }
 
