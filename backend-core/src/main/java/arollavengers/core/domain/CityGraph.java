@@ -36,7 +36,7 @@ public class CityGraph {
     private List<Link> unmodifiableRoutesView = Collections.unmodifiableList(links);
 
     /**
-     * Returns an unmodifiable view of all the links currently defined.
+     * @return an unmodifiable view of all the links currently defined.
      */
     public List<Link> getLinks() {
         return unmodifiableRoutesView;
@@ -132,7 +132,7 @@ public class CityGraph {
         /**
          * Indicates whether or not this route is connected to the specified cityId.
          *
-         * @param cityId
+         * @param cityId the specified cityId
          * @return <code>true</code> if this route is connected to the specified cityId.
          */
         public boolean contains(CityId cityId) {
