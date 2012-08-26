@@ -10,10 +10,13 @@ public class DummyUnitOfWork implements UnitOfWork<DomainEvent> {
   List<DomainEvent> uncommited;
 
   public boolean commit() {
+    //TODO c'est ici qu'il faut persister les events ?
     throw new RuntimeException("not implemented");
   }
 
   public boolean rollback() {
+    //TODO comment faire un rollback puisque tous les évents ont déjà été
+    //appliqués? Faut-il rejouer tous les événements commités ??
     throw new RuntimeException("not implemented");
   }
 

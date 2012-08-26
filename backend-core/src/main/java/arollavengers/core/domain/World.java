@@ -1,8 +1,7 @@
 package arollavengers.core.domain;
 
 import arollavengers.core.events.*;
-import arollavengers.core.exceptions.EntityIdAlreadyAssignedException;
-import arollavengers.core.exceptions.NoDiseaseToCureException;
+import arollavengers.core.exceptions.*;
 import arollavengers.core.infrastructure.AggregateRoot;
 import arollavengers.core.infrastructure.EventHandler;
 import arollavengers.core.infrastructure.Id;
@@ -12,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class World extends AggregateRoot<WorldEvent> {
+  public static final int MAX_ROLES = 4;
   private final UnitOfWork uow;
   private final WorldEventHandler eventHandler;
 
@@ -21,6 +21,8 @@ public class World extends AggregateRoot<WorldEvent> {
   private Difficulty difficulty;
 
   private MemberStates memberStates;
+
+  private Team team;
 
   private CityStates cityStates;
 
@@ -32,12 +34,37 @@ public class World extends AggregateRoot<WorldEvent> {
     this.eventHandler = new IntrospectionBasedEventHandler(this);
   }
 
+  /**
+   * Create a new world of given id and difficulty owned by a user
+   *
+   * @param newId      Id of the world
+   * @param owner      Owner of this world
+   * @param difficulty Difficulty of the game
+   */
   public void createWorld(Id newId, User owner, Difficulty difficulty) {
     if (!aggregateId().isUndefined()) {
       throw new EntityIdAlreadyAssignedException(aggregateId(), newId);
     }
     final WorldCreatedEvent worldCreatedEvent = new WorldCreatedEvent(newId, owner.userId(), difficulty);
     applyNewEvent(worldCreatedEvent);
+  }
+
+  public void registerRole(Member newComer) {
+    if (aggregateId().isUndefined()) {
+      throw new WorldNotYetCreatedException();
+    }
+
+    if (team().roles().size() >= MAX_ROLES) {
+      throw new WorldNumberOfRoleLimitReachedException(newComer.role());
+    }
+
+    if (team.hasRole(newComer.role())) {
+      throw new WorldRoleAlreadyChosenException(aggregateId(), newComer.role());
+    }
+
+    applyNewEvent(new WorldMemberJoinedTeamEvent(aggregateId(), newComer));
+
+
   }
 
 
@@ -49,8 +76,16 @@ public class World extends AggregateRoot<WorldEvent> {
     this.cityStates = new CityStates();
     this.eradicatedDiseases = new HashSet<Disease>();
     this.curedDiseases = new HashSet<Disease>();
+    this.team = new Team();
   }
 
+  /**
+   * Treat a city by a member of team removing one cube of given disease
+   *
+   * @param member  Action doer
+   * @param city    City to treat
+   * @param disease Disease to treat
+   */
   public void treatCity(Member member, CityId city, Disease disease) {
     MemberState memberState = memberStates.getStateOf(member);
     // fail if it is not player's turn or no more action point
@@ -104,6 +139,11 @@ public class World extends AggregateRoot<WorldEvent> {
     return difficulty;
   }
 
+  Team team() {
+    return team;
+  }
+
+
   private void doTreatCity(WorldCityTreatedEvent event) {
     CityState cityState = cityStates.getStateOf(event.city());
     cityState.removeOneCube(event.disease());
@@ -118,12 +158,17 @@ public class World extends AggregateRoot<WorldEvent> {
     eradicatedDiseases.add(event.disease());
   }
 
+
   protected UnitOfWork unitOfWork() {
     return uow;
   }
 
   protected EventHandler<WorldEvent> internalEventHandler() {
     return eventHandler;
+  }
+
+  public void doEnrole(final Member member) {
+    team.enrole(member);
   }
 }
 

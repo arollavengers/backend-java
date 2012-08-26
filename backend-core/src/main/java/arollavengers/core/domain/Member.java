@@ -10,7 +10,7 @@ public class Member {
   }
 
   public Id id() {
-    throw new RuntimeException("not implemented");
+    throw new RuntimeException("not implemented: un member est un aggregate root ?");
   }
 
   public MemberRole role() {
