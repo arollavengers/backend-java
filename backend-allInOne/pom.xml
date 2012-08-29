@@ -18,6 +18,7 @@
     <module>../backend-core</module>
     <module>../backend-webapp-springmvc</module>
     <module>../backend-end2endTests</module>
+    <module>../backend-persistence</module>
   </modules>
 
 </project>
