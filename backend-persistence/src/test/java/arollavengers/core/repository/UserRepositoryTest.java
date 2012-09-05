@@ -24,9 +24,9 @@ public class UserRepositoryTest {
 
   @Test
   public void find(){
-    final User user = new User();
     final String id = UUID.randomUUID().toString();
-    user.setId(id);
+    final User user = new User(id,"jprudent@gmail.com");
+
     userRepository.save(user);
 
     final User foo = userRepository.find(id);
@@ -35,9 +35,8 @@ public class UserRepositoryTest {
 
   @Test(expected = org.springframework.dao.DataAccessException.class)
   public void dbException(){
-    final User user = new User();
     final String id = UUID.randomUUID().toString();
-    user.setId(id);
+    final User user = new User(id,"jprudent@gmail.com");
 
     userRepository.save(user);
     userRepository.save(user);

@@ -19,6 +19,13 @@ public class User {
   @NotNull(message = "email is mandatory")
   private String email;
 
+  public User() {
+  }
+
+  public User(final String id, final String email) {
+    this.id = id;
+    this.email = email;
+  }
 
   public String getId() {
     return id;
@@ -26,5 +33,13 @@ public class User {
 
   public void setId(final String id) {
     this.id = id;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(final String email) {
+    this.email = email;
   }
 }

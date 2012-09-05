@@ -36,7 +36,7 @@ public class WorldTest {
 
     //When -- A world is created
     final Id worldId = Id.next();
-    final User owner = new User();
+    final User owner = User.fresh();
     w.createWorld(worldId, owner, Difficulty.Heroic);
 
     //Then --
@@ -54,7 +54,7 @@ public class WorldTest {
   public void testCreateWorld_When_AlreadyCreated() {
     //Given -- A world is created
     final Id worldId = Id.next();
-    final User owner = new User();
+    final User owner = User.fresh();
     w.createWorld(worldId, owner, Difficulty.Heroic);
 
     //When -- the world is REcreated
@@ -73,7 +73,7 @@ public class WorldTest {
   public void testRegisterRole() {
     //Given -- a new instance of a world
     final Id worldId = Id.next();
-    final User owner = new User();
+    final User owner = User.fresh();
     w.createWorld(worldId, owner, Difficulty.Heroic);
 
     //When -- a player join the game
@@ -97,7 +97,7 @@ public class WorldTest {
   public void testRegisterRole_WhenPlayerAlreadyRegistered() {
     //Given -- a new instance of a world
     final Id worldId = Id.next();
-    final User owner = new User();
+    final User owner = User.fresh();
     w.createWorld(worldId, owner, Difficulty.Heroic);
     // with a medic already registerd
     w.registerRole(new Member(MemberRole.Medic));
@@ -118,7 +118,7 @@ public class WorldTest {
   public void testRegisterRole_WhenPlayerLimitIsReached() {
     //Given -- a new instance of a world
     final Id worldId = Id.next();
-    final User owner = new User();
+    final User owner = User.fresh();
     w.createWorld(worldId, owner, Difficulty.Heroic);
     // with 4 roles registered
     w.registerRole(new Member(MemberRole.Medic));
