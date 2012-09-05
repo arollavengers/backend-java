@@ -1,9 +1,9 @@
 package arollavengers.core.infrastructure;
 
-public interface UnitOfWork<E extends DomainEvent> {
+public interface UnitOfWork {
   boolean commit();
 
   boolean rollback();
 
-  void registerNew(E event);
+  void registerNew(DomainEvent event);
 }

@@ -6,7 +6,7 @@ import java.util.UUID;
 public class Id {
 
   public static Id undefined() {
-    return UndefinedId.getInstance();
+    return UNDEFINED_ID;
   }
 
   public static Id next() {
@@ -36,22 +36,12 @@ public class Id {
     return this.equals(Id.undefined());
   }
 
+  private static final UndefinedId UNDEFINED_ID = new UndefinedId();
   private static class UndefinedId extends Id {
-
-    private static final UndefinedId INSTANCE = new UndefinedId();
-
-    private UndefinedId() {
-    }
-
-    public static Id getInstance() {
-      return INSTANCE;
-    }
-
-    @Override
+  @Override
     public String toString() {
       return "UndefinedId";
     }
-
   }
 }
 

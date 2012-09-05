@@ -1,6 +1,7 @@
 package arollavengers.core.infrastructure;
 
 
+import arollavengers.core.domain.pandemic.MemberRole;
 import arollavengers.core.exceptions.IncompatibleEventIdException;
 import arollavengers.core.exceptions.InvalidEventSequenceException;
 
@@ -89,5 +90,7 @@ public abstract class AggregateRoot<E extends DomainEvent> {
    *         Default implementation usually relies on {@link ThreadLocal}.
    */
   protected abstract UnitOfWork unitOfWork();
+
+
 }
 

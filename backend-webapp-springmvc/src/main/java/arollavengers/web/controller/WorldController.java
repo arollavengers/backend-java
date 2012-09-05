@@ -1,10 +1,9 @@
 package arollavengers.web.controller;
 
-import arollavengers.core.domain.Difficulty;
-import arollavengers.core.domain.User;
-import arollavengers.core.domain.UserId;
+import arollavengers.core.domain.pandemic.Difficulty;
+import arollavengers.core.domain.user.User;
 import arollavengers.core.infrastructure.Id;
-import arollavengers.core.service.world.WorldService;
+import arollavengers.core.service.pandemic.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
