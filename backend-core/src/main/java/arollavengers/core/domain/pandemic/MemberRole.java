@@ -1,4 +1,4 @@
-package arollavengers.core.domain;
+package arollavengers.core.domain.pandemic;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
