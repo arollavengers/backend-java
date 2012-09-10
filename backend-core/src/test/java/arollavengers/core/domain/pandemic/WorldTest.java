@@ -2,17 +2,15 @@ package arollavengers.core.domain.pandemic;
 
 import arollavengers.core.domain.user.User;
 import arollavengers.core.exceptions.EntityIdAlreadyAssignedException;
-import arollavengers.core.exceptions.pandemic.WorldNotYetCreatedException;
-import arollavengers.core.exceptions.pandemic.WorldNumberOfRoleLimitReachedException;
-import arollavengers.core.exceptions.pandemic.WorldRoleAlreadyChosenException;
+import arollavengers.core.exceptions.pandemic.*;
 import arollavengers.core.infrastructure.DummyUnitOfWork;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.UnitOfWork;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.fail;
 
 public class WorldTest {
 
@@ -57,6 +55,9 @@ public class WorldTest {
             assertThat(w.hasBeenEradicated(disease)).isFalse();
             assertThat(w.hasCureFor(disease)).isFalse();
         }
+
+        // Then -- game is not initialized yet
+        assertThat(w.playerDrawCardsSize()).isEqualTo(0);
     }
 
     @Test(expected = EntityIdAlreadyAssignedException.class)
@@ -75,6 +76,7 @@ public class WorldTest {
             assertThat(e).isEqualTo(new EntityIdAlreadyAssignedException(worldId, worldId));
             throw e;
         }
+        fail("EntityIdAlreadyAssignedException should be catched and throwed");
     }
 
     @Test
@@ -119,9 +121,10 @@ public class WorldTest {
             assertThat(e).isEqualTo(new WorldRoleAlreadyChosenException(worldId, MemberRole.Medic));
             throw e;
         }
+        fail("WorldRoleAlreadyChosenException should be catched and throwed");
     }
 
-    @Test(expected = WorldRoleAlreadyChosenException.class)
+    @Test(expected = UserAlreadyRegisteredException.class)
     public void testRegisterRole_WhenPlayerAlreadyRegistered_withADifferentRole() {
         //Given -- a new instance of a world
         final Id worldId = Id.next();
@@ -129,16 +132,17 @@ public class WorldTest {
         // with a medic already registerd
         w.registerMember(user, MemberRole.Medic);
 
-        //When -- another medic try to register
+        //When -- the same user try to register
         try {
             w.registerMember(user, MemberRole.Dispatcher);
         }
 
         //Then -- an exception is thrown
-        catch (WorldRoleAlreadyChosenException e) {
-            assertThat(e).isEqualTo(new WorldRoleAlreadyChosenException(worldId, MemberRole.Medic));
+        catch (UserAlreadyRegisteredException e) {
+            assertThat(e).isEqualTo(new UserAlreadyRegisteredException(worldId, user.aggregateId()));
             throw e;
         }
+        fail("WorldRoleAlreadyChosenException should be catched and throwed");
     }
 
     @Test(expected = WorldNumberOfRoleLimitReachedException.class)
@@ -168,6 +172,29 @@ public class WorldTest {
             assertThat(e).isEqualTo(new WorldNumberOfRoleLimitReachedException(MemberRole.Scientist));
             throw e;
         }
+        fail("WorldNumberOfRoleLimitReachedException should be catched and throwed");
+
+    }
+
+    @Test(expected = GameAlreadyStartedException.class)
+    public void testRegisterRole_WhenGameIsAlreadyStarted() {
+        //Given -- a world created
+        final Id worldId = Id.next();
+        w.createWorld(worldId, ownr, Difficulty.Heroic);
+
+        //Given -- there are 2 players registered
+        w.registerMember(ownr, MemberRole.Dispatcher);
+        w.registerMember(user, MemberRole.Medic);
+
+        //Given -- the game is started
+        w.startGame();
+
+
+        //When -- another user try to register
+        w.registerMember(othr, MemberRole.Scientist);
+
+
+        //Then -- an exception is thrown
 
     }
 
@@ -183,18 +210,55 @@ public class WorldTest {
 
     }
 
-    @Test
-    @Ignore
-    public void startGame() {
+    @Test(expected = NotEnoughPlayerException.class)
+    public void startGame_WhenNotEnoughMember() {
+
         //Given -- a world created
         final Id worldId = Id.next();
         w.createWorld(worldId, ownr, Difficulty.Heroic);
 
+        //Given -- there is only one player registered
+        w.registerMember(ownr, MemberRole.Researcher);
+
+        //When -- game is started
+        try {
+            w.startGame();
+        }
+
+        //Then -- an exception is thrown
+        catch (NotEnoughPlayerException e) {
+            assertThat(e).isEqualTo(new NotEnoughPlayerException(1, 2));
+            throw e;
+        }
+        fail("NotEnoughPlayerException should be catched and throwed");
+    }
+
+    @Test
+    public void startGame_With2Players() {
+        //Given -- a world created
+        final Id worldId = Id.next();
+        w.createWorld(worldId, ownr, Difficulty.Heroic);
+
+        //Given -- there are 2 players registered
+        w.registerMember(ownr, MemberRole.Dispatcher);
+        w.registerMember(user, MemberRole.Medic);
+
         //When -- game is started
         w.startGame();
 
+
         //Then -- game is started (no kidding)
         assertThat(w.isStarted()).isTrue();
+
+        //Then -- each players has 4 PlayerCard
+        final int initialCardsPerMember = 4;
+        assertThat(w.memberHandSize(ownr.aggregateId()).get()).isEqualTo(initialCardsPerMember);
+        assertThat(w.memberHandSize(user.aggregateId()).get()).isEqualTo(initialCardsPerMember);
+
+        //Then -- the player draw cards is initialized
+        final int remainingDrawPlayerCards = CityId.values().length - (initialCardsPerMember * 2);
+        assertThat(w.playerDrawCardsSize()).isEqualTo(remainingDrawPlayerCards);
+
     }
 
     private static User createUser(UnitOfWork uow, String login) {

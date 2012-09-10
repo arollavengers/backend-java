@@ -4,20 +4,18 @@ import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserRepository;
 import arollavengers.core.events.pandemic.*;
 import arollavengers.core.exceptions.EntityIdAlreadyAssignedException;
-import arollavengers.core.exceptions.pandemic.NoDiseaseToCureException;
-import arollavengers.core.exceptions.pandemic.WorldNotYetCreatedException;
-import arollavengers.core.exceptions.pandemic.WorldNumberOfRoleLimitReachedException;
-import arollavengers.core.exceptions.pandemic.WorldRoleAlreadyChosenException;
+import arollavengers.core.exceptions.pandemic.*;
 import arollavengers.core.infrastructure.*;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.base.Optional;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class World extends AggregateRoot<WorldEvent> {
-    public static final int MAX_ROLES = 4;
-    public static final int MIN_ROLES = 2;
+    public static final int MAX_TEAM_SIZE = 4;
+    public static final int MIN_TEAM_SIZE = 2;
     private final UnitOfWork uow;
     private final EventHandler<WorldEvent> eventHandler;
 
@@ -37,6 +35,8 @@ public class World extends AggregateRoot<WorldEvent> {
 
     private boolean started;
 
+    private PlayerDrawCard playerDrawCard;
+
     public World(UnitOfWork uow) {
         this.uow = uow;
         this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
@@ -50,6 +50,9 @@ public class World extends AggregateRoot<WorldEvent> {
      * @param difficulty Difficulty of the game
      */
     public void createWorld(Id newId, User owner, Difficulty difficulty) {
+
+        ensureValidUser(owner);
+
         if (!aggregateId().isUndefined()) {
             throw new EntityIdAlreadyAssignedException(aggregateId(), newId);
         }
@@ -67,6 +70,7 @@ public class World extends AggregateRoot<WorldEvent> {
         this.eradicatedDiseases = new HashSet<Disease>();
         this.curedDiseases = new HashSet<Disease>();
         this.team = new Team();
+        this.playerDrawCard = new PlayerDrawCard();
     }
 
     /**
@@ -76,9 +80,15 @@ public class World extends AggregateRoot<WorldEvent> {
      * @param role role of the user in the game
      */
     public void registerMember(User user, MemberRole role) {
+
         ensureWorldIsCreated();
 
-        if (team().roles().size() >= MAX_ROLES) {
+        ensureValidUser(user);
+
+        ensureGameIsNotAlreadyStarted();
+
+
+        if (team().size() >= MAX_TEAM_SIZE) {
             throw new WorldNumberOfRoleLimitReachedException(role);
         }
 
@@ -88,10 +98,22 @@ public class World extends AggregateRoot<WorldEvent> {
 
         final Optional<Member> member = team().findMember(user.aggregateId());
         if (member.isPresent()) {
-            throw new WorldRoleAlreadyChosenException(aggregateId(), member.get().role());
+            throw new UserAlreadyRegisteredException(aggregateId(), member.get().userId());
         }
 
         applyNewEvent(new WorldMemberJoinedTeamEvent(aggregateId(), user.aggregateId(), role));
+    }
+
+    private void ensureGameIsNotAlreadyStarted() {
+        if (isStarted()) {
+            throw new GameAlreadyStartedException();
+        }
+    }
+
+    private void ensureValidUser(final User user) {
+        if (user.aggregateId().isUndefined()) {
+            throw new InvalidUserException(user);
+        }
     }
 
     @OnEvent
@@ -100,11 +122,45 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     /**
-     * Start the game
+     * Start the game. It does the following actions:
+     * - start the game (nobody can register for playing anymore)
+     * - initialize draw cards
+     * - give initial hand to member
      */
     public void startGame() {
-        throw new WorldNotYetCreatedException();
+
+        ensureWorldIsCreated();
+
+        final int teamSize = team().size();
+        if (teamSize < MIN_TEAM_SIZE) {
+            throw new NotEnoughPlayerException(teamSize, MIN_TEAM_SIZE);
+        }
+
+        applyNewEvent(new GameStartedEvent(aggregateId()));
+
     }
+
+    @OnEvent
+    private void doStartGame(final GameStartedEvent event) {
+
+        playerDrawCard.buildAndShuffle();
+
+        this.started = true;
+
+        for (Member member : team()) {
+            for (int i = team().size(); i < 6; i++) {
+                applyNewEvent(new DrawnCardInPlayerDrawCardEvent(aggregateId(), member.role()));
+            }
+        }
+    }
+
+
+    @OnEvent
+    private void doDrawCardInPlayerDrawCards(final DrawnCardInPlayerDrawCardEvent event) {
+        PlayerCard card = playerDrawCard.drawTop();
+        team().findMember(event.memberRole()).get().addToHand(card);
+    }
+
 
     /**
      * Treat a city by a member of team removing one cube of given disease
@@ -206,6 +262,16 @@ public class World extends AggregateRoot<WorldEvent> {
         return team;
     }
 
+    public Optional<Integer> memberHandSize(@NotNull Id userId) {
+        final Optional<Member> member = team().findMember(userId);
+
+        if (member.isPresent()) {
+            return Optional.of(member.get().handSize());
+        }
+
+        return Optional.absent();
+    }
+
     @Override
     protected UnitOfWork unitOfWork() {
         return uow;
@@ -232,6 +298,10 @@ public class World extends AggregateRoot<WorldEvent> {
 
     public boolean isStarted() {
         return started;
+    }
+
+    public int playerDrawCardsSize() {
+        return playerDrawCard.size();
     }
 }
 
