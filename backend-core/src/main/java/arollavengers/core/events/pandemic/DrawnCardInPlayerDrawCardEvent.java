@@ -1,23 +1,23 @@
 package arollavengers.core.events.pandemic;
 
-import arollavengers.core.domain.pandemic.MemberRole;
+import arollavengers.core.domain.pandemic.Member;
 import arollavengers.core.infrastructure.Id;
 
 public class DrawnCardInPlayerDrawCardEvent implements WorldEvent {
 
     private final Id worldId;
 
-    private final MemberRole memberRole;
+    private final Member member;
 
     private long version;
 
-    public DrawnCardInPlayerDrawCardEvent(final Id worldId, final MemberRole memberRole) {
+    public DrawnCardInPlayerDrawCardEvent(final Id worldId, final Member member) {
         this.worldId = worldId;
-        this.memberRole = memberRole;
+        this.member = member;
     }
 
-    public MemberRole memberRole() {
-        return memberRole;
+    public Member member() {
+        return member;
     }
 
     @Override

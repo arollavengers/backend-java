@@ -255,8 +255,8 @@ public class WorldTest {
 
         //Then -- each players has 4 PlayerCard
         final int initialCardsPerMember = 4;
-        assertThat(w.memberHandSize(ownr.aggregateId()).get()).isEqualTo(initialCardsPerMember);
-        assertThat(w.memberHandSize(user.aggregateId()).get()).isEqualTo(initialCardsPerMember);
+        assertThat(w.memberHandSize(ownr.aggregateId())).isEqualTo(initialCardsPerMember);
+        assertThat(w.memberHandSize(user.aggregateId())).isEqualTo(initialCardsPerMember);
 
         //Then -- the player draw cards is initialized
         final int remainingDrawPlayerCards = CityId.values().length - (initialCardsPerMember * 2);

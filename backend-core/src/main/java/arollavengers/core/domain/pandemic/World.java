@@ -8,7 +8,7 @@ import arollavengers.core.exceptions.pandemic.*;
 import arollavengers.core.infrastructure.*;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.base.Optional;
-import org.jetbrains.annotations.NotNull;
+import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -119,7 +119,9 @@ public class World extends AggregateRoot<WorldEvent> {
 
     @OnEvent
     private void doEnrole(final WorldMemberJoinedTeamEvent event) {
-        team.enrole(new Member(event.newComerId(), event.role()));
+        final Member newMember = new Member(event.newComerId(), event.role());
+        team.enrole(newMember);
+        memberStates.createMemberState(newMember);
     }
 
     /**
@@ -150,7 +152,7 @@ public class World extends AggregateRoot<WorldEvent> {
 
         for (Member member : team()) {
             for (int i = team().size(); i < 6; i++) {
-                applyNewEvent(new DrawnCardInPlayerDrawCardEvent(aggregateId(), member.role()));
+                applyNewEvent(new DrawnCardInPlayerDrawCardEvent(aggregateId(), member));
             }
         }
 
@@ -166,7 +168,7 @@ public class World extends AggregateRoot<WorldEvent> {
     @OnEvent
     private void doDrawCardInPlayerDrawCards(final DrawnCardInPlayerDrawCardEvent event) {
         PlayerCard card = playerDrawCard.drawTop();
-        team().findMember(event.memberRole()).get().addToHand(card);
+        memberStates.getStateOf(event.member()).addToHand(card);
     }
 
 
@@ -270,16 +272,6 @@ public class World extends AggregateRoot<WorldEvent> {
         return team;
     }
 
-    public Optional<Integer> memberHandSize(@NotNull Id userId) {
-        final Optional<Member> member = team().findMember(userId);
-
-        if (member.isPresent()) {
-            return Optional.of(member.get().handSize());
-        }
-
-        return Optional.absent();
-    }
-
     @Override
     protected UnitOfWork unitOfWork() {
         return uow;
@@ -314,6 +306,16 @@ public class World extends AggregateRoot<WorldEvent> {
 
     public Collection<CityId> citiesWithResearchCenters() {
         return cityStates.citiesWithResearchCenters();
+    }
+
+    public int memberHandSize(final Id userId) {
+        Preconditions.checkNotNull(userId);
+
+        final Optional<Member> member = team().findMember(userId);
+        Preconditions.checkState(member.isPresent());
+
+        return memberStates.getStateOf(member.get()).handSize();
+
     }
 }
 
