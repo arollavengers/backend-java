@@ -266,6 +266,12 @@ public class WorldTest {
         assertThat(w.citiesWithResearchCenters()).hasSize(1);
         assertThat(w.citiesWithResearchCenters().iterator().next()).isEqualTo(CityId.Atlanta);
 
+        //Then -- Infection rate is 2
+        assertThat(w.infectionRate()).isEqualTo(2);
+
+        //Then -- Number of outbreaks
+        assertThat(w.outbreaks()).isEqualTo(0);
+
     }
 
     private static User createUser(UnitOfWork uow, String login) {

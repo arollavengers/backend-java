@@ -38,6 +38,10 @@ public class World extends AggregateRoot<WorldEvent> {
 
     private PlayerDrawCard playerDrawCard;
 
+    private int infectionRate = -1;
+
+    private int outbreaks = -1;
+
     public World(UnitOfWork uow) {
         this.uow = uow;
         this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
@@ -148,8 +152,6 @@ public class World extends AggregateRoot<WorldEvent> {
 
         playerDrawCard.buildAndShuffle();
 
-        this.started = true;
-
         for (Member member : team()) {
             for (int i = team().size(); i < 6; i++) {
                 applyNewEvent(new DrawnCardInPlayerDrawCardEvent(aggregateId(), member));
@@ -157,6 +159,11 @@ public class World extends AggregateRoot<WorldEvent> {
         }
 
         applyNewEvent(new ResearchCenterBuiltEvent(aggregateId(), CityId.Atlanta));
+
+        //TODO do this in event ?
+        this.infectionRate = 2;
+
+        this.started = true;
     }
 
 
@@ -316,6 +323,14 @@ public class World extends AggregateRoot<WorldEvent> {
 
         return memberStates.getStateOf(member.get()).handSize();
 
+    }
+
+    public int infectionRate() {
+        return this.infectionRate;
+    }
+
+    public int outbreaks() {
+        return this.outbreaks;
     }
 }
 
