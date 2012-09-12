@@ -1,36 +1,51 @@
 package arollavengers.core.domain.pandemic;
 
+import com.google.common.base.Preconditions;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class CityState {
 
-  private Map<Disease, Integer> cubes;
+    private Map<Disease, Integer> cubes;
 
-  public CityState() {
-    cubes = new HashMap<Disease, Integer>();
-    for (Disease disease : Disease.values()) {
-      cubes.put(disease, 0);
+    private boolean researchCenter;
+
+    public CityState() {
+        cubes = new HashMap<Disease, Integer>();
+        for (Disease disease : Disease.values()) {
+            cubes.put(disease, 0);
+        }
+
+        this.researchCenter = false;
     }
-  }
 
-  public int numberOfCubes(final Disease disease) {
-    return cubes.get(disease);
-  }
-
-  public void removeOneCube(final Disease disease) {
-    alreadyFreeOf(disease);
-    cubes.put(disease, Math.max(0, numberOfCubes(disease) - 1));
-  }
-
-  public void removeAllCubes(final Disease disease) {
-    alreadyFreeOf(disease);
-    cubes.put(disease, 0);
-  }
-
-  private void alreadyFreeOf(final Disease disease) {
-    if (numberOfCubes(disease) == 0) {
-      throw new IllegalStateException("City already free of " + disease);
+    public int numberOfCubes(final Disease disease) {
+        return cubes.get(disease);
     }
-  }
+
+    public void removeOneCube(final Disease disease) {
+        alreadyFreeOf(disease);
+        cubes.put(disease, Math.max(0, numberOfCubes(disease) - 1));
+    }
+
+    public void removeAllCubes(final Disease disease) {
+        alreadyFreeOf(disease);
+        cubes.put(disease, 0);
+    }
+
+    private void alreadyFreeOf(final Disease disease) {
+        if (numberOfCubes(disease) == 0) {
+            throw new IllegalStateException("City already free of " + disease);
+        }
+    }
+
+    public boolean hasResearchCenter() {
+        return researchCenter;
+    }
+
+    public void buildResearchCenter() {
+        Preconditions.checkState(!hasResearchCenter());
+        this.researchCenter = true;
+    }
 }

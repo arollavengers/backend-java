@@ -10,6 +10,7 @@ import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.base.Optional;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -152,8 +153,15 @@ public class World extends AggregateRoot<WorldEvent> {
                 applyNewEvent(new DrawnCardInPlayerDrawCardEvent(aggregateId(), member.role()));
             }
         }
+
+        applyNewEvent(new ResearchCenterBuiltEvent(aggregateId(), CityId.Atlanta));
     }
 
+
+    @OnEvent
+    private void doBuildResearchCenter(final ResearchCenterBuiltEvent event) {
+        cityStates.buildResearchCenter(event.city());
+    }
 
     @OnEvent
     private void doDrawCardInPlayerDrawCards(final DrawnCardInPlayerDrawCardEvent event) {
@@ -302,6 +310,10 @@ public class World extends AggregateRoot<WorldEvent> {
 
     public int playerDrawCardsSize() {
         return playerDrawCard.size();
+    }
+
+    public Collection<CityId> citiesWithResearchCenters() {
+        return cityStates.citiesWithResearchCenters();
     }
 }
 

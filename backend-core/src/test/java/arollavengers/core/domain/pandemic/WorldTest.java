@@ -56,8 +56,10 @@ public class WorldTest {
             assertThat(w.hasCureFor(disease)).isFalse();
         }
 
-        // Then -- game is not initialized yet
+        // Then -- cards are not initialized yet
         assertThat(w.playerDrawCardsSize()).isEqualTo(0);
+        //      -- No city has a research center
+        assertThat(w.citiesWithResearchCenters()).hasSize(0);
     }
 
     @Test(expected = EntityIdAlreadyAssignedException.class)
@@ -243,6 +245,7 @@ public class WorldTest {
         w.registerMember(ownr, MemberRole.Dispatcher);
         w.registerMember(user, MemberRole.Medic);
 
+
         //When -- game is started
         w.startGame();
 
@@ -258,6 +261,10 @@ public class WorldTest {
         //Then -- the player draw cards is initialized
         final int remainingDrawPlayerCards = CityId.values().length - (initialCardsPerMember * 2);
         assertThat(w.playerDrawCardsSize()).isEqualTo(remainingDrawPlayerCards);
+
+        //Then -- Atlanta is the only city with a research center
+        assertThat(w.citiesWithResearchCenters()).hasSize(1);
+        assertThat(w.citiesWithResearchCenters().iterator().next()).isEqualTo(CityId.Atlanta);
 
     }
 
