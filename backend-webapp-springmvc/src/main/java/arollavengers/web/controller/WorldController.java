@@ -17,12 +17,13 @@ public class WorldController {
   WorldService worldService;
 
   @RequestMapping("/create")
-  public Id create(UserId ownerId, Difficulty difficulty) {
+  public Id create(Id ownerId, Difficulty difficulty) {
 
     Assert.notNull(ownerId, "Owner is mandatory");
     Assert.notNull(difficulty, "difficulty is mandatory");
 
-    //TODO make this controller better
-    return worldService.createNew(User.withId(ownerId), difficulty);
+    Id worldId = Id.next();
+    worldService.createWorld(worldId, ownerId, difficulty);
+    return worldId;
   }
 }

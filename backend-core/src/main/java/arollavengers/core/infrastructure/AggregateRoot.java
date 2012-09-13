@@ -1,9 +1,10 @@
 package arollavengers.core.infrastructure;
 
 
-import arollavengers.core.domain.pandemic.MemberRole;
 import arollavengers.core.exceptions.IncompatibleEventIdException;
 import arollavengers.core.exceptions.InvalidEventSequenceException;
+
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AggregateRoot<E extends DomainEvent> {
 
@@ -45,8 +46,8 @@ public abstract class AggregateRoot<E extends DomainEvent> {
    *
    * @param stream Stream of events to rebuild state from
    */
-  public void loadFromHistory(Stream<E> stream) {
-    stream.foreach(new Function<E>() {
+  public void loadFromHistory(@NotNull Stream<E> stream) {
+    stream.consume(new Function<E>() {
       public void apply(E event) {
         applyEvent(event, false);
       }

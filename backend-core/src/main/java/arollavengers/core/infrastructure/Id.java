@@ -1,8 +1,10 @@
 package arollavengers.core.infrastructure;
 
+import arollavengers.core.pattern.annotation.ValueObject;
+
 import java.util.UUID;
 
-
+@ValueObject
 public class Id {
 
   public static Id undefined() {
@@ -10,12 +12,12 @@ public class Id {
   }
 
   public static Id next() {
-    return new Id(UUID.randomUUID());
+    return new Id(UUID.randomUUID().toString());
   }
 
-  private final UUID uuid;
+  private final String uuid;
 
-  private Id(final UUID uuid) {
+  private Id(final String uuid) {
     this.uuid = uuid;
   }
 
@@ -33,12 +35,35 @@ public class Id {
   }
 
   public boolean isUndefined() {
-    return this.equals(Id.undefined());
+    return this == UNDEFINED_ID;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    Id id = (Id) o;
+    return uuid.equals(id.uuid);
+  }
+
+  @Override
+  public int hashCode() {
+    return uuid.hashCode();
   }
 
   private static final UndefinedId UNDEFINED_ID = new UndefinedId();
+
+  public static Id create(String uuid) {
+    return new Id(uuid);
+  }
+
   private static class UndefinedId extends Id {
-  @Override
+    @Override
     public String toString() {
       return "UndefinedId";
     }

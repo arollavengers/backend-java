@@ -20,7 +20,7 @@ public class CityState {
 
   public void removeOneCube(final Disease disease) {
     alreadyFreeOf(disease);
-    cubes.put(disease, Math.max(0, numberOfCubes(disease) - 1));
+    cubes.put(disease, numberOfCubes(disease) - 1);
   }
 
   public void removeAllCubes(final Disease disease) {
@@ -32,5 +32,9 @@ public class CityState {
     if (numberOfCubes(disease) == 0) {
       throw new IllegalStateException("City already free of " + disease);
     }
+  }
+
+  public void addCubes(Disease disease) {
+    cubes.put(disease, numberOfCubes(disease) + 1);
   }
 }

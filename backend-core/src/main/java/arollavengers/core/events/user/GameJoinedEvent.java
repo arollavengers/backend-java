@@ -7,28 +7,33 @@ import arollavengers.core.infrastructure.Id;
  */
 public class GameJoinedEvent implements UserEvent {
 
-    private long version;
-    private final Id userId;
-    private final Id gameId;
+  private long version;
+  private final Id userId;
+  private final Id gameId;
 
-    public GameJoinedEvent(Id userId, Id gameId) {
-        this.userId = userId;
-        this.gameId = gameId;
-    }
+  public GameJoinedEvent(Id userId, Id gameId) {
+    this.userId = userId;
+    this.gameId = gameId;
+  }
 
-    public long version() {
-        return version;
-    }
+  public long version() {
+    return version;
+  }
 
-    public void assignVersion(final long version) {
-        this.version = version;
-    }
+  public void assignVersion(final long version) {
+    this.version = version;
+  }
 
-    public Id aggregateId() {
-        return userId;
-    }
+  public Id aggregateId() {
+    return userId;
+  }
 
-    public Id gameId() {
-        return gameId;
-    }
+  public Id gameId() {
+    return gameId;
+  }
+
+  @Override
+  public String toString() {
+    return "GameJoinedEvent[" + userId + ", v" + version + ", " + gameId + "]";
+  }
 }

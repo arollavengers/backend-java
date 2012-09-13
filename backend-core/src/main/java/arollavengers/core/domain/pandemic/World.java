@@ -21,7 +21,6 @@ import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -191,7 +190,7 @@ public class World extends AggregateRoot<WorldEvent> {
   }
 
   /**
-   * Team is mutable and thus should not be accessible from outside and kept private.
+   * Team is mutable and thus should not be accessible from outside and must be kept private.
    *
    * @see #rolesAssigned()
    * @see #isRoleAssigned(MemberRole)
