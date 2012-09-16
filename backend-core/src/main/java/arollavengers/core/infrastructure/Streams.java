@@ -1,5 +1,7 @@
 package arollavengers.core.infrastructure;
 
+import com.google.common.collect.Lists;
+
 import java.util.List;
 
 /**
@@ -24,4 +26,14 @@ public class Streams {
     };
   }
 
+  public static <E> List<E> toList(Stream<E> stream) {
+    final List<E> elements = Lists.newArrayList();
+    stream.consume(new Function<E>() {
+      @Override
+      public void apply(E e) {
+        elements.add(e);
+      }
+    });
+    return elements;
+  }
 }

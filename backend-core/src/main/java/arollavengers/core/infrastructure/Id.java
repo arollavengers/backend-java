@@ -2,6 +2,8 @@ package arollavengers.core.infrastructure;
 
 import arollavengers.core.pattern.annotation.ValueObject;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.UUID;
 
 @ValueObject
@@ -15,6 +17,7 @@ public class Id {
     return new Id(UUID.randomUUID().toString());
   }
 
+  @JsonProperty
   private final String uuid;
 
   private Id(final String uuid) {
@@ -31,9 +34,10 @@ public class Id {
     if (uuid == null) {
       throw new NullPointerException("UUID is null, should not happen");
     }
-    return uuid.toString();
+    return uuid;
   }
 
+  @JsonIgnore
   public boolean isUndefined() {
     return this == UNDEFINED_ID;
   }

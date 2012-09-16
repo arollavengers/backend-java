@@ -2,18 +2,34 @@ package arollavengers.core.events.user;
 
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class UserCreatedEvent implements UserEvent {
 
+  @JsonProperty
   private long version;
+
+  @JsonProperty
   private final Id newUserId;
+
+  @JsonProperty
   private final String login;
+
+  @JsonProperty
   private final char[] passwordDigest;
+
+  @JsonProperty
   private final char[] salt;
 
-  public UserCreatedEvent(Id newUserId, String login, char[] passwordDigest, char[] salt) {
+  @JsonCreator
+  public UserCreatedEvent(@JsonProperty("newUserId") Id newUserId,
+                          @JsonProperty("login") String login,
+                          @JsonProperty("passwordDigest") char[] passwordDigest,
+                          @JsonProperty("salt") char[] salt) {
     this.newUserId = newUserId;
     this.login = login;
     this.passwordDigest = passwordDigest;

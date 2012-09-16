@@ -12,6 +12,8 @@ import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import arollavengers.core.pattern.annotation.DependencyInjection;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 import javax.inject.Inject;
 import java.util.TreeSet;
 
@@ -119,7 +121,10 @@ public class UserLoginIndexSupport implements UserLoginIndex {
 
   public static abstract class LoginEvent implements DomainEvent {
 
+    @JsonProperty
     private long version;
+
+    @JsonProperty
     private final Id indexId;
 
     protected LoginEvent(Id indexId) {
@@ -140,10 +145,13 @@ public class UserLoginIndexSupport implements UserLoginIndex {
     }
   }
 
-  private static class LoginAddedEvent extends LoginEvent {
+  public static class LoginAddedEvent extends LoginEvent {
+
+    @JsonProperty
     private final String login;
 
-    protected LoginAddedEvent(Id indexId, String login) {
+    @JsonCreator
+    public LoginAddedEvent(@JsonProperty("indexId") Id indexId, @JsonProperty("login") String login) {
       super(indexId);
       this.login = login;
     }
@@ -158,10 +166,13 @@ public class UserLoginIndexSupport implements UserLoginIndex {
     }
   }
 
-  private static class LoginRemovedEvent extends LoginEvent {
+  public static class LoginRemovedEvent extends LoginEvent {
+
+    @JsonProperty
     private final String login;
 
-    protected LoginRemovedEvent(Id indexId, String login) {
+    @JsonCreator
+    public LoginRemovedEvent(@JsonProperty("indexId") Id indexId, @JsonProperty("login") String login) {
       super(indexId);
       this.login = login;
     }
@@ -176,8 +187,10 @@ public class UserLoginIndexSupport implements UserLoginIndex {
     }
   }
 
-  private static class LoginIndexCreatedEvent extends LoginEvent {
-    protected LoginIndexCreatedEvent(Id indexId) {
+  public static class LoginIndexCreatedEvent extends LoginEvent {
+
+    @JsonCreator
+    public LoginIndexCreatedEvent(@JsonProperty("indexId") Id indexId) {
       super(indexId);
     }
 

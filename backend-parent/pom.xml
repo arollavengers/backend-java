@@ -105,6 +105,12 @@
         <version>2.5</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.prevayler.extras</groupId>
+        <artifactId>prevayler-xstream</artifactId>
+        <version>2.5</version>
+      </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- ~~~~~~~~~~~~~~Guava~~~~~~~~~~~~~~~~ -->
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
