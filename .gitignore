@@ -22,6 +22,7 @@ file/
 target/
 bin/
 test-output/
+tmp/
 
 # other scm
 .svn
