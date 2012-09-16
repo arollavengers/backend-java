@@ -2,6 +2,9 @@ package arollavengers.core.domain.pandemic;
 
 import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserRepository;
+import arollavengers.core.events.pandemic.DrawnCardInPlayerDrawCardEvent;
+import arollavengers.core.events.pandemic.GameStartedEvent;
+import arollavengers.core.events.pandemic.ResearchCenterBuiltEvent;
 import arollavengers.core.events.pandemic.WorldCityCuredEvent;
 import arollavengers.core.events.pandemic.WorldCityTreatedEvent;
 import arollavengers.core.events.pandemic.WorldCreatedEvent;
@@ -10,7 +13,11 @@ import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.events.pandemic.WorldMemberActionSpentEvent;
 import arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent;
 import arollavengers.core.exceptions.EntityIdAlreadyAssignedException;
+import arollavengers.core.exceptions.pandemic.GameAlreadyStartedException;
+import arollavengers.core.exceptions.pandemic.InvalidUserException;
 import arollavengers.core.exceptions.pandemic.NoDiseaseToCureException;
+import arollavengers.core.exceptions.pandemic.NotEnoughPlayerException;
+import arollavengers.core.exceptions.pandemic.UserAlreadyRegisteredException;
 import arollavengers.core.exceptions.pandemic.WorldNotYetCreatedException;
 import arollavengers.core.exceptions.pandemic.WorldNumberOfRoleLimitReachedException;
 import arollavengers.core.exceptions.pandemic.WorldRoleAlreadyChosenException;
@@ -20,208 +27,330 @@ import arollavengers.core.infrastructure.EventHandler;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class World extends AggregateRoot<WorldEvent> {
-  public static final int MAX_ROLES = 4;
-  private final UnitOfWork uow;
-  private final EventHandler<WorldEvent> eventHandler;
 
-  // ~~~ World state
-  private Id ownerId;
+    public static final int MAX_TEAM_SIZE = 4;
+    public static final int MIN_TEAM_SIZE = 2;
+    private final UnitOfWork uow;
+    private final EventHandler<WorldEvent> eventHandler;
 
-  private Difficulty difficulty;
+    // ~~~ World state
+    private Id ownerId;
 
-  private MemberStates memberStates;
+    private Difficulty difficulty;
 
-  private Team team;
+    private MemberStates memberStates;
 
-  private CityStates cityStates;
+    private Team team;
 
-  private Set<Disease> eradicatedDiseases;
-  private Set<Disease> curedDiseases;
+    private CityStates cityStates;
 
-  public World(UnitOfWork uow) {
-    this.uow = uow;
-    this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
-  }
+    private Set<Disease> eradicatedDiseases;
+    private Set<Disease> curedDiseases;
 
-  /**
-   * Create a new world of given id and difficulty owned by a user
-   *
-   * @param newId      Id of the world
-   * @param owner      Owner of this world
-   * @param difficulty Difficulty of the game
-   */
-  public void createWorld(Id newId, User owner, Difficulty difficulty) {
-    if (!aggregateId().isUndefined()) {
-      throw new EntityIdAlreadyAssignedException(aggregateId(), newId);
-    }
-    final WorldCreatedEvent worldCreatedEvent = new WorldCreatedEvent(newId, owner.aggregateId(), difficulty);
-    applyNewEvent(worldCreatedEvent);
-  }
+    private boolean started;
 
-  @OnEvent
-  private void doCreateWorld(WorldCreatedEvent event) {
-    assignId(event.aggregateId());
-    this.difficulty = event.difficulty();
-    this.ownerId = event.ownerId();
-    this.memberStates = new MemberStates();
-    this.cityStates = new CityStates();
-    this.eradicatedDiseases = new HashSet<Disease>();
-    this.curedDiseases = new HashSet<Disease>();
-    this.team = new Team();
-  }
+    private PlayerDrawCard playerDrawCard;
 
-  /**
-   * Register a new user with the given role in the game.
-   *
-   * @param user user that wants to join the game
-   * @param role role of the user in the game
-   */
-  public void registerMember(User user, MemberRole role) {
-    ensureWorldIsCreated();
+    private int infectionRate = -1;
 
-    if (team().roles().size() >= MAX_ROLES) {
-      throw new WorldNumberOfRoleLimitReachedException(role);
+    private int outbreaks = -1;
+
+
+    public World(UnitOfWork uow) {
+        this.uow = uow;
+        this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
     }
 
-    if (team().hasRole(role)) {
-      throw new WorldRoleAlreadyChosenException(aggregateId(), role);
+    /**
+     * Create a new world of given id and difficulty owned by a user
+     *
+     * @param newId      Id of the world
+     * @param owner      Owner of this world
+     * @param difficulty Difficulty of the game
+     */
+    public void createWorld(Id newId, User owner, Difficulty difficulty) {
+        ensureValidUser(owner);
+
+        if (!aggregateId().isUndefined()) {
+            throw new EntityIdAlreadyAssignedException(aggregateId(), newId);
+        }
+        final WorldCreatedEvent worldCreatedEvent = new WorldCreatedEvent(newId, owner.aggregateId(), difficulty);
+        applyNewEvent(worldCreatedEvent);
     }
 
-    applyNewEvent(new WorldMemberJoinedTeamEvent(aggregateId(), user.aggregateId(), role));
-  }
-
-  @OnEvent
-  private void doEnrole(final WorldMemberJoinedTeamEvent event) {
-    team.enrole(new Member(event.aggregateId(), event.role()));
-  }
-
-  /**
-   * Treat a city by a member of team removing one cube of given disease
-   *
-   * @param member  Action doer
-   * @param city    City to treat
-   * @param disease Disease to treat
-   */
-  public void treatCity(Member member, CityId city, Disease disease) {
-    MemberState memberState = memberStates.getStateOf(member);
-    // fail if it is not player's turn or no more action point
-    memberState.ensureActionIsAuthorized();
-
-    CityState cityState = cityStates.getStateOf(city);
-    int cityDiseaseCubes = cityState.numberOfCubes(disease);
-    if (cityDiseaseCubes == 0) {
-      throw new NoDiseaseToCureException(aggregateId(), city, disease);
+    @OnEvent
+    private void doCreateWorld(WorldCreatedEvent event) {
+        assignId(event.aggregateId());
+        this.difficulty = event.difficulty();
+        this.ownerId = event.ownerId();
+        this.memberStates = new MemberStates();
+        this.cityStates = new CityStates();
+        this.eradicatedDiseases = new HashSet<Disease>();
+        this.curedDiseases = new HashSet<Disease>();
+        this.team = new Team();
+        this.playerDrawCard = new PlayerDrawCard();
+        this.infectionRate = 2;
+        this.outbreaks = 0;
     }
 
-    applyNewEvent(new WorldMemberActionSpentEvent(aggregateId(), member.userId()));
+    /**
+     * Register a new user with the given role in the game.
+     *
+     * @param user user that wants to join the game
+     * @param role role of the user in the game
+     */
+    public void registerMember(User user, MemberRole role) {
+        ensureWorldIsCreated();
 
-    int nbCubeTreated;
-    if (hasCureFor(disease) || member.role() == MemberRole.Medic) {
-      nbCubeTreated = cityDiseaseCubes;
-      applyNewEvent(new WorldCityCuredEvent(aggregateId(),
-              member.userId(),
-              city,
-              disease));
+        ensureValidUser(user);
+
+        ensureGameIsNotAlreadyStarted();
+
+
+        if (team().size() >= MAX_TEAM_SIZE) {
+            throw new WorldNumberOfRoleLimitReachedException(role);
+        }
+
+        if (team().hasRole(role)) {
+            throw new WorldRoleAlreadyChosenException(aggregateId(), role);
+        }
+
+        final Optional<Member> member = team().findMember(user.aggregateId());
+        if (member.isPresent()) {
+            throw new UserAlreadyRegisteredException(aggregateId(), member.get().userId());
+        }
+        applyNewEvent(new WorldMemberJoinedTeamEvent(aggregateId(), user.aggregateId(), role));
     }
-    else {
-      nbCubeTreated = 1;
-      applyNewEvent(new WorldCityTreatedEvent(aggregateId(),
-              member.userId(),
-              city,
-              disease));
+
+    private void ensureGameIsNotAlreadyStarted() {
+        if (isStarted()) {
+            throw new GameAlreadyStartedException();
+        }
     }
 
-    // check for eradication
-    int worldDiseaseCubes = cityStates.numberOfCubes(disease);
-    if (worldDiseaseCubes == nbCubeTreated) {
-      applyNewEvent(new WorldDiseaseEradicatedEvent(aggregateId(),
-              member.userId(),
-              disease));
+    private void ensureValidUser(final User user) {
+        if (user.aggregateId().isUndefined()) {
+            throw new InvalidUserException(user);
+        }
     }
-  }
 
-  @OnEvent
-  private void doTreatCity(WorldCityTreatedEvent event) {
-    CityState cityState = cityStates.getStateOf(event.city());
-    cityState.removeOneCube(event.disease());
-  }
-
-  @OnEvent
-  private void doCureCity(WorldCityCuredEvent event) {
-    CityState cityState = cityStates.getStateOf(event.city());
-    cityState.removeAllCubes(event.disease());
-  }
-
-  @OnEvent
-  private void doMarkDiseaseEradicated(WorldDiseaseEradicatedEvent event) {
-    eradicatedDiseases.add(event.disease());
-  }
-
-  /**
-   * Returns the world's owner id.
-   */
-  public Id ownerId() {
-    return ownerId;
-  }
-
-  /**
-   * Returns the world's owner.
-   * @see #ownerId()
-   */
-  User owner(UserRepository repository) {
-    return repository.getUser(uow, ownerId);
-  }
-
-  boolean hasCureFor(final Disease disease) {
-    return curedDiseases.contains(disease);
-  }
-
-  boolean hasBeenEradicated(final Disease disease) {
-    return eradicatedDiseases.contains(disease);
-  }
-
-  Difficulty difficulty() {
-    return difficulty;
-  }
-
-  /**
-   * Team is mutable and thus should not be accessible from outside and must be kept private.
-   *
-   * @see #rolesAssigned()
-   * @see #isRoleAssigned(MemberRole)
-   */
-  private Team team() {
-    return team;
-  }
-
-  @Override
-  protected UnitOfWork unitOfWork() {
-    return uow;
-  }
-
-  @Override
-  protected EventHandler<WorldEvent> internalEventHandler() {
-    return eventHandler;
-  }
-
-  private void ensureWorldIsCreated() {
-    if (aggregateId().isUndefined()) {
-      throw new WorldNotYetCreatedException();
+    @OnEvent
+    private void doEnrole(final WorldMemberJoinedTeamEvent event) {
+        final Member newMember = new Member(event.newComerId(), event.role());
+        team.enrole(newMember);
+        memberStates.createMemberState(newMember);
     }
-  }
 
-  public Set<MemberRole> rolesAssigned() {
-    return team().roles();
-  }
+    /**
+     * Start the game. It does the following actions:
+     * - start the game (nobody can register for playing anymore)
+     * - initialize draw cards
+     * - give initial hand to member
+     */
+    public void startGame() {
 
-  public boolean isRoleAssigned(MemberRole role) {
-    return team().hasRole(role);
-  }
+        ensureWorldIsCreated();
+
+        final int teamSize = team().size();
+        if (teamSize < MIN_TEAM_SIZE) {
+            throw new NotEnoughPlayerException(teamSize, MIN_TEAM_SIZE);
+        }
+
+        applyNewEvent(new GameStartedEvent(aggregateId()));
+
+    }
+
+    @OnEvent
+    private void doStartGame(final GameStartedEvent event) {
+
+        playerDrawCard.buildAndShuffle();
+
+        for (Member member : team()) {
+            for (int i = team().size(); i < 6; i++) {
+                applyNewEvent(new DrawnCardInPlayerDrawCardEvent(aggregateId(), member));
+            }
+        }
+
+        applyNewEvent(new ResearchCenterBuiltEvent(aggregateId(), CityId.Atlanta));
+
+        this.started = true;
+    }
+
+
+    @OnEvent
+    private void doBuildResearchCenter(final ResearchCenterBuiltEvent event) {
+        cityStates.buildResearchCenter(event.city());
+    }
+
+    @OnEvent
+    private void doDrawCardInPlayerDrawCards(final DrawnCardInPlayerDrawCardEvent event) {
+        PlayerCard card = playerDrawCard.drawTop();
+        memberStates.getStateOf(event.member()).addToHand(card);
+    }
+
+    /**
+     * Treat a city by a member of team removing one cube of given disease
+     *
+     * @param member  Action doer
+     * @param city    City to treat
+     * @param disease Disease to treat
+     */
+    public void treatCity(Member member, CityId city, Disease disease) {
+        MemberState memberState = memberStates.getStateOf(member);
+        // fail if it is not player's turn or no more action point
+        memberState.ensureActionIsAuthorized();
+
+        CityState cityState = cityStates.getStateOf(city);
+        int cityDiseaseCubes = cityState.numberOfCubes(disease);
+        if (cityDiseaseCubes == 0) {
+            throw new NoDiseaseToCureException(aggregateId(), city, disease);
+        }
+
+        applyNewEvent(new WorldMemberActionSpentEvent(aggregateId(), member.userId()));
+
+        int nbCubeTreated;
+        if (hasCureFor(disease) || member.role() == MemberRole.Medic) {
+            nbCubeTreated = cityDiseaseCubes;
+            applyNewEvent(new WorldCityCuredEvent(aggregateId(),
+                    member.userId(),
+                    city,
+                    disease));
+        }
+        else {
+            nbCubeTreated = 1;
+            applyNewEvent(new WorldCityTreatedEvent(aggregateId(),
+                    member.userId(),
+                    city,
+                    disease));
+        }
+
+        // check for eradication
+        int worldDiseaseCubes = cityStates.numberOfCubes(disease);
+        if (worldDiseaseCubes == nbCubeTreated) {
+            applyNewEvent(new WorldDiseaseEradicatedEvent(aggregateId(),
+                    member.userId(),
+                    disease));
+        }
+    }
+
+    @OnEvent
+    private void doTreatCity(WorldCityTreatedEvent event) {
+        CityState cityState = cityStates.getStateOf(event.city());
+        cityState.removeOneCube(event.disease());
+    }
+
+    @OnEvent
+    private void doCureCity(WorldCityCuredEvent event) {
+        CityState cityState = cityStates.getStateOf(event.city());
+        cityState.removeAllCubes(event.disease());
+    }
+
+    @OnEvent
+    private void doMarkDiseaseEradicated(WorldDiseaseEradicatedEvent event) {
+        eradicatedDiseases.add(event.disease());
+    }
+
+    /**
+     * Returns the world's owner id.
+     */
+    public Id ownerId() {
+        return ownerId;
+    }
+
+    /**
+     * @param repository Repository used to retrieve the user
+     * @return the world's owner. User returns will be automatically attached
+     *         to the world's unit of work.
+     * @see #ownerId()
+     */
+    User owner(UserRepository repository) {
+        return repository.getUser(uow, ownerId);
+    }
+
+    boolean hasCureFor(final Disease disease) {
+        return curedDiseases.contains(disease);
+    }
+
+    boolean hasBeenEradicated(final Disease disease) {
+        return eradicatedDiseases.contains(disease);
+    }
+
+    Difficulty difficulty() {
+        return difficulty;
+    }
+
+    /**
+     * Team is mutable and thus should not be accessible from outside and must be kept private.
+     *
+     * @return The team playing
+     * @see #rolesAssigned()
+     * @see #isRoleAssigned(MemberRole)
+     */
+    private Team team() {
+        return team;
+    }
+
+    @Override
+    protected UnitOfWork unitOfWork() {
+        return uow;
+    }
+
+    @Override
+    protected EventHandler<WorldEvent> internalEventHandler() {
+        return eventHandler;
+    }
+
+    private void ensureWorldIsCreated() {
+        if (aggregateId().isUndefined()) {
+            throw new WorldNotYetCreatedException();
+        }
+    }
+
+    public Set<MemberRole> rolesAssigned() {
+        return team().roles();
+    }
+
+    public boolean isRoleAssigned(MemberRole role) {
+        return team().hasRole(role);
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public int playerDrawCardsSize() {
+        return playerDrawCard.size();
+    }
+
+    public Collection<CityId> citiesWithResearchCenters() {
+        return cityStates.citiesWithResearchCenters();
+    }
+
+    public int memberHandSize(final Id userId) {
+        Preconditions.checkNotNull(userId);
+
+        final Optional<Member> member = team().findMember(userId);
+        Preconditions.checkState(member.isPresent());
+
+        return memberStates.getStateOf(member.get()).handSize();
+
+    }
+
+    public int infectionRate() {
+        return this.infectionRate;
+    }
+
+    public int outbreaks() {
+        return this.outbreaks;
+    }
 }
 
 
