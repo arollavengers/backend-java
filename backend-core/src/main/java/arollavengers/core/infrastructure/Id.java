@@ -12,7 +12,8 @@ public class Id {
 
     private static final UndefinedId UNDEFINED_ID = new UndefinedId();
 
-    public static Id create(String uuid) {
+    @JsonCreator
+    public static Id create(@JsonProperty("uuid") String uuid) {
         if (uuid == null) {
             return UNDEFINED_ID;
         }
@@ -30,8 +31,7 @@ public class Id {
     @JsonProperty
     private final String uuid;
 
-    @JsonCreator
-    private Id(@JsonProperty("uuid") final String uuid) {
+    private Id(final String uuid) {
         this.uuid = uuid;
     }
 
@@ -40,11 +40,12 @@ public class Id {
         this.uuid = null;
     }
 
+    public String toUUID() {
+        return uuid;
+    }
+
     @Override
     public String toString() {
-        if (uuid == null) {
-            throw new NullPointerException("UUID is null, should not happen");
-        }
         return uuid;
     }
 
@@ -68,7 +69,7 @@ public class Id {
 
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return (uuid==null)?0:uuid.hashCode();
     }
 
     private static class UndefinedId extends Id {

@@ -1,9 +1,10 @@
 package arollavengers.core.infrastructure;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 public interface Stream<E> {
-  void consume(Function<E> function);
+    /**
+     * @return <code>true</code> if, and only if, there is at least one element remaining in this stream
+     */
+    boolean hasRemaining();
+
+    void consume(Function<E> function);
 }

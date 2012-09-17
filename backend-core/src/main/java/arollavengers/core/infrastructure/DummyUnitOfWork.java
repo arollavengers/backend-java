@@ -88,6 +88,8 @@ public class DummyUnitOfWork implements UnitOfWork {
         private EventStore eventStore;
 
         private Uncommitted(Id aggregateId) {
+            if(aggregateId.isUndefined())
+                throw new RuntimeException("Id cannot be undefined here!");
             this.aggregateId = aggregateId;
         }
 

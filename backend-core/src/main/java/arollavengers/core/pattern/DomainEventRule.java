@@ -5,7 +5,7 @@ import arollavengers.core.pattern.annotation.ValueObject;
 import java.lang.reflect.Field;
 
 /**
- * A domain event can only be constitued of immutable types.
+ * A domain event can only be constituted of immutable types.
  *
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
