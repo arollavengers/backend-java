@@ -1,8 +1,6 @@
 package arollavengers.core.infrastructure;
 
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.DeserializationContext;
@@ -12,6 +10,8 @@ import org.codehaus.jackson.map.deser.std.StdDeserializer;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.node.ObjectNode;
 import org.prevayler.foundation.serialization.Serializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,6 +23,7 @@ import java.io.StringWriter;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class JacksonSerializer implements Serializer {
+    private static final Logger log = LoggerFactory.getLogger(JacksonSerializer.class);
 
     private ObjectWriter objectWriter;
     private ObjectMapper deserializer;
@@ -49,13 +50,17 @@ public class JacksonSerializer implements Serializer {
 
     @Override
     public void writeObject(OutputStream outputStream, Object object) throws Exception {
-        System.out.println("JacksonSerializer.writeObject(" + object + ")");
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        OutputStream out = outputStream;
+        if (log.isTraceEnabled()) {
+            out = new ByteArrayOutputStream();
+        }
+        objectWriter.writeValue(out, object);
 
-        objectWriter.writeValue(bout, object);
-
-        System.out.println("JacksonSerializer.writeObject(" + bout.toString("utf8") + ")");
-        outputStream.write(bout.toByteArray());
+        if (log.isTraceEnabled()) {
+            ByteArrayOutputStream bout = (ByteArrayOutputStream) out;
+            log.trace("Serialized content: {}", bout.toString("utf-8"));
+            outputStream.write(bout.toByteArray());
+        }
     }
 
     public String serializeAsString(Object event) throws IOException {
@@ -87,11 +92,12 @@ public class JacksonSerializer implements Serializer {
             ObjectMapper mapper = (ObjectMapper) jp.getCodec();
             ObjectNode root = (ObjectNode) mapper.readTree(jp);
 
-
-            ObjectWriter objectWriter = mapper.writerWithDefaultPrettyPrinter();
-            StringWriter writer = new StringWriter();
-            objectWriter.writeValue(writer, root);
-            System.out.println("JacksonSerializer$TypeAwareDeserializer.deserialize: " + writer);
+            if (log.isTraceEnabled()) {
+                ObjectWriter objectWriter = mapper.writerWithDefaultPrettyPrinter();
+                StringWriter writer = new StringWriter();
+                objectWriter.writeValue(writer, root);
+                log.trace("Content to deserialize: {}", writer);
+            }
 
             // remove type info otherwise it cannot be matched to concrete class field
             JsonNode removed = root.get("@class");
