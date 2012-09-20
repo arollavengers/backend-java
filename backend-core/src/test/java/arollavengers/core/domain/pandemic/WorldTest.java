@@ -5,6 +5,7 @@ import arollavengers.core.exceptions.EntityIdAlreadyAssignedException;
 import arollavengers.core.exceptions.pandemic.*;
 import arollavengers.core.infrastructure.DummyUnitOfWork;
 import arollavengers.core.infrastructure.Id;
+import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,13 +17,15 @@ public class WorldTest {
 
     private World w;
     private DummyUnitOfWork uow;
+    private SimpleBus bus;
     private User ownr;
     private User user;
     private User othr;
 
     @Before
     public void newWorld() {
-        uow = new DummyUnitOfWork();
+        bus = new SimpleBus();
+        uow = new DummyUnitOfWork(bus);
         w = new World(uow);
 
         ownr = createUser(uow, "Travis");
@@ -264,7 +267,7 @@ public class WorldTest {
 
         //Then -- Atlanta is the only city with a research center
         assertThat(w.citiesWithResearchCenters()).hasSize(1);
-        assertThat(w.citiesWithResearchCenters().iterator().next()).isEqualTo(CityId.Atlanta);
+        assertThat(w.citiesWithResearchCenters()).contains(CityId.Atlanta);
 
         //Then -- Infection rate is 2
         assertThat(w.infectionRate()).isEqualTo(2);
@@ -276,7 +279,7 @@ public class WorldTest {
 
     private static User createUser(UnitOfWork uow, String login) {
         User user = new User(uow);
-        user.createUser(Id.next(), login, "password".toCharArray(), "salt".toCharArray());
+        user.createUser(Id.next(), login, "password".toCharArray(), "salt".getBytes());
         return user;
     }
 }

@@ -4,21 +4,43 @@ import arollavengers.core.exceptions.InvalidUnitOfWorkStateException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
 public class DummyUnitOfWork implements UnitOfWork {
 
-    private Map<Id, Uncommitted> uncommittedMap = Maps.newHashMap();
-    private Map<Id, AggregateRoot<?>> attachedMap = Maps.newHashMap();
+    private final Map<Id, Uncommitted> uncommittedMap = Maps.newHashMap();
+    private final Map<Id, AggregateRoot<?>> attachedMap = Maps.newHashMap();
+    private final List<Message> unpublishedMessages = Lists.newArrayList();
+    private final Bus bus;
+
+    @Inject
+    public DummyUnitOfWork(Bus bus) {
+        this.bus = bus;
+    }
+
 
     @Override
     public void commit() {
         // c'est ici qu'il faut persister les events ?
         // ... ouep!
+        commitAllUncommited();
+        publishAllUnpublished();
+    }
+
+    private void publishAllUnpublished() {
+        for(Message message: unpublishedMessages) {
+            bus.publish(message);
+        }
+        unpublishedMessages.clear();
+    }
+
+    private void commitAllUncommited() {
         for (Uncommitted uncommitted : uncommittedMap.values()) {
             uncommitted.commit();
         }
+        uncommittedMap.clear();
     }
 
     @Override
@@ -34,6 +56,7 @@ public class DummyUnitOfWork implements UnitOfWork {
         Id aggregateId = event.aggregateId();
         Uncommitted uncommitted = getOrCreateUncommitted(aggregateId);
         uncommitted.add(event);
+        unpublishedMessages.add(event);
     }
 
     private Uncommitted getOrCreateUncommitted(Id id) {
@@ -48,7 +71,7 @@ public class DummyUnitOfWork implements UnitOfWork {
     /**
      * Return a copy of all uncommitted events for all aggregate roots.
      */
-    public List<DomainEvent> getUncommitted() {
+    public List<DomainEvent> getAllUncommitted() {
         List<DomainEvent> collected = Lists.newArrayList();
         for (Uncommitted uncommitted : uncommittedMap.values()) {
             collected.addAll(uncommitted.events);
@@ -109,6 +132,10 @@ public class DummyUnitOfWork implements UnitOfWork {
                 throw new InvalidUnitOfWorkStateException("No event store bound to " + aggregateId);
             }
             eventStore.store(aggregateId, Streams.from(events));
+        }
+
+        public void publish(Bus bus) {
+
         }
     }
 }

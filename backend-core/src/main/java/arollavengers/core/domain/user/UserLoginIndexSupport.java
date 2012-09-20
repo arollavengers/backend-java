@@ -11,12 +11,13 @@ import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import arollavengers.core.pattern.annotation.DependencyInjection;
+import com.google.common.collect.Maps;
 
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import javax.inject.Inject;
-import java.util.TreeSet;
+import java.util.SortedMap;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -31,15 +32,20 @@ public class UserLoginIndexSupport implements UserLoginIndex {
     @Override
     public void useLogin(UnitOfWork uow, String login, Id userId) {
         Index index = getIndex(uow);
-        index.addLogin(login);
+        index.registerLogin(login, userId);
         uow.registerEventStoreFor(loginIndexAggregateId, eventStore);
     }
 
     @Override
     public void unuseLogin(UnitOfWork uow, String login, Id userId) {
         Index index = getIndex(uow);
-        index.removeLogin(login);
+        index.unregisterLogin(login);
         uow.registerEventStoreFor(loginIndexAggregateId, eventStore);
+    }
+
+    @Override
+    public Id getByLogin(UnitOfWork uow, String login) {
+        return getIndex(uow).getByLogin(login);
     }
 
     private Index getIndex(UnitOfWork uow) {
@@ -71,7 +77,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
         private final EventHandler<LoginEvent> eventHandler;
         private final UnitOfWork uow;
 
-        private TreeSet<String> logins = new TreeSet<String>();
+        private SortedMap<String, Id> logins = Maps.newTreeMap();
 
         private Index(UnitOfWork uow) {
             this.uow = uow;
@@ -87,25 +93,29 @@ public class UserLoginIndexSupport implements UserLoginIndex {
             assignId(event.aggregateId());
         }
 
-        public void addLogin(String login) {
-            if (logins.contains(login)) {
+        public void registerLogin(String login, Id userId) {
+            if (logins.containsKey(login)) {
                 throw new LoginAlreadyInUseException("Login: " + login);
             }
-            applyNewEvent(new LoginAddedEvent(aggregateId(), login));
+            applyNewEvent(new LoginAddedEvent(aggregateId(), login, userId));
         }
 
         @OnEvent
         private void doAddLogin(LoginAddedEvent event) {
-            logins.add(event.login());
+            logins.put(event.login(), event.userId());
         }
 
-        public void removeLogin(String login) {
+        public void unregisterLogin(String login) {
             applyNewEvent(new LoginRemovedEvent(aggregateId(), login));
         }
 
         @OnEvent
         private void doRemoveLogin(LoginRemovedEvent event) {
             logins.remove(event.login());
+        }
+
+        public Id getByLogin(String login) {
+            return logins.get(login);
         }
 
         @Override
@@ -129,8 +139,9 @@ public class UserLoginIndexSupport implements UserLoginIndex {
         private final Id indexId;
 
         protected LoginEvent(Id indexId) {
-            if(indexId.isUndefined())
+            if (indexId.isUndefined()) {
                 throw new IllegalArgumentException("Id is undefied!");
+            }
             this.indexId = indexId;
         }
 
@@ -157,10 +168,17 @@ public class UserLoginIndexSupport implements UserLoginIndex {
         @JsonProperty
         private final String login;
 
+        @JsonProperty
+        private final Id userId;
+
         @JsonCreator
-        public LoginAddedEvent(@JsonProperty("indexId") Id indexId, @JsonProperty("login") String login) {
+        public LoginAddedEvent(@JsonProperty("indexId") Id indexId,
+                               @JsonProperty("login") String login,
+                               @JsonProperty("userId") Id userId)
+        {
             super(indexId);
             this.login = login;
+            this.userId = userId;
         }
 
         public String login() {
@@ -170,6 +188,10 @@ public class UserLoginIndexSupport implements UserLoginIndex {
         @Override
         public String toString() {
             return "LoginAddedEvent[" + aggregateId() + ", v" + version() + ", " + login() + "]";
+        }
+
+        public Id userId() {
+            return userId;
         }
     }
 

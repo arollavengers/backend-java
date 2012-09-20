@@ -1,7 +1,5 @@
 package arollavengers.core.service.user;
 
-import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
-
 import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserLoginIndex;
 import arollavengers.core.domain.user.UserRepository;
@@ -13,61 +11,84 @@ import arollavengers.core.pattern.annotation.DependencyInjection;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
+import java.security.SecureRandom;
 
 @Service
 public class UserService {
 
-  @Inject
-  private UnitOfWorkFactory unitOfWorkFactory;
+    @Inject
+    private UnitOfWorkFactory unitOfWorkFactory;
 
-  @Inject
-  private UserRepository userRepository;
+    @Inject
+    private UserRepository userRepository;
 
-  @Inject
-  private UserLoginIndex userLoginIndex;
+    @Inject
+    private UserLoginIndex userLoginIndex;
 
-  public User createUser(@NotNull UnitOfWork uow, @NotNull Id userId, @NotNull String login, char[] passwordDigest) {
-    userLoginIndex.useLogin(uow, login, userId);
+    /**
+     *
+     */
+    public User createUser(@NotNull UnitOfWork uow, @NotNull Id userId, @NotNull String login, char[] passwordDigest) {
+        userLoginIndex.useLogin(uow, login, userId);
 
-    User user = new User(uow);
-    user.createUser(userId, login, passwordDigest, generateSalt());
-    userRepository.addUser(uow, user);
-    return user;
-  }
+        User user = new User(uow);
+        user.createUser(userId, login, passwordDigest, generateSalt());
+        userRepository.addUser(uow, user);
+        return user;
+    }
 
-  private char[] generateSalt() {
-    String data = String.valueOf(System.currentTimeMillis());
-    return md5Hex(data).toCharArray();
-  }
+    /**
+     *
+     */
+    public User login(@NotNull String login, char[] passwordDigest) {
+        UnitOfWork uow = unitOfWorkFactory.create();
+        Id userId = userLoginIndex.getByLogin(uow, login);
+        if (userId == null) {
+            return null;
+        }
 
-  /**
-   * Define the {@link UnitOfWorkFactory} used by the service.
-   *
-   * @param unitOfWorkFactory
-   */
-  @DependencyInjection
-  public void setUnitOfWorkFactory(UnitOfWorkFactory unitOfWorkFactory) {
-    this.unitOfWorkFactory = unitOfWorkFactory;
-  }
+        User user = userRepository.getUser(uow, userId);
+        if (user == null) {
+            return null;
+        }
 
-  /**
-   * Define the {@link arollavengers.core.domain.user.UserRepositorySupport} used by the service.
-   *
-   * @param userRepository
-   */
-  @DependencyInjection
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+        if (user.checkPassword(passwordDigest)) {
+            return user;
+        }
+        else {
+            return null;
+        }
+    }
 
-  /**
-   * Define the {@link arollavengers.core.domain.user.UserLoginIndex} used by the service.
-   *
-   * @param userLoginIndex
-   */
-  @DependencyInjection
-  public void setUserLoginIndex(UserLoginIndex userLoginIndex) {
-    this.userLoginIndex = userLoginIndex;
-  }
+    private byte[] generateSalt() {
+        byte[] salt = new byte[32];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        return salt;
+    }
+
+    /**
+     * Define the {@link UnitOfWorkFactory} used by the service.
+     */
+    @DependencyInjection
+    public void setUnitOfWorkFactory(UnitOfWorkFactory unitOfWorkFactory) {
+        this.unitOfWorkFactory = unitOfWorkFactory;
+    }
+
+    /**
+     * Define the {@link arollavengers.core.domain.user.UserRepositorySupport} used by the service.
+     */
+    @DependencyInjection
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Define the {@link arollavengers.core.domain.user.UserLoginIndex} used by the service.
+     */
+    @DependencyInjection
+    public void setUserLoginIndex(UserLoginIndex userLoginIndex) {
+        this.userLoginIndex = userLoginIndex;
+    }
 }
 

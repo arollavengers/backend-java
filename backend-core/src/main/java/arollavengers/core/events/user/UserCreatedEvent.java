@@ -25,16 +25,16 @@ public class UserCreatedEvent implements UserEvent {
   private final String login;
 
   @JsonProperty
-  private final char[] passwordDigest;
+  private final byte[] passwordDigest;
 
   @JsonProperty
-  private final char[] salt;
+  private final byte[] salt;
 
   @JsonCreator
   public UserCreatedEvent(@JsonProperty("newUserId") Id newUserId,
                           @JsonProperty("login") String login,
-                          @JsonProperty("passwordDigest") char[] passwordDigest,
-                          @JsonProperty("salt") char[] salt) {
+                          @JsonProperty("passwordDigest") byte[] passwordDigest,
+                          @JsonProperty("salt") byte[] salt) {
     this.newUserId = newUserId;
     this.login = login;
     this.passwordDigest = passwordDigest;
@@ -57,11 +57,11 @@ public class UserCreatedEvent implements UserEvent {
     return login;
   }
 
-  public char[] passwordDigest() {
+  public byte[] passwordDigest() {
     return passwordDigest;
   }
 
-  public char[] salt() {
+  public byte[] salt() {
     return salt;
   }
 

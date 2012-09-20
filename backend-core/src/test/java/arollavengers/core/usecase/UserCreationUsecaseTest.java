@@ -13,6 +13,8 @@ import arollavengers.core.infrastructure.EventStoreInMemory;
 import arollavengers.core.infrastructure.EventStoreJdbc;
 import arollavengers.core.infrastructure.EventStorePrevayler;
 import arollavengers.core.infrastructure.Id;
+import arollavengers.core.infrastructure.Message;
+import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.UnitOfWorkFactory;
 import arollavengers.core.service.user.UserService;
@@ -20,6 +22,7 @@ import arollavengers.junit.LabeledParameterized;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,12 +41,7 @@ import java.util.UUID;
 @RunWith(LabeledParameterized.class)
 public class UserCreationUsecaseTest {
 
-    public enum Mode {
-        InMemory,
-        Prevayler,
-        Jdbc,
-        Hibernate
-    }
+    private CollectorListener collectorListener;
 
     @LabeledParameterized.Parameters
     public static List<Object[]> parameters() {
@@ -64,6 +62,8 @@ public class UserCreationUsecaseTest {
     private UserRepositorySupport userRepository;
     private UnitOfWorkFactory unitOfWorkFactory;
     private EventStore eventStore;
+    private SimpleBus bus;
+
     private TestSettings testSettings;
 
     public UserCreationUsecaseTest(Mode mode) {
@@ -88,6 +88,7 @@ public class UserCreationUsecaseTest {
 
         // ~~~
         eventStore.dump(System.out);
+        dumpMessages();
 
         // Then
         uow = unitOfWorkFactory.create();
@@ -95,8 +96,6 @@ public class UserCreationUsecaseTest {
         assertThat(user).isNotNull();
         assertThat(user.login()).isEqualTo("Travis");
 
-        // ~~~
-        eventStore.dump(System.out);
     }
 
     @Test
@@ -136,7 +135,7 @@ public class UserCreationUsecaseTest {
         assertThat(user2).isSameAs(user1);
     }
 
-    @Test(expected = LoginAlreadyInUseException.class)
+    @Test
     public void create_user_with_login_already_used() throws Exception {
         // Given
         prepareEnvironment();
@@ -147,49 +146,39 @@ public class UserCreationUsecaseTest {
         userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
         uow.commit();
 
+        collectorListener.clearMessages();
+
+        // Then
         Id newUserId2 = Id.next();
         uow = unitOfWorkFactory.create();
-        userService.createUser(uow, newUserId2, "Travis", "Wahouu".toCharArray());
+        try {
+            userService.createUser(uow, newUserId2, "Travis", "Wahouu".toCharArray());
+            Assert.fail("An exception should have been raised");
+        }
+        catch (LoginAlreadyInUseException alreadyInUse) {
+            // great!
+        }
+        assertThat(collectorListener.getMessages()).isEmpty();
+    }
+
+    private void dumpMessages () {
+        System.out.println("UserCreationUsecaseTest.dumpMessages:");
+        for (Message message : collectorListener.getMessages()) {
+            System.out.println(">> " + message);
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void prepareEnvironment() throws Exception {
-        switch (mode) {
-            case Prevayler:
-                eventStore = new EventStorePrevayler();
-                String dataFolder =
-                        testSettings.getProperty("prevayler.event-store.basedir") + "/" + UUID.randomUUID().toString();
-                ((EventStorePrevayler) eventStore).setDataFolder(dataFolder);
-                ((EventStorePrevayler) eventStore).postConstruct();
-                break;
-            case Jdbc:
-                SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-                dataSource.setDriverClass((Class<? extends Driver>) Class.forName(testSettings.getProperty("jdbc.driver")));
-                dataSource.setUrl(testSettings.getProperty("jdbc.url"));
-                for (String script : testSettings.getProperty("jdbc.scripts").split(",")) {
-                    FileInputStream inputStream = new FileInputStream(script.trim());
-                    try {
-                        executeScriptOn(dataSource, IOUtils.toString(inputStream, "utf-8"));
-                    }
-                    finally {
-                        IOUtils.closeQuietly(inputStream);
-                    }
-                }
-
-                eventStore = new EventStoreJdbc();
-                ((EventStoreJdbc) eventStore).setDataSource(dataSource);
-                ((EventStoreJdbc) eventStore).postConstruct();
-                break;
-            case Hibernate:
-            case InMemory:
-                eventStore = new EventStoreInMemory();
-                break;
-        }
+        eventStore = mode.eventStore(testSettings);
+        collectorListener = new CollectorListener();
+        bus = new SimpleBus();
+        bus.subscribe(collectorListener);
 
         unitOfWorkFactory = new UnitOfWorkFactory() {
             @Override
             public UnitOfWork create() {
-                return new DummyUnitOfWork();
+                return new DummyUnitOfWork(bus);
             }
         };
 
@@ -207,9 +196,61 @@ public class UserCreationUsecaseTest {
 
     private static void executeScriptOn(DataSource dataSource, String script) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        for(String sql : script.split(";")) {
+        for (String sql : script.split(";")) {
             jdbcTemplate.update(sql.trim());
         }
     }
+
+    public enum Mode {
+        InMemory
+                {
+                    @Override
+                    EventStore eventStore(TestSettings testSettings) {
+                        return new EventStoreInMemory();
+                    }
+                },
+        Prevayler
+                {
+                    @Override
+                    EventStore eventStore(TestSettings testSettings) throws Exception {
+                        EventStorePrevayler eventStore = new EventStorePrevayler();
+                        String dataFolder =
+                                testSettings.getProperty("prevayler.event-store.basedir") + "/"
+                                        + UUID.randomUUID().toString();
+                        eventStore.setDataFolder(dataFolder);
+                        eventStore.postConstruct();
+                        return eventStore;
+                    }
+                },
+        Jdbc
+                {
+                    @SuppressWarnings("unchecked")
+                    @Override
+                    EventStore eventStore(TestSettings testSettings) throws Exception {
+                        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+                        dataSource.setDriverClass((Class<? extends Driver>) Class.forName(testSettings.getProperty("jdbc.driver")));
+                        dataSource.setUrl(testSettings.getProperty("jdbc.url"));
+                        for (String script : testSettings.getProperty("jdbc.scripts").split(",")) {
+                            FileInputStream inputStream = new FileInputStream(script.trim());
+                            try {
+                                executeScriptOn(dataSource, IOUtils.toString(inputStream, "utf-8"));
+                            }
+                            finally {
+                                IOUtils.closeQuietly(inputStream);
+                            }
+                        }
+
+                        EventStoreJdbc eventStore = new EventStoreJdbc();
+                        eventStore.setDataSource(dataSource);
+                        eventStore.postConstruct();
+                        return eventStore;
+                    }
+                };
+        //Hibernate
+
+        abstract EventStore eventStore(TestSettings testSettings) throws Exception;
+
+    }
+
 
 }
