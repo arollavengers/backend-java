@@ -9,7 +9,6 @@ import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jackson.map.deser.std.StdDeserializer;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.node.ObjectNode;
-import org.prevayler.foundation.serialization.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
@@ -22,7 +21,7 @@ import java.io.StringWriter;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class JacksonSerializer implements Serializer {
+public class JacksonSerializer implements Serializer  {
     private static final Logger log = LoggerFactory.getLogger(JacksonSerializer.class);
 
     private ObjectWriter objectWriter;
@@ -49,31 +48,53 @@ public class JacksonSerializer implements Serializer {
     }
 
     @Override
-    public void writeObject(OutputStream outputStream, Object object) throws Exception {
+    public void writeObject(OutputStream outputStream, Object object) throws SerializationException {
         OutputStream out = outputStream;
         if (log.isTraceEnabled()) {
             out = new ByteArrayOutputStream();
         }
-        objectWriter.writeValue(out, object);
+        try {
+            objectWriter.writeValue(out, object);
 
-        if (log.isTraceEnabled()) {
-            ByteArrayOutputStream bout = (ByteArrayOutputStream) out;
-            log.trace("Serialized content: {}", bout.toString("utf-8"));
-            outputStream.write(bout.toByteArray());
+            if (log.isTraceEnabled()) {
+                ByteArrayOutputStream bout = (ByteArrayOutputStream) out;
+                log.trace("Serialized content: {}", bout.toString("utf-8"));
+                outputStream.write(bout.toByteArray());
+            }
+        }
+        catch (IOException e) {
+            throw new SerializationException(e);
         }
     }
 
-    public String serializeAsString(Object event) throws IOException {
-        return objectWriter.writeValueAsString(event);
+    @Override
+    public String serializeAsString(Object event) {
+        try {
+            return objectWriter.writeValueAsString(event);
+        }
+        catch (IOException e) {
+            throw new SerializationException(e);
+        }
     }
 
     @Override
-    public Object readObject(InputStream inputStream) throws Exception {
-        return deserializer.readValue(inputStream, Object.class);
+    public Object readObject(InputStream inputStream) throws SerializationException {
+        try {
+            return deserializer.readValue(inputStream, Object.class);
+        }
+        catch (IOException e) {
+            throw new SerializationException(e);
+        }
     }
 
-    public Object deserializeFomString(String json) throws IOException {
-        return deserializer.readValue(json, Object.class);
+    @Override
+    public Object deserializeFomString(String json)  {
+        try {
+            return deserializer.readValue(json, Object.class);
+        }
+        catch (IOException e) {
+            throw new SerializationException(e);
+        }
     }
 
 

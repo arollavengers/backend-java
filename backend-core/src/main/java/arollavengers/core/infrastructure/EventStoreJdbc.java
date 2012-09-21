@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -37,22 +36,22 @@ public class EventStoreJdbc implements EventStore {
 
     private JdbcTemplate jdbcTemplate;
 
-    private JacksonSerializer serializer;
+    @Inject
+    private Serializer serializer;
 
     @DependencyInjection
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
+    @DependencyInjection
+    public void setSerializer(Serializer serializer) {
+        this.serializer = serializer;
+    }
+
     @PostConstruct
     public void postConstruct() {
         jdbcTemplate = new JdbcTemplate(dataSource);
-        serializer = new JacksonSerializer();
-        serializer.postConstruct();
-    }
-
-    @PreDestroy
-    public void dispose() {
     }
 
     @Override
@@ -130,7 +129,7 @@ public class EventStoreJdbc implements EventStore {
 
         PreparedStatement pStmt = connection.prepareStatement("insert into stream_events (stream_id, event_id, event_data) values (?,?,?)");
         try {
-            for(DomainEvent event : events) {
+            for (DomainEvent event : events) {
                 String eventAsString = serializer.serializeAsString(event);
 
                 pStmt.setString(1, streamId.toUUID());
@@ -158,9 +157,9 @@ public class EventStoreJdbc implements EventStore {
             public E mapRow(ResultSet rs, int rowNum) throws SQLException {
                 String eventData = rs.getString(3);
                 try {
-                    return (E)serializer.deserializeFomString(eventData);
+                    return (E) serializer.deserializeFomString(eventData);
                 }
-                catch (IOException e) {
+                catch (Serializer.SerializationException e) {
                     // TODO better exception...
                     throw new RuntimeException("Failed to deserialize event from content: " + eventData, e);
                 }
@@ -173,11 +172,12 @@ public class EventStoreJdbc implements EventStore {
     public void dump(final PrintStream out) {
         jdbcTemplate.query("select stream_id, event_id, event_data from stream_events order by stream_id, event_id", new RowCallbackHandler() {
             private final String repl = "\n" + StringUtils.repeat(" ", 36) + "|" + StringUtils.repeat(" ", 6) + "|";
+
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 out.print(StringUtils.rightPad(rs.getString(1), 36, '.'));
                 out.print("|");
-                out.print(StringUtils.leftPad(""+rs.getLong(2), 6, '.'));
+                out.print(StringUtils.leftPad("" + rs.getLong(2), 6, '.'));
                 out.print("|");
                 out.print(rs.getString(3).replace("\n", repl));
                 out.println();
