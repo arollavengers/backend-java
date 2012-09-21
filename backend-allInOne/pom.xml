@@ -15,11 +15,13 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>../backend-pattern</module>
+    <module>../backend-pattern-aop</module>
+    <module>../backend-common-test</module>
     <module>../backend-core</module>
     <module>../backend-webapp-springmvc</module>
     <module>../backend-end2endTests</module>
     <module>../backend-persistence</module>
-    <module>../backend-common-test</module>
   </modules>
 
 </project>
