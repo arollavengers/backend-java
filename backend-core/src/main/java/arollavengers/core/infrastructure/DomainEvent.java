@@ -1,9 +1,12 @@
 package arollavengers.core.infrastructure;
 
+import arollavengers.core.pattern.annotation.CanBeInvokedOnlyOnce;
+
 public interface DomainEvent extends Message {
-  long version();
+    long version();
 
-  Id aggregateId();
+    Id aggregateId();
 
-  void assignVersion(long l);
+    @CanBeInvokedOnlyOnce
+    void assignVersion(long l);
 }

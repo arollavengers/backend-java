@@ -123,21 +123,21 @@ public class JacksonSerializer implements Serializer  {
             // remove type info otherwise it cannot be matched to concrete class field
             JsonNode removed = root.get("@class");
             if (removed == null) {
-                throw new RuntimeException("No type information");
+                throw new SerializationException("No type information");
             }
             String klazzName = removed.getTextValue();
 
             try {
                 Class<?> klazz = Class.forName(klazzName);
                 if (!getValueClass().isAssignableFrom(klazz)) {
-                    throw new RuntimeException(
+                    throw new SerializationException(
                             "Incompatible type information got: " + klazzName + ", expected assignable from: "
                                     + getValueClass());
                 }
                 return (E) mapper.readValue(root, klazz);
             }
             catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new SerializationException(e);
             }
         }
     }

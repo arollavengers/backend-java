@@ -1,4 +1,4 @@
-package arollavengers.core.infrastructure;
+package arollavengers.core.util;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>

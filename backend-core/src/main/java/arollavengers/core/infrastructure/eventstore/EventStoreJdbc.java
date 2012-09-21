@@ -1,6 +1,12 @@
-package arollavengers.core.infrastructure;
+package arollavengers.core.infrastructure.eventstore;
 
 import arollavengers.core.exceptions.eventstore.MidAirCollisionException;
+import arollavengers.core.infrastructure.DomainEvent;
+import arollavengers.core.infrastructure.EventStore;
+import arollavengers.core.infrastructure.Id;
+import arollavengers.core.infrastructure.Serializer;
+import arollavengers.core.infrastructure.Stream;
+import arollavengers.core.infrastructure.Streams;
 import arollavengers.core.pattern.annotation.DependencyInjection;
 
 import org.apache.commons.lang3.StringUtils;

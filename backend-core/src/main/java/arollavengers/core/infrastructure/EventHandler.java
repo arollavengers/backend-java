@@ -1,5 +1,12 @@
 package arollavengers.core.infrastructure;
 
+/**
+ *
+ * @param <E>
+ */
 public interface EventHandler<E> {
-  public void handle(final E event);
+    /**
+     * @param event the event that must be handled
+     */
+    void handle(final E event);
 }

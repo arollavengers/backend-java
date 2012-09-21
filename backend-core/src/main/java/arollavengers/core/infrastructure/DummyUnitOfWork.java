@@ -133,9 +133,5 @@ public class DummyUnitOfWork implements UnitOfWork {
             }
             eventStore.store(aggregateId, Streams.from(events));
         }
-
-        public void publish(Bus bus) {
-
-        }
     }
 }

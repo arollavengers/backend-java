@@ -1,6 +1,12 @@
-package arollavengers.core.infrastructure;
+package arollavengers.core.infrastructure.eventstore;
 
 import arollavengers.core.exceptions.eventstore.MidAirCollisionException;
+import arollavengers.core.infrastructure.DomainEvent;
+import arollavengers.core.infrastructure.EventStore;
+import arollavengers.core.util.Function;
+import arollavengers.core.infrastructure.Id;
+import arollavengers.core.infrastructure.Stream;
+import arollavengers.core.infrastructure.Streams;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 

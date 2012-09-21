@@ -1,5 +1,7 @@
 package arollavengers.core.infrastructure;
 
+import arollavengers.core.util.Function;
+
 import org.jetbrains.annotations.NotNull;
 import java.util.List;
 

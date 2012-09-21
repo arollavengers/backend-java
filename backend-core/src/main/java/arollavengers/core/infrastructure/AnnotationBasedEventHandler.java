@@ -12,12 +12,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Implementation of {@link EventHandler} that rely on the {@link OnEvent} annotation
+ * to find the suitable method to dispatch the event.
+ *
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
+ * @see OnEvent
  */
 public class AnnotationBasedEventHandler<E> implements EventHandler<E> {
 
     private final Object target;
 
+    /**
+     * @param target the underlying target to which events will be dispatched.
+     */
     public AnnotationBasedEventHandler(Object target) {
         this.target = target;
     }
@@ -38,6 +45,10 @@ public class AnnotationBasedEventHandler<E> implements EventHandler<E> {
 
 
     private static Cache shared = new Cache();
+
+    /**
+     * Internal cache: class doesn't change at runtime, so let's cache the annotated method once.
+     */
     private static class Cache {
 
         private final Map<Class<?>, List<Method>> methodsPerKlazz = Maps.newConcurrentMap();

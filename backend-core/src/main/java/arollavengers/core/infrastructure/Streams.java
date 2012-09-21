@@ -1,5 +1,7 @@
 package arollavengers.core.infrastructure;
 
+import arollavengers.core.util.Function;
+import arollavengers.core.util.Functions;
 import com.google.common.collect.Lists;
 
 import java.util.List;

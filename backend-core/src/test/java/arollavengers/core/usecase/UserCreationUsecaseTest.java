@@ -9,15 +9,16 @@ import arollavengers.core.domain.user.UserRepositorySupport;
 import arollavengers.core.exceptions.user.LoginAlreadyInUseException;
 import arollavengers.core.infrastructure.DummyUnitOfWork;
 import arollavengers.core.infrastructure.EventStore;
-import arollavengers.core.infrastructure.EventStoreInMemory;
-import arollavengers.core.infrastructure.EventStoreJdbc;
-import arollavengers.core.infrastructure.EventStorePrevayler;
+import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
+import arollavengers.core.infrastructure.eventstore.EventStoreJdbc;
+import arollavengers.core.infrastructure.eventstore.EventStorePrevayler;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Message;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.UnitOfWorkFactory;
 import arollavengers.core.service.user.UserService;
+import arollavengers.core.util.Objects;
 import arollavengers.junit.LabeledParameterized;
 import com.google.common.collect.Lists;
 
@@ -38,36 +39,35 @@ import java.util.UUID;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@SuppressWarnings("ConstantConditions")
 @RunWith(LabeledParameterized.class)
 public class UserCreationUsecaseTest {
 
-    private CollectorListener collectorListener;
-
+    /**
+     * Test will be executed on all different event store implementations.
+     * @see TypeOfEventStore
+     */
     @LabeledParameterized.Parameters
     public static List<Object[]> parameters() {
         List<Object[]> modes = Lists.newArrayList();
-        for (Mode mode : Mode.values()) {
-            modes.add(o(mode));
+        for (TypeOfEventStore typeOfEventStore : TypeOfEventStore.values()) {
+            modes.add(Objects.o(typeOfEventStore));
         }
         return modes;
     }
 
-    private static Object[] o(Object... args) {
-        return args;
-    }
-
-    private final Mode mode;
+    private final TypeOfEventStore typeOfEventStore;
+    //
+    private TestSettings testSettings;
     //
     private UserService userService;
     private UserRepositorySupport userRepository;
     private UnitOfWorkFactory unitOfWorkFactory;
-    private EventStore eventStore;
     private SimpleBus bus;
+    private CollectorListener collectorListener;
 
-    private TestSettings testSettings;
-
-    public UserCreationUsecaseTest(Mode mode) {
-        this.mode = mode;
+    public UserCreationUsecaseTest(TypeOfEventStore typeOfEventStore) {
+        this.typeOfEventStore = typeOfEventStore;
     }
 
     @Before
@@ -87,8 +87,8 @@ public class UserCreationUsecaseTest {
         uow.commit();
 
         // ~~~
-        eventStore.dump(System.out);
-        dumpMessages();
+        // eventStore.dump(System.out);
+        // dumpMessages();
 
         // Then
         uow = unitOfWorkFactory.create();
@@ -161,6 +161,7 @@ public class UserCreationUsecaseTest {
         assertThat(collectorListener.getMessages()).isEmpty();
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     private void dumpMessages () {
         System.out.println("UserCreationUsecaseTest.dumpMessages:");
         for (Message message : collectorListener.getMessages()) {
@@ -170,7 +171,7 @@ public class UserCreationUsecaseTest {
 
     @SuppressWarnings("unchecked")
     private void prepareEnvironment() throws Exception {
-        eventStore = mode.eventStore(testSettings);
+        EventStore eventStore = typeOfEventStore.eventStore(testSettings);
         collectorListener = new CollectorListener();
         bus = new SimpleBus();
         bus.subscribe(collectorListener);
@@ -201,7 +202,7 @@ public class UserCreationUsecaseTest {
         }
     }
 
-    public enum Mode {
+    public enum TypeOfEventStore {
         InMemory
                 {
                     @Override
