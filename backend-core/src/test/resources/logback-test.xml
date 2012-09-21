@@ -7,7 +7,7 @@
 	  	</encoder>
 	</appender>
 
-	<logger name="arollavengers" level="info" />
+	<logger name="arollavengers" level="warn" />
 	<logger name="org.springframework.jdbc" level="warn" />
 
 	<root level="warn">

@@ -3,10 +3,9 @@ package arollavengers.core.infrastructure.eventstore;
 import arollavengers.core.infrastructure.DomainEvent;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
-import arollavengers.core.infrastructure.JacksonSerializer;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.Streams;
-import arollavengers.core.pattern.annotation.DependencyInjection;
+import arollavengers.pattern.annotation.DependencyInjection;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -18,6 +17,8 @@ import org.prevayler.Prevayler;
 import org.prevayler.PrevaylerFactory;
 import org.prevayler.Query;
 import org.prevayler.foundation.serialization.Serializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Value;
 import javax.annotation.PostConstruct;
@@ -35,10 +36,14 @@ import java.util.Map;
  */
 public class EventStorePrevayler implements EventStore {
 
+    private Logger log = LoggerFactory.getLogger(EventStorePrevayler.class);
+
     private Prevayler prevayler;
 
     @Value("${event-store.prevayler.data-folder}")
     private String dataFolder;
+
+    private arollavengers.core.infrastructure.Serializer serializer;
 
     @Override
     public void store(@NotNull Id streamId, @NotNull Stream<DomainEvent> stream) {
@@ -85,19 +90,17 @@ public class EventStorePrevayler implements EventStore {
         if (dataFolder == null) {
             throw new BeanInitializationException("No data folder defined");
         }
-        System.out.println("EventStorePrevayler.postConstruct(" + dataFolder + ")");
 
-        JacksonSerializer jacksonSerializer = new JacksonSerializer();
-        jacksonSerializer.postConstruct();
+        log.info("Prevayler data store folder: {}", dataFolder);
 
         PrevaylerFactory factory = new PrevaylerFactory();
         factory.configurePrevalentSystem(new PrevalentEventStore());
         factory.configurePrevalenceDirectory(dataFolder);
-        factory.configureJournalSerializer("journal", adapt(jacksonSerializer));
+        factory.configureJournalSerializer("journal", adapt(serializer));
         prevayler = factory.create();
     }
 
-    private Serializer adapt(final JacksonSerializer serializer) {
+    private Serializer adapt(final arollavengers.core.infrastructure.Serializer serializer) {
         return new Serializer() {
             @Override
             public void writeObject(OutputStream stream, Object object) throws Exception {
@@ -114,6 +117,11 @@ public class EventStorePrevayler implements EventStore {
     @DependencyInjection
     public void setDataFolder(String dataFolder) {
         this.dataFolder = dataFolder;
+    }
+
+    @DependencyInjection
+    public void setSerializer(arollavengers.core.infrastructure.Serializer serializer) {
+        this.serializer = serializer;
     }
 
     public static final class PrevalentEventStore implements Serializable {

@@ -13,6 +13,12 @@
 
   <artifactId>backend-core</artifactId>
 
+  <properties>
+    <gmavenVersion>1.4</gmavenVersion>
+    <gmavenProviderSelection>2.0</gmavenProviderSelection>
+    <groovyVersion>2.0.0</groovyVersion>
+  </properties>
+
   <!-- ************************************************ -->
   <!-- *~~~~~~~~~~~~~~~~~~~~BUILD~~~~~~~~~~~~~~~~~~~~~* -->
   <!-- ************************************************ -->
@@ -26,12 +32,83 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <version>${gmavenVersion}</version>
+        <executions>
+          <execution>
+            <id>instrument-classes</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <providerSelection>${gmavenProviderSelection}</providerSelection>
+              <source>
+
+                // see http://agileice.blogspot.fr/2009/04/accessing-maven-runtime-classpath-in.html
+                def runtimeClasspath = project.runtimeClasspathElements.join(File.pathSeparator);
+                // log.info("Runtime classpath {}", runtimeClasspath)
+
+                import groovy.io.FileType
+                import arollavengers.pattern.instrumenter.InstrumentClasses
+
+                def classesDir = new File(project.basedir, "/target/classes")
+
+                def instrumenter = new InstrumentClasses(classesDir).useClassPath(runtimeClasspath).useDefaultInstrumenters()
+                def instrument = { name -> instrumenter.instrument(name) }
+
+                classesDir.eachFileRecurse(FileType.FILES) { file ->
+                if(file.name.endsWith(".class"))
+                instrument(file.absolutePath - classesDir.absolutePath)
+                }
+              </source>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>backend-pattern-aop</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>backend-pattern</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
   </build>
 
   <!-- ************************************************ -->
   <!-- *~~~~~~~~~~~~~~~~DEPENDENCIES~~~~~~~~~~~~~~~~~~* -->
   <!-- ************************************************ -->
   <dependencies>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>${groovyVersion}</version>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~Project~~~~~~~~~~~~~~~ -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>backend-pattern</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- ~~~~~~~~~~~~~~Spring~~~~~~~~~~~~~~~ -->
@@ -49,11 +126,6 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-aop</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

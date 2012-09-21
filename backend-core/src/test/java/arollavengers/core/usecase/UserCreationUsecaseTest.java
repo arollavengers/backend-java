@@ -9,6 +9,7 @@ import arollavengers.core.domain.user.UserRepositorySupport;
 import arollavengers.core.exceptions.user.LoginAlreadyInUseException;
 import arollavengers.core.infrastructure.DummyUnitOfWork;
 import arollavengers.core.infrastructure.EventStore;
+import arollavengers.core.infrastructure.JacksonSerializer;
 import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
 import arollavengers.core.infrastructure.eventstore.EventStoreJdbc;
 import arollavengers.core.infrastructure.eventstore.EventStorePrevayler;
@@ -214,11 +215,16 @@ public class UserCreationUsecaseTest {
                 {
                     @Override
                     EventStore eventStore(TestSettings testSettings) throws Exception {
-                        EventStorePrevayler eventStore = new EventStorePrevayler();
                         String dataFolder =
                                 testSettings.getProperty("prevayler.event-store.basedir") + "/"
                                         + UUID.randomUUID().toString();
+
+                        JacksonSerializer serializer = new JacksonSerializer();
+                        serializer.postConstruct();
+
+                        EventStorePrevayler eventStore = new EventStorePrevayler();
                         eventStore.setDataFolder(dataFolder);
+                        eventStore.setSerializer(serializer);
                         eventStore.postConstruct();
                         return eventStore;
                     }
@@ -241,8 +247,12 @@ public class UserCreationUsecaseTest {
                             }
                         }
 
+                        JacksonSerializer serialier = new JacksonSerializer();
+                        serialier.postConstruct();
+
                         EventStoreJdbc eventStore = new EventStoreJdbc();
                         eventStore.setDataSource(dataSource);
+                        eventStore.setSerializer(serialier);
                         eventStore.postConstruct();
                         return eventStore;
                     }

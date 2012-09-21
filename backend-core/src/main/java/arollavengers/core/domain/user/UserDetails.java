@@ -1,6 +1,6 @@
 package arollavengers.core.domain.user;
 
-import arollavengers.core.pattern.annotation.ValueObject;
+import arollavengers.pattern.annotation.ValueObject;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>

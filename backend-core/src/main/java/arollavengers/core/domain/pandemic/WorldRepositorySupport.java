@@ -5,7 +5,7 @@ import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.UnitOfWork;
-import arollavengers.core.pattern.annotation.DependencyInjection;
+import arollavengers.pattern.annotation.DependencyInjection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

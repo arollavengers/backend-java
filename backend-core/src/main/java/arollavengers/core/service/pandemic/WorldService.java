@@ -9,7 +9,7 @@ import arollavengers.core.exceptions.user.UserNotFoundException;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.UnitOfWorkFactory;
-import arollavengers.core.pattern.annotation.DependencyInjection;
+import arollavengers.pattern.annotation.DependencyInjection;
 
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;

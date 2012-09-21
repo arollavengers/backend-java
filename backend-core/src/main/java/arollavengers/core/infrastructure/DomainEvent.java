@@ -1,6 +1,6 @@
 package arollavengers.core.infrastructure;
 
-import arollavengers.core.pattern.annotation.CanBeInvokedOnlyOnce;
+import arollavengers.pattern.annotation.CanBeInvokedOnlyOnce;
 
 public interface DomainEvent extends Message {
     long version();

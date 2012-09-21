@@ -2,7 +2,7 @@ package arollavengers.core.domain.user.view;
 
 import arollavengers.core.domain.user.UserDetails;
 import arollavengers.core.infrastructure.Id;
-import arollavengers.core.pattern.annotation.ValueObject;
+import arollavengers.pattern.annotation.ValueObject;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>

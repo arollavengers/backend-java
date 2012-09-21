@@ -1,6 +1,6 @@
 package arollavengers.core.infrastructure;
 
-import arollavengers.core.pattern.annotation.ValueObject;
+import arollavengers.pattern.annotation.ValueObject;
 
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnore;

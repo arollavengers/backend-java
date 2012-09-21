@@ -7,7 +7,7 @@ import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Serializer;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.Streams;
-import arollavengers.core.pattern.annotation.DependencyInjection;
+import arollavengers.pattern.annotation.DependencyInjection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;

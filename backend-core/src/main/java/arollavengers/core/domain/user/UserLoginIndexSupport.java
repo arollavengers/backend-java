@@ -10,7 +10,7 @@ import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
-import arollavengers.core.pattern.annotation.DependencyInjection;
+import arollavengers.pattern.annotation.DependencyInjection;
 import com.google.common.collect.Maps;
 
 import org.codehaus.jackson.annotate.JsonCreator;
