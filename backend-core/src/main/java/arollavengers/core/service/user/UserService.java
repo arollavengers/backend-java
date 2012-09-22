@@ -38,9 +38,15 @@ public class UserService {
     }
 
     /**
+     * Check the provided credentials and returns the corresponding user's {@link Id} if
+     * they are valid.
      *
+     * @param login login of the user that attempts to get logged
+     * @param password plain password for the corresponding login
+     * @return the corresponding user's {@link Id} is the credentials are fulfilled otherwise
+     *    returns <code>null</code>
      */
-    public User login(@NotNull String login, char[] passwordDigest) {
+    public Id getUserWithCredentials(@NotNull String login, char[] password) {
         UnitOfWork uow = unitOfWorkFactory.create();
         Id userId = userLoginIndex.getByLogin(uow, login);
         if (userId == null) {
@@ -52,8 +58,8 @@ public class UserService {
             return null;
         }
 
-        if (user.checkPassword(passwordDigest)) {
-            return user;
+        if (user.checkPassword(password)) {
+            return userId;
         }
         else {
             return null;

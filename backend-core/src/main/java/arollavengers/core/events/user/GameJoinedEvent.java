@@ -1,5 +1,6 @@
 package arollavengers.core.events.user;
 
+import arollavengers.core.domain.GameType;
 import arollavengers.core.infrastructure.Id;
 
 /**
@@ -7,33 +8,42 @@ import arollavengers.core.infrastructure.Id;
  */
 public class GameJoinedEvent implements UserEvent {
 
-  private long version;
-  private final Id userId;
-  private final Id gameId;
+    private long version;
+    private final Id userId;
+    private final Id gameId;
+    private final GameType gameType;
 
-  public GameJoinedEvent(Id userId, Id gameId) {
-    this.userId = userId;
-    this.gameId = gameId;
-  }
+    public GameJoinedEvent(Id userId, Id gameId, GameType gameType) {
+        this.userId = userId;
+        this.gameId = gameId;
+        this.gameType = gameType;
+    }
 
-  public long version() {
-    return version;
-  }
+    @Override
+    public long version() {
+        return version;
+    }
 
-  public void assignVersion(final long version) {
-    this.version = version;
-  }
+    @Override
+    public void assignVersion(final long version) {
+        this.version = version;
+    }
 
-  public Id aggregateId() {
-    return userId;
-  }
+    @Override
+    public Id aggregateId() {
+        return userId;
+    }
 
-  public Id gameId() {
-    return gameId;
-  }
+    public Id gameId() {
+        return gameId;
+    }
 
-  @Override
-  public String toString() {
-    return "GameJoinedEvent[" + userId + ", v" + version + ", " + gameId + "]";
-  }
+    public GameType gameType() {
+        return gameType;
+    }
+
+    @Override
+    public String toString() {
+        return "GameJoinedEvent[" + userId + ", v" + version + ", " + gameId + "]";
+    }
 }

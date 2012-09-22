@@ -1,5 +1,7 @@
 package arollavengers.core.domain.user;
 
+import arollavengers.core.domain.GameType;
+import arollavengers.core.events.user.GameJoinedEvent;
 import arollavengers.core.events.user.UserCreatedEvent;
 import arollavengers.core.events.user.UserEvent;
 import arollavengers.core.exceptions.EntityIdAlreadyAssignedException;
@@ -93,5 +95,19 @@ public class User extends AggregateRoot<UserEvent> {
     public boolean checkPassword(char[] password) {
         byte[] submittedDigest = digest(password, salt);
         return Arrays.equals(submittedDigest, passwordDigest);
+    }
+
+    /**
+     *
+     * @param gameId
+     * @param gameType
+     */
+    public void joinGame(Id gameId, GameType gameType) {
+        applyNewEvent(new GameJoinedEvent(aggregateId(), gameId, gameType));
+    }
+
+    @OnEvent
+    private void doJoinGame(GameJoinedEvent event) {
+        //
     }
 }

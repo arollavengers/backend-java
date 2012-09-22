@@ -26,7 +26,7 @@ public class WorldRepositorySupport implements WorldRepository {
    * @param world the world
    */
   @Override
-  public void add(@NotNull UnitOfWork uow, @NotNull World world) {
+  public void addWorld(@NotNull UnitOfWork uow, @NotNull World world) {
     uow.registerEventStoreFor(world.aggregateId(), eventStore);
   }
 

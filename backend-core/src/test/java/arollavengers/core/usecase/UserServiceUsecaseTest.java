@@ -9,53 +9,24 @@ import arollavengers.core.domain.user.UserRepositorySupport;
 import arollavengers.core.exceptions.user.LoginAlreadyInUseException;
 import arollavengers.core.infrastructure.DummyUnitOfWork;
 import arollavengers.core.infrastructure.EventStore;
-import arollavengers.core.infrastructure.JacksonSerializer;
-import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
-import arollavengers.core.infrastructure.eventstore.EventStoreJdbc;
-import arollavengers.core.infrastructure.eventstore.EventStorePrevayler;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Message;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.UnitOfWorkFactory;
 import arollavengers.core.service.user.UserService;
-import arollavengers.core.util.Objects;
-import arollavengers.junit.LabeledParameterized;
-import com.google.common.collect.Lists;
+import arollavengers.core.testutils.TypeOfEventStore;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
-import javax.sql.DataSource;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Driver;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 @SuppressWarnings("ConstantConditions")
-@RunWith(LabeledParameterized.class)
-public class UserCreationUsecaseTest {
-
-    /**
-     * Test will be executed on all different event store implementations.
-     * @see TypeOfEventStore
-     */
-    @LabeledParameterized.Parameters
-    public static List<Object[]> parameters() {
-        List<Object[]> modes = Lists.newArrayList();
-        for (TypeOfEventStore typeOfEventStore : TypeOfEventStore.values()) {
-            modes.add(Objects.o(typeOfEventStore));
-        }
-        return modes;
-    }
+public class UserServiceUsecaseTest {
 
     private final TypeOfEventStore typeOfEventStore;
     //
@@ -67,7 +38,11 @@ public class UserCreationUsecaseTest {
     private SimpleBus bus;
     private CollectorListener collectorListener;
 
-    public UserCreationUsecaseTest(TypeOfEventStore typeOfEventStore) {
+    public UserServiceUsecaseTest() {
+        this(TypeOfEventStore.InMemory);
+    }
+
+    protected UserServiceUsecaseTest(TypeOfEventStore typeOfEventStore) {
         this.typeOfEventStore = typeOfEventStore;
     }
 
@@ -77,7 +52,7 @@ public class UserCreationUsecaseTest {
     }
 
     @Test
-    public void create_user_then_commit_and_getIt() throws Exception {
+    public void createUser_then_commit_and_getIt() throws Exception {
         // Given
         prepareEnvironment();
 
@@ -162,9 +137,55 @@ public class UserCreationUsecaseTest {
         assertThat(collectorListener.getMessages()).isEmpty();
     }
 
+    @Test
+    public void login_with_valid_password () throws Exception {
+        // Given
+        prepareEnvironment();
+
+        Id newUserId = Id.next();
+        UnitOfWork uow = unitOfWorkFactory.create();
+        userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
+        uow.commit();
+
+        // When
+        Id loggedId = userService.getUserWithCredentials("Travis", "Pacman".toCharArray());
+
+        // Then
+        assertThat(loggedId).isEqualTo(newUserId);
+    }
+
+    @Test
+    public void login_with_unknown_login () throws Exception {
+        // Given
+        prepareEnvironment();
+
+        // When
+        Id loggedId = userService.getUserWithCredentials("Travis", "Pacman".toCharArray());
+
+        // Then
+        assertThat(loggedId).isNull();
+    }
+
+    @Test
+    public void login_with_invalid_password () throws Exception {
+        // Given
+        prepareEnvironment();
+
+        Id newUserId = Id.next();
+        UnitOfWork uow = unitOfWorkFactory.create();
+        userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
+        uow.commit();
+
+        // When
+        Id loggedId = userService.getUserWithCredentials("Travis", "P4cm4n".toCharArray());
+
+        // Then
+        assertThat(loggedId).isNull();
+    }
+
     @SuppressWarnings("UnusedDeclaration")
     private void dumpMessages () {
-        System.out.println("UserCreationUsecaseTest.dumpMessages:");
+        System.out.println("UserServiceUsecaseTest.dumpMessages:");
         for (Message message : collectorListener.getMessages()) {
             System.out.println(">> " + message);
         }
@@ -195,73 +216,4 @@ public class UserCreationUsecaseTest {
         userService.setUserRepository(userRepository);
         userService.setUserLoginIndex(userLoginIndex);
     }
-
-    private static void executeScriptOn(DataSource dataSource, String script) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        for (String sql : script.split(";")) {
-            jdbcTemplate.update(sql.trim());
-        }
-    }
-
-    public enum TypeOfEventStore {
-        InMemory
-                {
-                    @Override
-                    EventStore eventStore(TestSettings testSettings) {
-                        return new EventStoreInMemory();
-                    }
-                },
-        Prevayler
-                {
-                    @Override
-                    EventStore eventStore(TestSettings testSettings) throws Exception {
-                        String dataFolder =
-                                testSettings.getProperty("prevayler.event-store.basedir") + "/"
-                                        + UUID.randomUUID().toString();
-
-                        JacksonSerializer serializer = new JacksonSerializer();
-                        serializer.postConstruct();
-
-                        EventStorePrevayler eventStore = new EventStorePrevayler();
-                        eventStore.setDataFolder(dataFolder);
-                        eventStore.setSerializer(serializer);
-                        eventStore.postConstruct();
-                        return eventStore;
-                    }
-                },
-        Jdbc
-                {
-                    @SuppressWarnings("unchecked")
-                    @Override
-                    EventStore eventStore(TestSettings testSettings) throws Exception {
-                        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-                        dataSource.setDriverClass((Class<? extends Driver>) Class.forName(testSettings.getProperty("jdbc.driver")));
-                        dataSource.setUrl(testSettings.getProperty("jdbc.url"));
-                        for (String script : testSettings.getProperty("jdbc.scripts").split(",")) {
-                            FileInputStream inputStream = new FileInputStream(script.trim());
-                            try {
-                                executeScriptOn(dataSource, IOUtils.toString(inputStream, "utf-8"));
-                            }
-                            finally {
-                                IOUtils.closeQuietly(inputStream);
-                            }
-                        }
-
-                        JacksonSerializer serialier = new JacksonSerializer();
-                        serialier.postConstruct();
-
-                        EventStoreJdbc eventStore = new EventStoreJdbc();
-                        eventStore.setDataSource(dataSource);
-                        eventStore.setSerializer(serialier);
-                        eventStore.postConstruct();
-                        return eventStore;
-                    }
-                };
-        //Hibernate
-
-        abstract EventStore eventStore(TestSettings testSettings) throws Exception;
-
-    }
-
-
 }
