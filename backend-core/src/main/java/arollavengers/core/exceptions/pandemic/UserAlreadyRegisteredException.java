@@ -2,7 +2,7 @@ package arollavengers.core.exceptions.pandemic;
 
 import arollavengers.core.infrastructure.Id;
 
-public class UserAlreadyRegisteredException extends RuntimeException {
+public class UserAlreadyRegisteredException extends PandemicRuntimeException {
 
     private final Id worldId;
     private final Id alreadyRegisteredUserId;

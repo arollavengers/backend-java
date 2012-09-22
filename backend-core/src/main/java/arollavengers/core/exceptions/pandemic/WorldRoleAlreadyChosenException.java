@@ -3,7 +3,7 @@ package arollavengers.core.exceptions.pandemic;
 import arollavengers.core.domain.pandemic.MemberRole;
 import arollavengers.core.infrastructure.Id;
 
-public class WorldRoleAlreadyChosenException extends RuntimeException {
+public class WorldRoleAlreadyChosenException extends PandemicRuntimeException {
   private final Id aggregateId;
   private final MemberRole duplicatedRole;
 

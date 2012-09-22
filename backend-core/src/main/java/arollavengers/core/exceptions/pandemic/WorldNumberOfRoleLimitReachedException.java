@@ -2,7 +2,7 @@ package arollavengers.core.exceptions.pandemic;
 
 import arollavengers.core.domain.pandemic.MemberRole;
 
-public class WorldNumberOfRoleLimitReachedException extends RuntimeException {
+public class WorldNumberOfRoleLimitReachedException extends PandemicRuntimeException {
   private final MemberRole extraRole;
 
   public WorldNumberOfRoleLimitReachedException(final MemberRole extraRole) {

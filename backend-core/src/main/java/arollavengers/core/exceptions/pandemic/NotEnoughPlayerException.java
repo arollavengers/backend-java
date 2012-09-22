@@ -1,6 +1,6 @@
 package arollavengers.core.exceptions.pandemic;
 
-public class NotEnoughPlayerException extends RuntimeException {
+public class NotEnoughPlayerException extends PandemicRuntimeException {
 
     private final int teamSize;
     private final int minTeamSize;
