@@ -5,7 +5,7 @@ public interface UnitOfWork {
 
   void rollback();
 
-  void registerNew(DomainEvent event);
+  void registerNew(Id aggregateId, DomainEvent event);
 
   void registerEventStoreFor(Id aggregateId, EventStore eventStore);
 

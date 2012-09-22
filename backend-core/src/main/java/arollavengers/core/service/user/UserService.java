@@ -31,8 +31,8 @@ public class UserService {
     public User createUser(@NotNull UnitOfWork uow, @NotNull Id userId, @NotNull String login, char[] passwordDigest) {
         userLoginIndex.useLogin(uow, login, userId);
 
-        User user = new User(uow);
-        user.createUser(userId, login, passwordDigest, generateSalt());
+        User user = new User(userId, uow);
+        user.createUser(login, passwordDigest, generateSalt());
         userRepository.addUser(uow, user);
         return user;
     }

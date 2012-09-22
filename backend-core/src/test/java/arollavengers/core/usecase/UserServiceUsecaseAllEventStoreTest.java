@@ -1,7 +1,5 @@
 package arollavengers.core.usecase;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import arollavengers.core.testutils.TypeOfEventStore;
 import arollavengers.core.util.Objects;
 import arollavengers.junit.LabeledParameterized;

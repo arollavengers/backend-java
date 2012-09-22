@@ -26,7 +26,7 @@ public class DrawnCardInPlayerDrawCardEvent implements WorldEvent {
     }
 
     @Override
-    public Id aggregateId() {
+    public Id entityId() {
         return worldId;
     }
 

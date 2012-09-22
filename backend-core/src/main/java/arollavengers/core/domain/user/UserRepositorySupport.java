@@ -27,7 +27,7 @@ public class UserRepositorySupport implements UserRepository {
      */
     @Override
     public void addUser(@NotNull UnitOfWork uow, @NotNull User user) {
-        uow.registerEventStoreFor(user.aggregateId(), eventStore);
+        uow.registerEventStoreFor(user.entityId(), eventStore);
         uow.attach(user);
     }
 
@@ -36,7 +36,6 @@ public class UserRepositorySupport implements UserRepository {
      *
      * @param uow    unit of work in which the loaded user will be attached
      * @param userId the user's id
-     * @return
      */
     @Override
     @Nullable
@@ -47,7 +46,7 @@ public class UserRepositorySupport implements UserRepository {
             if (stream == null) {
                 return null;
             }
-            user = new User(uow);
+            user = new User(userId, uow);
             user.loadFromHistory(stream);
             uow.attach(user);
         }

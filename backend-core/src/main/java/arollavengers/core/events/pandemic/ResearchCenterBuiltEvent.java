@@ -21,7 +21,7 @@ public class ResearchCenterBuiltEvent implements WorldEvent {
     }
 
     @Override
-    public Id aggregateId() {
+    public Id entityId() {
         return worldId;
     }
 

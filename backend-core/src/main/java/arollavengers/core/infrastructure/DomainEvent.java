@@ -5,8 +5,9 @@ import arollavengers.pattern.annotation.CanBeInvokedOnlyOnce;
 public interface DomainEvent extends Message {
     long version();
 
-    Id aggregateId();
+    Id entityId();
 
     @CanBeInvokedOnlyOnce
-    void assignVersion(long l);
+    void assignVersion(long version);
+
 }

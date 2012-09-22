@@ -18,14 +18,17 @@ public class WorldCityCuredEvent implements WorldEvent {
 
     }
 
+    @Override
     public long version() {
         throw new RuntimeException("not implemented");
     }
 
-    public Id aggregateId() {
+    @Override
+    public Id entityId() {
         return worldId;
     }
 
+    @Override
     public void assignVersion(final long l) {
         throw new RuntimeException("not implemented");
     }

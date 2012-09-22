@@ -10,7 +10,7 @@ public class WorldMemberActionSpentEvent implements WorldEvent {
     throw new RuntimeException("not implemented");
   }
 
-  public Id aggregateId() {
+  public Id entityId() {
     throw new RuntimeException("not implemented");
   }
 

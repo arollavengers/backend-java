@@ -27,7 +27,7 @@ public class WorldRepositorySupport implements WorldRepository {
    */
   @Override
   public void addWorld(@NotNull UnitOfWork uow, @NotNull World world) {
-    uow.registerEventStoreFor(world.aggregateId(), eventStore);
+    uow.registerEventStoreFor(world.entityId(), eventStore);
   }
 
   /**
@@ -35,7 +35,6 @@ public class WorldRepositorySupport implements WorldRepository {
    *
    * @param uow     unit of work in which the loaded world will be attached
    * @param worldId the world's id
-   * @return
    */
   @Override
   @Nullable
@@ -44,7 +43,7 @@ public class WorldRepositorySupport implements WorldRepository {
     if (stream == null) {
       return null;
     }
-    World user = new World(uow);
+    World user = new World(worldId, uow);
     user.loadFromHistory(stream);
     return user;
   }

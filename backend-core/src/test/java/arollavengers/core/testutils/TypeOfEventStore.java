@@ -3,7 +3,6 @@ package arollavengers.core.testutils;
 import arollavengers.core.TestSettings;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.JacksonSerializer;
-import arollavengers.core.testutils.SqlUtils;
 import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
 import arollavengers.core.infrastructure.eventstore.EventStoreJdbc;
 import arollavengers.core.infrastructure.eventstore.EventStorePrevayler;

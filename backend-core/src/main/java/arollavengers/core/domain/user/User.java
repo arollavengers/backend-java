@@ -4,7 +4,6 @@ import arollavengers.core.domain.GameType;
 import arollavengers.core.events.user.GameJoinedEvent;
 import arollavengers.core.events.user.UserCreatedEvent;
 import arollavengers.core.events.user.UserEvent;
-import arollavengers.core.exceptions.EntityIdAlreadyAssignedException;
 import arollavengers.core.infrastructure.AggregateRoot;
 import arollavengers.core.infrastructure.AnnotationBasedEventHandler;
 import arollavengers.core.infrastructure.EventHandler;
@@ -28,7 +27,8 @@ public class User extends AggregateRoot<UserEvent> {
     private byte[] passwordDigest;
     private byte[] salt;
 
-    public User(UnitOfWork uow) {
+    public User(Id userId, UnitOfWork uow) {
+        super(userId);
         this.uow = uow;
         this.eventHandler = new AnnotationBasedEventHandler<UserEvent>(this);
     }
@@ -55,23 +55,18 @@ public class User extends AggregateRoot<UserEvent> {
     /**
      * Create a new user.
      *
-     * @param newId          Id of the user
      * @param login          login of the user
      * @param password       password
      * @param salt           salt to use to digest the password
      */
-    public void createUser(@NotNull Id newId, @NotNull String login, char[] password, byte[] salt) {
-        if (!aggregateId().isUndefined()) {
-            throw new EntityIdAlreadyAssignedException(aggregateId(), newId);
-        }
+    public void createUser(@NotNull String login, char[] password, byte[] salt) {
         passwordDigest = digest(password, salt);
-        UserCreatedEvent createdEvent = new UserCreatedEvent(newId, login, passwordDigest, salt);
+        UserCreatedEvent createdEvent = new UserCreatedEvent(entityId(), login, passwordDigest, salt);
         applyNewEvent(createdEvent);
     }
 
     @OnEvent
     private void doCreateUser(UserCreatedEvent event) {
-        assignId(event.aggregateId());
         this.login = event.login();
         this.passwordDigest = event.passwordDigest();
         this.salt = event.salt();
@@ -103,7 +98,7 @@ public class User extends AggregateRoot<UserEvent> {
      * @param gameType
      */
     public void joinGame(Id gameId, GameType gameType) {
-        applyNewEvent(new GameJoinedEvent(aggregateId(), gameId, gameType));
+        applyNewEvent(new GameJoinedEvent(entityId(), gameId, gameType));
     }
 
     @OnEvent

@@ -52,8 +52,7 @@ public class DummyUnitOfWork implements UnitOfWork {
     }
 
     @Override
-    public void registerNew(final DomainEvent event) {
-        Id aggregateId = event.aggregateId();
+    public void registerNew(Id aggregateId, DomainEvent event) {
         Uncommitted uncommitted = getOrCreateUncommitted(aggregateId);
         uncommitted.add(event);
         unpublishedMessages.add(event);
@@ -91,12 +90,12 @@ public class DummyUnitOfWork implements UnitOfWork {
 
     @Override
     public void attach(AggregateRoot<?> aggregateRoot) {
-        attachedMap.put(aggregateRoot.aggregateId(), aggregateRoot);
+        attachedMap.put(aggregateRoot.entityId(), aggregateRoot);
     }
 
     @Override
     public void detach(AggregateRoot<?> aggregateRoot) {
-        attachedMap.remove(aggregateRoot.aggregateId());
+        attachedMap.remove(aggregateRoot.entityId());
     }
 
     @SuppressWarnings("unchecked")
