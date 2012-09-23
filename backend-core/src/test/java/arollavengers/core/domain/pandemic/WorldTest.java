@@ -16,6 +16,7 @@ import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,7 +62,7 @@ public class WorldTest {
         }
 
         // Then -- cards are not initialized yet
-        assertThat(w.playerDrawCardsSize()).isEqualTo(0);
+        assertThat(w.playerDrawPileSize()).isEqualTo(0);
         //      -- No city has a research center
         assertThat(w.citiesWithResearchCenters()).hasSize(0);
     }
@@ -207,9 +208,7 @@ public class WorldTest {
         //When -- another user try to register
         w.registerMember(othr, MemberRole.Scientist);
 
-
         //Then -- an exception is thrown
-
     }
 
     @Test(expected = WorldNotYetCreatedException.class)
@@ -269,12 +268,12 @@ public class WorldTest {
 
         //Then -- each players has 4 PlayerCard
         final int initialCardsPerMember = 4;
-// TODO       assertThat(w.memberHandSize(ownr.entityId())).isEqualTo(initialCardsPerMember);
-// TODO       assertThat(w.memberHandSize(user.entityId())).isEqualTo(initialCardsPerMember);
+        assertThat(w.memberHandSize(ownr.entityId())).isEqualTo(initialCardsPerMember);
+        assertThat(w.memberHandSize(user.entityId())).isEqualTo(initialCardsPerMember);
 
         //Then -- the player draw cards is initialized
 // TODO       final int remainingDrawPlayerCards = CityId.values().length - (initialCardsPerMember * 2);
-// TODO       assertThat(w.playerDrawCardsSize()).isEqualTo(remainingDrawPlayerCards);
+// TODO       assertThat(w.playerDrawPileSize()).isEqualTo(remainingDrawPlayerCards);
 
         //Then -- Atlanta is the only city with a research center
         assertThat(w.citiesWithResearchCenters()).hasSize(1);

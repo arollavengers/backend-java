@@ -2,8 +2,8 @@ package arollavengers.core.domain.pandemic;
 
 import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserRepository;
-import arollavengers.core.events.pandemic.DrawnCardInPlayerDrawCardEvent;
 import arollavengers.core.events.pandemic.GameStartedEvent;
+import arollavengers.core.events.pandemic.PlayerDrawnCardFromPileEvent;
 import arollavengers.core.events.pandemic.ResearchCenterBuiltEvent;
 import arollavengers.core.events.pandemic.WorldCityCuredEvent;
 import arollavengers.core.events.pandemic.WorldCityTreatedEvent;
@@ -12,6 +12,7 @@ import arollavengers.core.events.pandemic.WorldDiseaseEradicatedEvent;
 import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.events.pandemic.WorldMemberActionSpentEvent;
 import arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent;
+import arollavengers.core.events.pandemic.WorldPlayerDrawPileCreatedEvent;
 import arollavengers.core.exceptions.EntityAlreadyCreatedException;
 import arollavengers.core.exceptions.pandemic.GameAlreadyStartedException;
 import arollavengers.core.exceptions.pandemic.InvalidUserException;
@@ -57,7 +58,7 @@ public class World extends AggregateRoot<WorldEvent> {
 
     private boolean started;
 
-    private PlayerDrawCard playerDrawCard;
+    private PlayerDrawPile playerDrawPile;
 
     private int infectionRate = -1;
 
@@ -84,8 +85,9 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     private void ensureEntityWasNotAlreadyCreated() {
-        if(!ownerId.isUndefined())
+        if (!ownerId.isUndefined()) {
             throw new EntityAlreadyCreatedException(entityId());
+        }
     }
 
     @OnEvent
@@ -97,7 +99,6 @@ public class World extends AggregateRoot<WorldEvent> {
         this.eradicatedDiseases = new HashSet<Disease>();
         this.curesDiscovered = new HashSet<Disease>();
         this.team = new Team();
-        this.playerDrawCard = new PlayerDrawCard();
         this.infectionRate = 2;
         this.outbreaks = 0;
     }
@@ -156,17 +157,34 @@ public class World extends AggregateRoot<WorldEvent> {
     public void startGame() {
 
         ensureWorldIsCreated();
+        ensureGameIsNotAlreadyStarted();
 
         final int teamSize = team().size();
         if (teamSize < MIN_TEAM_SIZE) {
             throw new NotEnoughPlayerException(teamSize, MIN_TEAM_SIZE);
         }
-//
-//        PlayerDrawCard playerDrawCard = new PlayerDrawCard();
-//        playerDrawCard.buildAndShuffle();
-//
-//        applyNewEvent(new PlayerDrawCardCreated(entityId(), Pl));
+
+        applyNewEvent(new WorldPlayerDrawPileCreatedEvent(entityId(), Id.next()));
+        playerDrawPile.initialize();
+
+        int nbCardsPerPlayer = nbCardsPerPlayer(teamSize);
+        for (Member member : team()) {
+            for (int i = 0; i < nbCardsPerPlayer; i++) {
+                applyNewEvent(new PlayerDrawnCardFromPileEvent(entityId(), member, playerDrawPile.drawTop()));
+            }
+        }
+        playerDrawPile.completeForDifficulty(difficulty());
+        applyNewEvent(new ResearchCenterBuiltEvent(entityId(), CityId.Atlanta));
         applyNewEvent(new GameStartedEvent(entityId()));
+    }
+
+    private int nbCardsPerPlayer(int teamSize) {
+        return 6 - teamSize;
+    }
+
+    @OnEvent
+    private void doCreateDrawPile(final WorldPlayerDrawPileCreatedEvent event) {
+        playerDrawPile = new PlayerDrawPile(aggregate(), event.drawPileId());
     }
 
     @OnEvent
@@ -176,19 +194,23 @@ public class World extends AggregateRoot<WorldEvent> {
         // due to the replay behavior used to reload the aggregate
         // random sequence must be calculated once, and stored in an event
         // for replay
-//        playerDrawCard.buildAndShuffle(event.randomSeq());
+        //
+        // ~~~ don't do this:
+        // playerDrawPile.buildAndShuffle(event.randomSeq());
 
-        for (Member member : team()) {
-            for (int i = team().size(); i < 6; i++) {
-                applyNewEvent(new DrawnCardInPlayerDrawCardEvent(entityId(), member));
-            }
-        }
-
-        applyNewEvent(new ResearchCenterBuiltEvent(entityId(), CityId.Atlanta));
+        // no event triggering in 'OnEvent' : only state assignments
+        // otherwise new events are generated at each 'replay/reloadFromHistory'
+        //
+        // ~~~ don't do this:
+        // for (Member member : team()) {
+        //     for (int i = team().size(); i < 6; i++) {
+        //         applyNewEvent(new PlayerDrawnCardFromPileEvent(entityId(), member));
+        //     }
+        // }
+        // applyNewEvent(new ResearchCenterBuiltEvent(entityId(), CityId.Atlanta));
 
         this.started = true;
     }
-
 
     @OnEvent
     private void doBuildResearchCenter(final ResearchCenterBuiltEvent event) {
@@ -196,9 +218,12 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     @OnEvent
-    private void doDrawCardInPlayerDrawCards(final DrawnCardInPlayerDrawCardEvent event) {
-//        PlayerCard card = playerDrawCard.drawTop();
-//        memberStates.getStateOf(event.member()).addToHand(card);
+    private void doDrawCardInPlayerDrawCards(final PlayerDrawnCardFromPileEvent event) {
+        // no computation : only state assignments
+        // ~~~ don't do this:
+        // PlayerCard card = playerDrawPile.drawTop();
+
+        memberStates.getStateOf(event.member()).addToHand(event.playerCard());
     }
 
     /**
@@ -331,8 +356,11 @@ public class World extends AggregateRoot<WorldEvent> {
         return started;
     }
 
-    public int playerDrawCardsSize() {
-        return playerDrawCard.size();
+    public int playerDrawPileSize() {
+        if (playerDrawPile == null) {
+            return 0;
+        }
+        return playerDrawPile.size();
     }
 
     public Collection<CityId> citiesWithResearchCenters() {

@@ -55,11 +55,16 @@ public enum PlayerCityCard implements PlayerCard {
 
     private final CityId cityId;
 
-    PlayerCityCard(final CityId cityId) {
+    PlayerCityCard(CityId cityId) {
         this.cityId = cityId;
     }
 
     public CityId cityId() {
         return cityId;
+    }
+
+    @Override
+    public PlayerCardType cardType() {
+        return PlayerCardType.City;
     }
 }
