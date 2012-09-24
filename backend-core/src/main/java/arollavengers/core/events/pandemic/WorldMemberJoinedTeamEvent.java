@@ -7,11 +7,15 @@ public class WorldMemberJoinedTeamEvent implements WorldEvent {
 
     private long version;
     private final Id worldId;
+    private final Id memberId;
     private final Id newComerId;
     private final MemberRole role;
 
-    public WorldMemberJoinedTeamEvent(final Id worldId, final Id newComerId, final MemberRole role) {
+    public WorldMemberJoinedTeamEvent(final Id worldId,
+                                      final Id memberId,
+                                      final Id newComerId, final MemberRole role) {
         this.worldId = worldId;
+        this.memberId = memberId;
         this.newComerId = newComerId;
         this.role = role;
     }
@@ -31,6 +35,10 @@ public class WorldMemberJoinedTeamEvent implements WorldEvent {
         return worldId;
     }
 
+    public Id memberId() {
+        return memberId;
+    }
+
     public Id newComerId() {
         return newComerId;
     }
@@ -41,7 +49,7 @@ public class WorldMemberJoinedTeamEvent implements WorldEvent {
 
     @Override
     public String toString() {
-        return "WorldMemberJoinedTeamEvent[" + worldId + ", v" + version + ", " + newComerId + ": " + role + "]";
+        return "WorldMemberJoinedTeamEvent[" + worldId + ", v" + version + ", " + memberId + ", " + newComerId + ": " + role + "]";
     }
 
 }
