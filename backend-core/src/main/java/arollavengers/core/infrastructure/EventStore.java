@@ -1,7 +1,7 @@
 package arollavengers.core.infrastructure;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.PrintStream;
 
 /**
@@ -16,7 +16,7 @@ public interface EventStore {
      * @param streamId the id of the stream the events will be appended to
      * @param stream the stream of event to store
      */
-    void store(@NotNull Id streamId, @NotNull Stream<DomainEvent> stream);
+    void store(@Nonnull Id streamId, @Nonnull Stream<DomainEvent> stream);
 
     /**
      *
@@ -26,7 +26,7 @@ public interface EventStore {
      * @return
      */
     @Nullable
-    <E extends DomainEvent> Stream<E> openStream(@NotNull Id streamId, Class<E> eventType);
+    <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, Class<E> eventType);
 
     /**
      * Debug method that dump the content of the event store.

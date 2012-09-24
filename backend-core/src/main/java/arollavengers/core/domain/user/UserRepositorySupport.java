@@ -7,8 +7,8 @@ import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.pattern.annotation.DependencyInjection;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -26,7 +26,7 @@ public class UserRepositorySupport implements UserRepository {
      * @param user the user
      */
     @Override
-    public void addUser(@NotNull UnitOfWork uow, @NotNull User user) {
+    public void addUser(@Nonnull UnitOfWork uow, @Nonnull User user) {
         uow.registerEventStoreFor(user.aggregateId(), eventStore);
         uow.attach(user);
     }
@@ -40,7 +40,7 @@ public class UserRepositorySupport implements UserRepository {
      */
     @Override
     @Nullable
-    public User getUser(@NotNull UnitOfWork uow, @NotNull Id userId) {
+    public User getUser(@Nonnull UnitOfWork uow, @Nonnull Id userId) {
         User user = uow.getAggregate(userId);
         if (user == null) {
             Stream<UserEvent> stream = eventStore.openStream(userId, UserEvent.class);

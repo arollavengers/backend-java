@@ -3,15 +3,15 @@ package arollavengers.core.domain.pandemic;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.UnitOfWork;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public interface WorldRepository {
-  void addWorld(@NotNull UnitOfWork uow, @NotNull World world);
+  void addWorld(@Nonnull UnitOfWork uow, @Nonnull World world);
 
   @Nullable
-  World getWorld(@NotNull UnitOfWork uow, @NotNull Id worldId);
+  World getWorld(@Nonnull UnitOfWork uow, @Nonnull Id worldId);
 }

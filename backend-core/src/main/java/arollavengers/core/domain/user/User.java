@@ -13,7 +13,7 @@ import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import arollavengers.core.util.Bytes;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -60,7 +60,7 @@ public class User extends AggregateRoot<UserEvent> {
      * @param password       password
      * @param salt           salt to use to digest the password
      */
-    public void createUser(@NotNull Id newId, @NotNull String login, char[] password, byte[] salt) {
+    public void createUser(@Nonnull Id newId, @Nonnull String login, char[] password, byte[] salt) {
         if (!aggregateId().isUndefined()) {
             throw new EntityIdAlreadyAssignedException(aggregateId(), newId);
         }

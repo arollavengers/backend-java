@@ -3,7 +3,7 @@ package arollavengers.core.domain.pandemic;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.*;
 
@@ -18,7 +18,7 @@ public class CityStates {
         this.cityStates = Collections.unmodifiableMap(cityStatesSeed);
     }
 
-    public CityState getStateOf(@NotNull final CityId city) {
+    public CityState getStateOf(@Nonnull final CityId city) {
         return cityStates.get(city);
     }
 
@@ -36,7 +36,7 @@ public class CityStates {
         return ret;
     }
 
-    public void buildResearchCenter(@NotNull final CityId city) {
+    public void buildResearchCenter(@Nonnull final CityId city) {
         Preconditions.checkNotNull(city);
         getStateOf(city).buildResearchCenter();
     }

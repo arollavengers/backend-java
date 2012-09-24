@@ -8,7 +8,7 @@ import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.UnitOfWorkFactory;
 import arollavengers.pattern.annotation.DependencyInjection;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.security.SecureRandom;
@@ -28,7 +28,7 @@ public class UserService {
     /**
      *
      */
-    public User createUser(@NotNull UnitOfWork uow, @NotNull Id userId, @NotNull String login, char[] passwordDigest) {
+    public User createUser(@Nonnull UnitOfWork uow, @Nonnull Id userId, @Nonnull String login, char[] passwordDigest) {
         userLoginIndex.useLogin(uow, login, userId);
 
         User user = new User(uow);
@@ -46,7 +46,7 @@ public class UserService {
      * @return the corresponding user's {@link Id} is the credentials are fulfilled otherwise
      *    returns <code>null</code>
      */
-    public Id getUserWithCredentials(@NotNull String login, char[] password) {
+    public Id getUserWithCredentials(@Nonnull String login, char[] password) {
         UnitOfWork uow = unitOfWorkFactory.create();
         Id userId = userLoginIndex.getByLogin(uow, login);
         if (userId == null) {

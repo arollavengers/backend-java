@@ -5,7 +5,7 @@ import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -53,7 +53,7 @@ public class AnnotationBasedEventHandler<E> implements EventHandler<E> {
 
         private final Map<Class<?>, List<Method>> methodsPerKlazz = Maps.newConcurrentMap();
 
-        @NotNull
+        @Nonnull
         private List<Method> getMethodsFor(Class<?> klazz) {
             List<Method> methods = methodsPerKlazz.get(klazz);
             if (methods == null) {
@@ -63,7 +63,7 @@ public class AnnotationBasedEventHandler<E> implements EventHandler<E> {
             return methods;
         }
 
-        @NotNull
+        @Nonnull
         private List<Method> buildMethodsFor(Class<?> klazz) {
             List<Method> methods =Lists.newArrayList();
             for (Method method : klazz.getDeclaredMethods()) {
@@ -78,7 +78,7 @@ public class AnnotationBasedEventHandler<E> implements EventHandler<E> {
             return methods;
         }
 
-        @NotNull
+        @Nonnull
         public Method getMethodFor(Class<?> aClass, Object event) {
             List<Method> methods = getMethodsFor(aClass);
             Class<?> eventClass = event.getClass();

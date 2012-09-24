@@ -4,8 +4,8 @@ import arollavengers.core.exceptions.InvalidUnitOfWorkStateException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class UnitOfWorkDefault implements UnitOfWork {
     }
 
     @Override
-    public void registerNew(@NotNull final DomainEvent event) {
+    public void registerNew(@Nonnull final DomainEvent event) {
         Id aggregateId = event.aggregateId();
         Uncommitted uncommitted = getOrCreateUncommitted(aggregateId);
         uncommitted.add(event);
@@ -86,25 +86,25 @@ public class UnitOfWorkDefault implements UnitOfWork {
     }
 
     @Override
-    public void registerEventStoreFor(@NotNull Id aggregateId, @NotNull EventStore eventStore) {
+    public void registerEventStoreFor(@Nonnull Id aggregateId, @Nonnull EventStore eventStore) {
         Uncommitted uncommitted = getOrCreateUncommitted(aggregateId);
         uncommitted.define(eventStore);
     }
 
     @Override
-    public void attach(@NotNull AggregateRoot<?> aggregateRoot) {
+    public void attach(@Nonnull AggregateRoot<?> aggregateRoot) {
         attachedMap.put(aggregateRoot.aggregateId(), aggregateRoot);
     }
 
     @Override
-    public void detach(@NotNull Id aggregateId) {
+    public void detach(@Nonnull Id aggregateId) {
         attachedMap.remove(aggregateId);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     @Nullable
-    public <T extends AggregateRoot<?>> T getAggregate(@NotNull Id id) {
+    public <T extends AggregateRoot<?>> T getAggregate(@Nonnull Id id) {
         return (T) attachedMap.get(id);
     }
 

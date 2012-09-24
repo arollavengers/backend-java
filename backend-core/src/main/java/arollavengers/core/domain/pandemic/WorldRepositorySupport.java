@@ -7,8 +7,8 @@ import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.pattern.annotation.DependencyInjection;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -26,7 +26,7 @@ public class WorldRepositorySupport implements WorldRepository {
    * @param world the world
    */
   @Override
-  public void addWorld(@NotNull UnitOfWork uow, @NotNull World world) {
+  public void addWorld(@Nonnull UnitOfWork uow, @Nonnull World world) {
     uow.registerEventStoreFor(world.aggregateId(), eventStore);
   }
 
@@ -39,7 +39,7 @@ public class WorldRepositorySupport implements WorldRepository {
    */
   @Override
   @Nullable
-  public World getWorld(@NotNull UnitOfWork uow, @NotNull Id worldId) {
+  public World getWorld(@Nonnull UnitOfWork uow, @Nonnull Id worldId) {
     Stream<WorldEvent> stream = eventStore.openStream(worldId, WorldEvent.class);
     if (stream == null) {
       return null;

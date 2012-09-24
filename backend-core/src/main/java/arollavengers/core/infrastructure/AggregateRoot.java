@@ -5,7 +5,7 @@ import arollavengers.core.exceptions.IncompatibleEventIdException;
 import arollavengers.core.exceptions.InvalidEventSequenceException;
 import arollavengers.core.util.Function;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public abstract class AggregateRoot<E extends DomainEvent> {
 
@@ -47,7 +47,7 @@ public abstract class AggregateRoot<E extends DomainEvent> {
      *
      * @param stream Stream of events to rebuild state from
      */
-    public void loadFromHistory(@NotNull Stream<E> stream) {
+    public void loadFromHistory(@Nonnull Stream<E> stream) {
         stream.consume(new Function<E>() {
             public void apply(E event) {
                 applyEvent(event, false);

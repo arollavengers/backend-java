@@ -10,7 +10,7 @@ import arollavengers.core.infrastructure.Streams;
 import arollavengers.pattern.annotation.DependencyInjection;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -61,7 +61,7 @@ public class EventStoreJdbc implements EventStore {
     }
 
     @Override
-    public void store(@NotNull final Id streamId, @NotNull final Stream<DomainEvent> stream) {
+    public void store(@Nonnull final Id streamId, @Nonnull final Stream<DomainEvent> stream) {
         jdbcTemplate.execute(new ConnectionCallback<Object>() {
             @Override
             public Object doInConnection(Connection connection) throws SQLException, DataAccessException {
@@ -155,7 +155,7 @@ public class EventStoreJdbc implements EventStore {
     }
 
     @Override
-    public <E extends DomainEvent> Stream<E> openStream(@NotNull Id streamId, Class<E> eventType) {
+    public <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, Class<E> eventType) {
         String sql = "select stream_id, event_id, event_data from stream_events where stream_id = ? order by event_id";
         List<E> events = jdbcTemplate.query(sql, new RowMapper<E>() {
             @SuppressWarnings("unchecked")

@@ -1,16 +1,16 @@
 package arollavengers.core.infrastructure;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public interface Bus {
-    void publish(@NotNull Message message);
-    void subscribe(@NotNull Listener listener);
-    void unsubscribe(@NotNull Listener listener);
+    void publish(@Nonnull Message message);
+    void subscribe(@Nonnull Listener listener);
+    void unsubscribe(@Nonnull Listener listener);
 
     public interface Listener {
-      void onMessage(@NotNull Message message);
+      void onMessage(@Nonnull Message message);
     }
 }

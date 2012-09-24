@@ -12,7 +12,7 @@ import com.google.common.collect.Maps;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.prevayler.Prevayler;
 import org.prevayler.PrevaylerFactory;
 import org.prevayler.Query;
@@ -46,14 +46,14 @@ public class EventStorePrevayler implements EventStore {
     private arollavengers.core.infrastructure.Serializer serializer;
 
     @Override
-    public void store(@NotNull Id streamId, @NotNull Stream<DomainEvent> stream) {
+    public void store(@Nonnull Id streamId, @Nonnull Stream<DomainEvent> stream) {
         List<DomainEvent> events = Streams.toList(stream);
         prevayler.execute(new AppendStream(streamId, events.toArray(new DomainEvent[events.size()])));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E extends DomainEvent> Stream<E> openStream(@NotNull Id streamId, @NotNull Class<E> eventType) {
+    public <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, @Nonnull Class<E> eventType) {
         try {
             return (Stream<E>) prevayler.execute(new QueryStream(streamId));
         }

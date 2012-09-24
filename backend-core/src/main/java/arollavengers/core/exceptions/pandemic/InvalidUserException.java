@@ -1,11 +1,11 @@
 package arollavengers.core.exceptions.pandemic;
 
 import arollavengers.core.domain.user.User;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public class InvalidUserException extends PandemicRuntimeException {
 
-    public InvalidUserException(@NotNull final User user) {
+    public InvalidUserException(@Nonnull final User user) {
         super("User invalid " + user);
     }
 }

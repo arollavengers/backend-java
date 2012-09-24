@@ -4,7 +4,7 @@ import arollavengers.core.infrastructure.Bus;
 import arollavengers.core.infrastructure.Message;
 import com.google.common.collect.Lists;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -15,7 +15,7 @@ public class CollectorListener implements Bus.Listener {
     private List<Message> messages = Lists.newArrayList();
 
     @Override
-    public void onMessage(@NotNull Message message) {
+    public void onMessage(@Nonnull Message message) {
         messages.add(message);
     }
 

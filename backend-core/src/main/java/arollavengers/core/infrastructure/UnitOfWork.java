@@ -1,7 +1,8 @@
 package arollavengers.core.infrastructure;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * <blockquote>A Unit of Work keeps track of everything you do during a business transaction
@@ -22,7 +23,7 @@ public interface UnitOfWork {
 
     void rollback();
 
-    void registerNew(@NotNull DomainEvent event);
+    void registerNew(@Nonnull DomainEvent event);
 
     /**
      * Register the event store that must be used to store the event for the given
@@ -32,7 +33,7 @@ public interface UnitOfWork {
      * @param aggregateId aggregate root's id
      * @param eventStore event store used to store the aggregate's events.
      */
-    void registerEventStoreFor(@NotNull Id aggregateId, @NotNull EventStore eventStore);
+    void registerEventStoreFor(@Nonnull Id aggregateId, @Nonnull EventStore eventStore);
 
     /**
      * Attach the aggregate root to the unit of work, this ensure that for a given entity
@@ -47,9 +48,9 @@ public interface UnitOfWork {
      * @param aggregateRoot aggregate root to attach
      * @see #getAggregate(Id)
      */
-    void attach(@NotNull AggregateRoot<?> aggregateRoot);
+    void attach(@Nonnull AggregateRoot<?> aggregateRoot);
 
-    void detach(@NotNull Id aggregateId);
+    void detach(@Nonnull Id aggregateId);
 
     /**
      *
@@ -58,5 +59,5 @@ public interface UnitOfWork {
      * @see #attach(AggregateRoot)
      */
     @Nullable
-    <T extends AggregateRoot<?>> T getAggregate(@NotNull Id id);
+    <T extends AggregateRoot<?>> T getAggregate(@Nonnull Id id);
 }

@@ -58,7 +58,8 @@
 
                 def classesDir = new File(project.basedir, "/target/classes")
 
-                def instrumenter = new InstrumentClasses(classesDir).useClassPath(runtimeClasspath).useDefaultInstrumenters()
+                def instrumenter = new
+                InstrumentClasses(classesDir).useClassPath(runtimeClasspath).useDefaultInstrumenters()
                 def instrument = { name -> instrumenter.instrument(name) }
 
                 classesDir.eachFileRecurse(FileType.FILES) { file ->
@@ -190,8 +191,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jetbrains</groupId>
-      <artifactId>annotations</artifactId>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

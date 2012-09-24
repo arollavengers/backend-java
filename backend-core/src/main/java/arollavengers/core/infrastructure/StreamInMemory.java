@@ -2,7 +2,7 @@ package arollavengers.core.infrastructure;
 
 import arollavengers.core.util.Function;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -13,7 +13,7 @@ public class StreamInMemory<E> implements Stream<E> {
 
     private Object[] elements;
 
-    public StreamInMemory(@NotNull List<E> values) {
+    public StreamInMemory(@Nonnull List<E> values) {
         this.elements = values.toArray();
     }
 
@@ -23,7 +23,7 @@ public class StreamInMemory<E> implements Stream<E> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void consume(@NotNull Function<E> function) {
+    public void consume(@Nonnull Function<E> function) {
         int position = 0;
         try {
             for (; position < elements.length; position++) {
