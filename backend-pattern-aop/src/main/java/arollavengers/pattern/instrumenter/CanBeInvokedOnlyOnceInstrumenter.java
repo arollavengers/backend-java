@@ -1,6 +1,14 @@
 package arollavengers.pattern.instrumenter;
 
+import static arollavengers.pattern.func.Filters.and;
+import static arollavengers.pattern.javassist.JavassistUtils.findMethod;
+import static arollavengers.pattern.javassist.JavassistUtils.findMethodInHierarchy;
+import static arollavengers.pattern.javassist.JavassistUtils.methodWithAnnotation;
+import static arollavengers.pattern.javassist.JavassistUtils.sameMethodAs;
+
 import arollavengers.pattern.annotation.CanBeInvokedOnlyOnce;
+import arollavengers.pattern.func.Filter;
+import arollavengers.pattern.func.Filters;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
@@ -12,18 +20,22 @@ import javassist.NotFoundException;
  */
 public class CanBeInvokedOnlyOnceInstrumenter implements Instrumenter {
 
+    private boolean verbose;
+
     @Override
     public boolean instrument(CtClass clazz) throws CannotCompileException, NotFoundException {
-        if(!canInstrument(clazz))
+        if (!canInstrument(clazz)) {
             return false;
+        }
 
         boolean modified = false;
-        for(CtMethod method : clazz.getDeclaredMethods()) {
-            if(mustBeInstrumented(clazz, method)) {
+        for (CtMethod method : clazz.getDeclaredMethods()) {
+            if (mustBeInstrumented(clazz, method)) {
                 modified = true;
                 instrument(clazz, method);
             }
         }
+
         return modified;
     }
 
@@ -38,43 +50,18 @@ public class CanBeInvokedOnlyOnceInstrumenter implements Instrumenter {
 
     private boolean mustBeInstrumented(CtClass ctClass, CtMethod method) throws NotFoundException {
         // easy case
-        if(method.hasAnnotation(CanBeInvokedOnlyOnce.class))
+        if (method.hasAnnotation(CanBeInvokedOnlyOnce.class)) {
             return true;
-
-        return isMethodAnnotatedInHierarchy(ctClass, method);
-    }
-
-    private boolean isMethodAnnotatedInHierarchy(CtClass ctClass, CtMethod method) throws NotFoundException {
-        CtMethod found = findMethod(ctClass, method);
-        if(found!=null && found.hasAnnotation(CanBeInvokedOnlyOnce.class))
-            return true;
-
-        CtClass[] interfaces = ctClass.getInterfaces();
-        if(interfaces!=null) {
-            for(CtClass intf : interfaces) {
-                boolean annotationPresent = isMethodAnnotatedInHierarchy(intf, method);
-                if(annotationPresent)
-                    return true;
-            }
         }
 
-        CtClass superclass = ctClass.getSuperclass();
-        if(superclass != null) {
-            return isMethodAnnotatedInHierarchy(superclass, method);
+        Filter<CtMethod> filter = and(
+                sameMethodAs(method),
+                methodWithAnnotation(CanBeInvokedOnlyOnce.class));
+        if (verbose) {
+            filter = Filters.verbose(filter);
         }
-        return false;
-    }
-
-    private static CtMethod findMethod(CtClass ctClass, CtMethod method) {
-        for(CtMethod classMethod : ctClass.getDeclaredMethods()) {
-            if(sameMethods(classMethod, method))
-                return classMethod;
-        }
-        return null;
-    }
-
-    private static boolean sameMethods(CtMethod one, CtMethod two) {
-        return two.getName().equals(one.getName()) && two.getSignature().equals(one.getSignature());
+        CtMethod found = findMethodInHierarchy(ctClass, filter);
+        return found != null;
     }
 
     protected void instrument(CtClass clazz, CtMethod method) throws CannotCompileException {

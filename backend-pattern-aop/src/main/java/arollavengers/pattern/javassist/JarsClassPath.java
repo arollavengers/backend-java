@@ -18,7 +18,7 @@ import java.util.jar.JarFile;
 public class JarsClassPath implements ClassPath {
 
     private List<Jar> jars;
-    private boolean verbose;
+    private boolean verbose = true;
 
     public JarsClassPath() {
     }

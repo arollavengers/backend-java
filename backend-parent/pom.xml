@@ -24,6 +24,7 @@
     <jackson.version>1.9.4</jackson.version>
     <spring.version>3.1.2.RELEASE</spring.version>
     <javassist.version>3.12.1.GA</javassist.version>
+    <groovy.version>2.0.0</groovy.version>
 
     <jetty-maven-plugin.version>8.0.0.M2</jetty-maven-plugin.version>
   </properties>
@@ -122,6 +123,15 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- ~~~~~~~~~~~~~Groovy~~~~~~~~~~~~~~~~ -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-all</artifactId>
+        <version>${groovy.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- ~~~~~~~~~~~~Javassist~~~~~~~~~~~~~~ -->
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <dependency>
@@ -145,17 +155,19 @@
         <version>2.5</version>
       </dependency>
 
+      <!-- Nonnull/Nullable... annotations -->
       <dependency>
         <groupId>com.google.code.findbugs</groupId>
         <artifactId>jsr305</artifactId>
         <version>2.0.1</version>
       </dependency>
 
-      <dependency>
+      <!-- Replaced by jsr305 see above -->
+      <!--dependency>
         <groupId>org.jetbrains</groupId>
         <artifactId>annotations</artifactId>
         <version>7.0.2</version>
-      </dependency>
+      </dependency-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- ~~~~~~~~~~JSR 303 Validation~~~~~~~ -->

@@ -39,6 +39,7 @@ public class InstrumentClasses {
 
     public InstrumentClasses useDefaultInstrumenters() {
         instrumenterList.add(new CanBeInvokedOnlyOnceInstrumenter());
+        instrumenterList.add(new NonnullInstrumenter());
         return this;
     }
 
