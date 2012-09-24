@@ -30,7 +30,7 @@ public class GameJoinedEvent implements UserEvent {
     }
 
     @Override
-    public Id aggregateId() {
+    public Id entityId() {
         return userId;
     }
 

@@ -23,7 +23,7 @@ public interface UnitOfWork {
 
     void rollback();
 
-    void registerNew(@Nonnull DomainEvent event);
+    void registerNew(@Nonnull Id aggregateId, @Nonnull DomainEvent event);
 
     /**
      * Register the event store that must be used to store the event for the given

@@ -54,8 +54,7 @@ public class UnitOfWorkDefault implements UnitOfWork {
     }
 
     @Override
-    public void registerNew(@Nonnull final DomainEvent event) {
-        Id aggregateId = event.aggregateId();
+    public void registerNew(@Nonnull Id aggregateId, @Nonnull DomainEvent event) {
         Uncommitted uncommitted = getOrCreateUncommitted(aggregateId);
         uncommitted.add(event);
         unpublishedMessages.add(event);
@@ -93,7 +92,7 @@ public class UnitOfWorkDefault implements UnitOfWork {
 
     @Override
     public void attach(@Nonnull AggregateRoot<?> aggregateRoot) {
-        attachedMap.put(aggregateRoot.aggregateId(), aggregateRoot);
+        attachedMap.put(aggregateRoot.entityId(), aggregateRoot);
     }
 
     @Override

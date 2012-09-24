@@ -36,8 +36,8 @@ public class UserTest {
     public void create_then_password_is_digested() {
         Id userId = Id.next();
 
-        User user = new User(uow);
-        user.createUser(userId, "Travis", "Pacman".toCharArray(), "hop".getBytes());
+        User user = new User(userId, uow);
+        user.createUser("Travis", "Pacman".toCharArray(), "hop".getBytes());
 
         List<DomainEvent> allUncommitted = uow.getAllUncommitted();
 
@@ -52,8 +52,8 @@ public class UserTest {
     public void checkPassword() {
         Id userId = Id.next();
 
-        User user = new User(uow);
-        user.createUser(userId, "Travis", "Pacman".toCharArray(), "hop".getBytes());
+        User user = new User(userId, uow);
+        user.createUser("Travis", "Pacman".toCharArray(), "hop".getBytes());
         assertThat(user.checkPassword("Mccallum".toCharArray())).isFalse();
         assertThat(user.checkPassword("Pacman".toCharArray())).isTrue();
     }

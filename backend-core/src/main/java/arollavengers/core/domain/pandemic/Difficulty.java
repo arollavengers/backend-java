@@ -6,13 +6,13 @@ public enum Difficulty {
   Normal(5),
   Heroic(6);
 
-  private final int nbPiles;
+  private final int nbEpidemicCards;
 
-  Difficulty(final int nbPiles) {
-    this.nbPiles = nbPiles;
+  Difficulty(final int nbEpidemicCards) {
+    this.nbEpidemicCards = nbEpidemicCards;
   }
 
-  public int nbPiles() {
-    return nbPiles;
+  public int nbEpidemicCards() {
+    return nbEpidemicCards;
   }
 }

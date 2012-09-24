@@ -43,8 +43,8 @@ public class WorldService {
             throw new UserNotFoundException(ownerId);
         }
 
-        World world = new World(uow);
-        world.createWorld(worldId, user, difficulty);
+        World world = new World(worldId, uow);
+        world.createWorld(user, difficulty);
         worldRepository.addWorld(uow, world);
         uow.commit();
     }

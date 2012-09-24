@@ -61,7 +61,7 @@ public class LearnJacksonByTest {
     MyEvent myEvent = (MyEvent) o;
     assertThat(myEvent.login()).isEqualTo("Travis");
     assertThat(myEvent.password()).isEqualTo("Pacman".toCharArray());
-    assertThat(myEvent.aggregateId()).isEqualTo(Id.create("4241febf-4901-43b6-b8ed-c9a75770fbb6"));
+    assertThat(myEvent.entityId()).isEqualTo(Id.create("4241febf-4901-43b6-b8ed-c9a75770fbb6"));
   }
 
   @Test
@@ -87,7 +87,7 @@ public class LearnJacksonByTest {
     MyEvent myEvent = (MyEvent) o;
     assertThat(myEvent.login()).isEqualTo("Travis");
     assertThat(myEvent.password()).isEqualTo("Pacman".toCharArray());
-    assertThat(myEvent.aggregateId()).isEqualTo(Id.create("4241febf-4901-43b6-b8ed-c9a75770fbb6"));
+    assertThat(myEvent.entityId()).isEqualTo(Id.create("4241febf-4901-43b6-b8ed-c9a75770fbb6"));
   }
 
   // --------------------------------------------------------------------------
@@ -159,7 +159,7 @@ public class LearnJacksonByTest {
     }
 
     @Override
-    public Id aggregateId() {
+    public Id entityId() {
       return id;
     }
 

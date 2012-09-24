@@ -49,7 +49,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
     }
 
     private Index getIndex(UnitOfWork uow) {
-        Index index = new Index(uow);
+        Index index = new Index(loginIndexAggregateId, uow);
         Stream<LoginEvent> stream = eventStore.openStream(loginIndexAggregateId, LoginEvent.class);
         if (stream != null && stream.hasRemaining()) // first time the stream is null or empty
         {
@@ -79,7 +79,8 @@ public class UserLoginIndexSupport implements UserLoginIndex {
 
         private SortedMap<String, Id> logins = Maps.newTreeMap();
 
-        private Index(UnitOfWork uow) {
+        private Index(Id indexId, UnitOfWork uow) {
+            super(indexId);
             this.uow = uow;
             this.eventHandler = new AnnotationBasedEventHandler<LoginEvent>(this);
         }
@@ -90,14 +91,13 @@ public class UserLoginIndexSupport implements UserLoginIndex {
 
         @OnEvent
         private void onCreate(LoginIndexCreatedEvent event) {
-            assignId(event.aggregateId());
         }
 
         public void registerLogin(String login, Id userId) {
             if (logins.containsKey(login)) {
                 throw new LoginAlreadyInUseException("Login: " + login);
             }
-            applyNewEvent(new LoginAddedEvent(aggregateId(), login, userId));
+            applyNewEvent(new LoginAddedEvent(entityId(), login, userId));
         }
 
         @OnEvent
@@ -106,7 +106,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
         }
 
         public void unregisterLogin(String login) {
-            applyNewEvent(new LoginRemovedEvent(aggregateId(), login));
+            applyNewEvent(new LoginRemovedEvent(entityId(), login));
         }
 
         @OnEvent
@@ -154,7 +154,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
         }
 
         @Override
-        public Id aggregateId() {
+        public Id entityId() {
             return indexId;
         }
     }
@@ -187,7 +187,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
 
         @Override
         public String toString() {
-            return "LoginAddedEvent[" + aggregateId() + ", v" + version() + ", " + login() + "]";
+            return "LoginAddedEvent[" + entityId() + ", v" + version() + ", " + login() + "]";
         }
 
         public Id userId() {
@@ -216,7 +216,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
 
         @Override
         public String toString() {
-            return "LoginRemovedEvent[" + aggregateId() + ", v" + version() + ", " + login() + "]";
+            return "LoginRemovedEvent[" + entityId() + ", v" + version() + ", " + login() + "]";
         }
     }
 
@@ -233,7 +233,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
 
         @Override
         public String toString() {
-            return "LoginIndexCreatedEvent[" + aggregateId() + ", v" + version() + "]";
+            return "LoginIndexCreatedEvent[" + entityId() + ", v" + version() + "]";
         }
     }
 }
