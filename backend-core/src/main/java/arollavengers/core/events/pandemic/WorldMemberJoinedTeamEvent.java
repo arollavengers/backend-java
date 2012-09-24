@@ -6,12 +6,12 @@ import arollavengers.core.infrastructure.Id;
 public class WorldMemberJoinedTeamEvent implements WorldEvent {
 
     private long version;
-    private final Id aggregateId;
+    private final Id worldId;
     private final Id newComerId;
     private final MemberRole role;
 
-    public WorldMemberJoinedTeamEvent(final Id aggregateId, final Id newComerId, final MemberRole role) {
-        this.aggregateId = aggregateId;
+    public WorldMemberJoinedTeamEvent(final Id worldId, final Id newComerId, final MemberRole role) {
+        this.worldId = worldId;
         this.newComerId = newComerId;
         this.role = role;
     }
@@ -28,7 +28,7 @@ public class WorldMemberJoinedTeamEvent implements WorldEvent {
 
     @Override
     public Id entityId() {
-        return aggregateId;
+        return worldId;
     }
 
     public Id newComerId() {
@@ -38,4 +38,10 @@ public class WorldMemberJoinedTeamEvent implements WorldEvent {
     public MemberRole role() {
         return role;
     }
+
+    @Override
+    public String toString() {
+        return "WorldMemberJoinedTeamEvent[" + worldId + ", v" + version + ", " + newComerId + ": " + role + "]";
+    }
+
 }

@@ -26,4 +26,10 @@ public class GameStartedEvent implements WorldEvent {
     public void assignVersion(final long version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "GameStartedEvent[" + worldId + ", v" + version + "]";
+    }
+
 }

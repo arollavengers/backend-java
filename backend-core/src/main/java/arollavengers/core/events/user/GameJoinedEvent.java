@@ -44,6 +44,6 @@ public class GameJoinedEvent implements UserEvent {
 
     @Override
     public String toString() {
-        return "GameJoinedEvent[" + userId + ", v" + version + ", " + gameId + "]";
+        return "GameJoinedEvent[" + userId + ", v" + version + ", " + gameType + "/" + gameId + "]";
     }
 }

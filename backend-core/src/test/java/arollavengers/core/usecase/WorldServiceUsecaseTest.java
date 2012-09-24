@@ -1,10 +1,12 @@
 package arollavengers.core.usecase;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import arollavengers.core.TestSettings;
 import arollavengers.core.domain.pandemic.Difficulty;
 import arollavengers.core.domain.pandemic.MemberRole;
+import arollavengers.core.domain.pandemic.World;
 import arollavengers.core.domain.pandemic.WorldRepositorySupport;
 import arollavengers.core.domain.user.UserLoginIndexSupport;
 import arollavengers.core.domain.user.UserRepositorySupport;
@@ -19,6 +21,7 @@ import arollavengers.core.service.pandemic.WorldService;
 import arollavengers.core.service.user.UserService;
 import arollavengers.core.testutils.TypeOfEventStore;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import java.io.IOException;
@@ -38,6 +41,8 @@ public class WorldServiceUsecaseTest {
     private UserService userService;
     private WorldService worldService;
     private EventStore eventStore;
+    private WorldRepositorySupport worldRepository;
+    private UserRepositorySupport userRepository;
 
     public WorldServiceUsecaseTest() {
         this(TypeOfEventStore.InMemory);
@@ -100,13 +105,49 @@ public class WorldServiceUsecaseTest {
         eventStore.dump(System.out);
     }
 
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void start_a_game() throws Exception {
+        // Given
+        prepareEnvironment();
+
+        Id ownerId = Id.next();
+        Id playerId1 = Id.next();
+        Id playerId2 = Id.next();
+        givenAFreshNewUserWithId(ownerId, "Travis");
+        givenAFreshNewUserWithId(playerId1, "Vlad");
+        givenAFreshNewUserWithId(playerId2, "Thundercat");
+
+        Id worldId = Id.next();
+        givenAFreshNewWorldWithIdAndOwner(worldId, ownerId);
+
+        worldService.joinGame(worldId, ownerId, MemberRole.Medic);
+        worldService.joinGame(worldId, playerId1, MemberRole.OperationsExpert);
+        worldService.joinGame(worldId, playerId2, MemberRole.Dispatcher);
+
+        UnitOfWork uow = unitOfWorkFactory.create();
+        World world = worldRepository.getWorld(uow, worldId);
+        assertThat(world).isNotNull();
+
+        world.startGame();
+        uow.commit();
+
+        // When
+        collectorListener.dump(System.out);
+    }
+    
+    // ------------------------------------------------------------------------
+
     private void givenAFreshNewWorldWithIdAndOwner(Id worldId, Id ownerId) {
         worldService.createWorld(worldId, ownerId, Difficulty.Normal);
     }
 
     private void givenAFreshNewUserWithId(Id userId) {
+        givenAFreshNewUserWithId(userId, "Travis");
+    }
+    private void givenAFreshNewUserWithId(Id userId, String login) {
         UnitOfWork uow = unitOfWorkFactory.create();
-        userService.createUser(uow, userId, "Travis", "Pacman".toCharArray());
+        userService.createUser(uow, userId, login, login.toCharArray());
         uow.commit();
     }
 
@@ -127,7 +168,7 @@ public class WorldServiceUsecaseTest {
         UserLoginIndexSupport userLoginIndex = new UserLoginIndexSupport();
         userLoginIndex.setEventStore(eventStore);
 
-        UserRepositorySupport userRepository = new UserRepositorySupport();
+        userRepository = new UserRepositorySupport();
         userRepository.setEventStore(eventStore);
 
         userService = new UserService();
@@ -135,7 +176,7 @@ public class WorldServiceUsecaseTest {
         userService.setUserRepository(userRepository);
         userService.setUserLoginIndex(userLoginIndex);
 
-        WorldRepositorySupport worldRepository = new WorldRepositorySupport();
+        worldRepository = new WorldRepositorySupport();
         worldRepository.setEventStore(eventStore);
 
         worldService = new WorldService();

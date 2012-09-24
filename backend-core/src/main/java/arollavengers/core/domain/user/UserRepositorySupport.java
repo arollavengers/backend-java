@@ -48,7 +48,9 @@ public class UserRepositorySupport implements UserRepository {
             }
             user = new User(userId, uow);
             user.loadFromHistory(stream);
+
             uow.attach(user);
+            uow.registerEventStoreFor(userId, eventStore);
         }
         return user;
     }

@@ -33,4 +33,9 @@ public class ResearchCenterBuiltEvent implements WorldEvent {
     public CityId city() {
         return cityId;
     }
+
+    @Override
+    public String toString() {
+        return "ResearchCenterBuiltEvent[" + worldId + ", v" + version + ", " + cityId + "]";
+    }
 }

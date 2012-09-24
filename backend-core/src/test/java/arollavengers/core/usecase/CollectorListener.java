@@ -5,6 +5,7 @@ import arollavengers.core.infrastructure.Message;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nonnull;
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -25,5 +26,10 @@ public class CollectorListener implements Bus.Listener {
 
     public void clearMessages() {
         messages.clear();
+    }
+
+    public void dump(PrintStream out) {
+        for(Message message : getMessages())
+            out.println(message);
     }
 }

@@ -39,4 +39,11 @@ public class WorldCreatedEvent implements WorldEvent {
     public Id ownerId() {
         return userId;
     }
+
+    @Override
+    public String toString() {
+        return "WorldCreatedEvent[" + newWorldId + ", v" + version + ", owner: " + userId + ", difficulty: " + difficulty + "]";
+    }
+
+
 }

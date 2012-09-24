@@ -16,40 +16,47 @@ import javax.inject.Inject;
  */
 public class WorldRepositorySupport implements WorldRepository {
 
-  @Inject
-  private EventStore eventStore;
+    @Inject
+    private EventStore eventStore;
 
-  /**
-   * Add the world to the repository.
-   *
-   * @param uow   unit of work in which the world will be attached
-   * @param world the world
-   */
-  @Override
-  public void addWorld(@Nonnull UnitOfWork uow, @Nonnull World world) {
-    uow.registerEventStoreFor(world.entityId(), eventStore);
-  }
-
-  /**
-   * Return the world (if it exists) with the specified id.
-   *
-   * @param uow     unit of work in which the loaded world will be attached
-   * @param worldId the world's id
-   */
-  @Override
-  @Nullable
-  public World getWorld(@Nonnull UnitOfWork uow, @Nonnull Id worldId) {
-    Stream<WorldEvent> stream = eventStore.openStream(worldId, WorldEvent.class);
-    if (stream == null) {
-      return null;
+    /**
+     * Add the world to the repository.
+     *
+     * @param uow   unit of work in which the world will be attached
+     * @param world the world
+     */
+    @Override
+    public void addWorld(@Nonnull UnitOfWork uow, @Nonnull World world) {
+        uow.registerEventStoreFor(world.entityId(), eventStore);
+        uow.attach(world);
     }
-    World user = new World(worldId, uow);
-    user.loadFromHistory(stream);
-    return user;
-  }
 
-  @DependencyInjection
-  public void setEventStore(EventStore eventStore) {
-    this.eventStore = eventStore;
-  }
+    /**
+     * Return the world (if it exists) with the specified id.
+     *
+     * @param uow     unit of work in which the loaded world will be attached
+     * @param worldId the world's id
+     */
+    @Override
+    @Nullable
+    public World getWorld(@Nonnull UnitOfWork uow, @Nonnull Id worldId) {
+        World world = uow.getAggregate(worldId);
+        if (world == null) {
+            Stream<WorldEvent> stream = eventStore.openStream(worldId, WorldEvent.class);
+            if (stream == null) {
+                return null;
+            }
+            world = new World(worldId, uow);
+            world.loadFromHistory(stream);
+
+            uow.registerEventStoreFor(world.entityId(), eventStore);
+            uow.attach(world);
+        }
+        return world;
+    }
+
+    @DependencyInjection
+    public void setEventStore(EventStore eventStore) {
+        this.eventStore = eventStore;
+    }
 }
