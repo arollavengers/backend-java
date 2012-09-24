@@ -1,6 +1,6 @@
 package arollavengers.core.infrastructure;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -10,7 +10,7 @@ public abstract class Entity<E extends DomainEvent> {
     private final Aggregate<E> aggregate;
     private final Id entityId;
 
-    public Entity(@NotNull Aggregate<E> aggregate, @NotNull Id entityId) {
+    public Entity(@Nonnull Aggregate<E> aggregate, @Nonnull Id entityId) {
         this.aggregate = aggregate;
         this.entityId = entityId;
         this.aggregate.register(this);

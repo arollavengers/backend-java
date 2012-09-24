@@ -20,13 +20,12 @@ import java.util.List;
 public class UserTest {
 
     private UnitOfWorkDefault uow;
-    private Bus bus;
     private CollectorListener collectorListener;
 
     @Before
     public void setUp() {
         collectorListener = new CollectorListener();
-        bus = new SimpleBus();
+        Bus bus = new SimpleBus();
         bus.subscribe(collectorListener);
 
         uow = new UnitOfWorkDefault(bus);

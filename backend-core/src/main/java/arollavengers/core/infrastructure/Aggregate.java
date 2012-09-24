@@ -5,7 +5,7 @@ import arollavengers.core.exceptions.InvalidEventSequenceException;
 import arollavengers.core.util.Function;
 import com.google.common.collect.Maps;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -22,10 +22,9 @@ public class Aggregate<E extends DomainEvent> {
     }
 
     /**
-     *
-     * @param entity
+     * Register the entity within the aggregate.
      */
-    public void register(Entity<E> entity) {
+    public void register(@Nonnull Entity<E> entity) {
         entityMap.put(entity.entityId(), entity);
     }
 
@@ -41,7 +40,7 @@ public class Aggregate<E extends DomainEvent> {
      *
      * @param stream Stream of events to rebuild state from
      */
-    public void loadFromHistory(@NotNull Stream<E> stream) {
+    public void loadFromHistory(@Nonnull Stream<E> stream) {
         stream.consume(new Function<E>() {
             public void apply(E event) {
                 applyEvent(event, false);
@@ -49,7 +48,7 @@ public class Aggregate<E extends DomainEvent> {
         });
     }
 
-    protected void applyEvent(E event, boolean isNew) {
+    protected void applyEvent(@Nonnull E event, boolean isNew) {
         checkEventSequenceOrAssignIt(event, isNew);
 
         Entity<E> entity = getEntityOrFail(event);

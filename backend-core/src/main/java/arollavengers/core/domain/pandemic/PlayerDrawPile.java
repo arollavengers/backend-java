@@ -16,7 +16,7 @@ import arollavengers.core.infrastructure.annotation.OnEvent;
 import arollavengers.core.util.ListUtils;
 import com.google.common.collect.Lists;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
@@ -26,10 +26,9 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
 
     private final EventHandler<WorldEvent> eventHandler;
     //
-    private Difficulty difficulty;
     private List<PlayerCard> cards;
 
-    public PlayerDrawPile(@NotNull Aggregate<WorldEvent> aggregate, @NotNull Id entityId) {
+    public PlayerDrawPile(@Nonnull Aggregate<WorldEvent> aggregate, @Nonnull Id entityId) {
         super(aggregate, entityId);
         this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
     }
@@ -43,6 +42,7 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
      * Initialize the pile and shuffle the cards in an unpredictible way.
      *
      * @throws arollavengers.core.domain.pandemic.PlayerDrawPile.PlayerDrawPileAlreadyInitializedException
+     *
      */
     public void initialize() throws PlayerDrawPileAlreadyInitializedException {
         ensureDrawPileNotAlreadyInitialized();
@@ -67,6 +67,7 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
      * Draw the first card on the top of the pile.
      *
      * @throws arollavengers.core.domain.pandemic.PlayerDrawPile.PlayerDrawPileNotYetInitializedException
+     *
      */
     public PlayerCard drawTop() throws PlayerDrawPileNotYetInitializedException {
         ensureDrawPileHasBeenInitialized();
@@ -88,7 +89,9 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
      *
      * @param difficulty difficulty used to adjust the player draw pile
      * @throws arollavengers.core.domain.pandemic.PlayerDrawPile.PlayerDrawPileNotYetInitializedException
+     *
      * @throws arollavengers.core.domain.pandemic.PlayerDrawPile.PlayerDrawPileAlreadyAdjustedForDifficultyException
+     *
      */
     public void completeForDifficulty(Difficulty difficulty) {
         ensureDrawPileHasBeenInitialized();
@@ -102,7 +105,7 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
 
         cards.clear();
 
-        for(List<PlayerCard> pile : listOfPile) {
+        for (List<PlayerCard> pile : listOfPile) {
             // Shuffle 1 Epidemic card (face down) into each pile.
             int insertIndex = random.nextInt(pile.size());
             pile.add(insertIndex, PlayerSpecialCard.Epidemic);
@@ -123,21 +126,29 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
     }
 
     private void ensureDrawPileHasBeenInitialized() throws PlayerDrawPileNotYetInitializedException {
-        if(cards==null)
+        if (cards == null) {
             throw new PlayerDrawPileNotYetInitializedException();
+        }
     }
 
     private void ensureDrawPileNotAlreadyInitialized() throws PlayerDrawPileAlreadyInitializedException {
-        if(cards!=null)
+        if (cards != null) {
             throw new PlayerDrawPileAlreadyInitializedException();
+        }
     }
 
     private void ensureDrawPileNotAlreadyAdjustedForDifficulty() throws PlayerDrawPileNotYetInitializedException {
-        if(cards.contains(PlayerSpecialCard.Epidemic))
+        if (cards.contains(PlayerSpecialCard.Epidemic)) {
             throw new PlayerDrawPileAlreadyAdjustedForDifficultyException();
+        }
     }
 
-    public static class PlayerDrawPileAlreadyInitializedException extends InfrastructureRuntimeException {}
-    public static class PlayerDrawPileNotYetInitializedException extends InfrastructureRuntimeException {}
-    public static class PlayerDrawPileAlreadyAdjustedForDifficultyException extends InfrastructureRuntimeException {}
+    public static class PlayerDrawPileAlreadyInitializedException extends InfrastructureRuntimeException {
+    }
+
+    public static class PlayerDrawPileNotYetInitializedException extends InfrastructureRuntimeException {
+    }
+
+    public static class PlayerDrawPileAlreadyAdjustedForDifficultyException extends InfrastructureRuntimeException {
+    }
 }

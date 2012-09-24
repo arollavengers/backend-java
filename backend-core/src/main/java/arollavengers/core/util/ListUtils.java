@@ -22,6 +22,8 @@ public class ListUtils {
                 toIndex++;
             }
             if (fromIndex < elements.size() && toIndex <= elements.size()) {
+                // Note: sublist return a view of the original list, not a copy
+                // since lists can be modified, one must create our own copy
                 listOfList.add(Lists.newArrayList(elements.subList(fromIndex, toIndex)));
             }
             else {
