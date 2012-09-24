@@ -7,7 +7,7 @@ import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserLoginIndexSupport;
 import arollavengers.core.domain.user.UserRepositorySupport;
 import arollavengers.core.exceptions.user.LoginAlreadyInUseException;
-import arollavengers.core.infrastructure.DummyUnitOfWork;
+import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Message;
@@ -201,7 +201,7 @@ public class UserServiceUsecaseTest {
         unitOfWorkFactory = new UnitOfWorkFactory() {
             @Override
             public UnitOfWork create() {
-                return new DummyUnitOfWork(bus);
+                return new UnitOfWorkDefault(bus);
             }
         };
 

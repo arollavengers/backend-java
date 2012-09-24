@@ -5,10 +5,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import arollavengers.core.events.user.UserCreatedEvent;
 import arollavengers.core.infrastructure.Bus;
 import arollavengers.core.infrastructure.DomainEvent;
-import arollavengers.core.infrastructure.DummyUnitOfWork;
+import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.SimpleBus;
-import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.usecase.CollectorListener;
 
 import org.junit.Before;
@@ -20,7 +19,7 @@ import java.util.List;
  */
 public class UserTest {
 
-    private DummyUnitOfWork uow;
+    private UnitOfWorkDefault uow;
     private Bus bus;
     private CollectorListener collectorListener;
 
@@ -30,7 +29,7 @@ public class UserTest {
         bus = new SimpleBus();
         bus.subscribe(collectorListener);
 
-        uow = new DummyUnitOfWork(bus);
+        uow = new UnitOfWorkDefault(bus);
     }
 
     @Test

@@ -4,11 +4,13 @@ import arollavengers.core.exceptions.InvalidUnitOfWorkStateException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-public class DummyUnitOfWork implements UnitOfWork {
+public class UnitOfWorkDefault implements UnitOfWork {
 
     private final Map<Id, Uncommitted> uncommittedMap = Maps.newHashMap();
     private final Map<Id, AggregateRoot<?>> attachedMap = Maps.newHashMap();
@@ -16,7 +18,7 @@ public class DummyUnitOfWork implements UnitOfWork {
     private final Bus bus;
 
     @Inject
-    public DummyUnitOfWork(Bus bus) {
+    public UnitOfWorkDefault(Bus bus) {
         this.bus = bus;
     }
 
@@ -52,7 +54,7 @@ public class DummyUnitOfWork implements UnitOfWork {
     }
 
     @Override
-    public void registerNew(final DomainEvent event) {
+    public void registerNew(@NotNull final DomainEvent event) {
         Id aggregateId = event.aggregateId();
         Uncommitted uncommitted = getOrCreateUncommitted(aggregateId);
         uncommitted.add(event);
@@ -84,24 +86,25 @@ public class DummyUnitOfWork implements UnitOfWork {
     }
 
     @Override
-    public void registerEventStoreFor(Id aggregateId, EventStore eventStore) {
+    public void registerEventStoreFor(@NotNull Id aggregateId, @NotNull EventStore eventStore) {
         Uncommitted uncommitted = getOrCreateUncommitted(aggregateId);
         uncommitted.define(eventStore);
     }
 
     @Override
-    public void attach(AggregateRoot<?> aggregateRoot) {
+    public void attach(@NotNull AggregateRoot<?> aggregateRoot) {
         attachedMap.put(aggregateRoot.aggregateId(), aggregateRoot);
     }
 
     @Override
-    public void detach(AggregateRoot<?> aggregateRoot) {
-        attachedMap.remove(aggregateRoot.aggregateId());
+    public void detach(@NotNull Id aggregateId) {
+        attachedMap.remove(aggregateId);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends AggregateRoot<?>> T getAggregate(Id id) {
+    @Nullable
+    public <T extends AggregateRoot<?>> T getAggregate(@NotNull Id id) {
         return (T) attachedMap.get(id);
     }
 

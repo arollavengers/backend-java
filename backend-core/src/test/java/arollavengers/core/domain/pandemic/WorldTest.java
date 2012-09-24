@@ -3,10 +3,11 @@ package arollavengers.core.domain.pandemic;
 import arollavengers.core.domain.user.User;
 import arollavengers.core.exceptions.EntityIdAlreadyAssignedException;
 import arollavengers.core.exceptions.pandemic.*;
-import arollavengers.core.infrastructure.DummyUnitOfWork;
+import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ import static org.fest.assertions.api.Assertions.fail;
 public class WorldTest {
 
     private World w;
-    private DummyUnitOfWork uow;
+    private UnitOfWorkDefault uow;
     private SimpleBus bus;
     private User ownr;
     private User user;
@@ -25,7 +26,7 @@ public class WorldTest {
     @Before
     public void newWorld() {
         bus = new SimpleBus();
-        uow = new DummyUnitOfWork(bus);
+        uow = new UnitOfWorkDefault(bus);
         w = new World(uow);
 
         ownr = createUser(uow, "Travis");
