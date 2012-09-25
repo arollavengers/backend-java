@@ -7,23 +7,31 @@ import javax.annotation.Nonnull;
 
 import java.util.*;
 
-public class CityStates {
-    private final Map<CityId, CityState> cityStates;
+public class CityStates implements CityStatesView {
+    private final EnumMap<CityId, CityState> cityStates;
 
     public CityStates() {
-        final HashMap<CityId, CityState> cityStatesSeed = Maps.newHashMap();
+        this.cityStates = new EnumMap<CityId, CityState>(CityId.class);
         for (CityId cityId : CityId.values()) {
-            cityStatesSeed.put(cityId, new CityState());
+            cityStates.put(cityId, new CityState());
         }
-        this.cityStates = Collections.unmodifiableMap(cityStatesSeed);
     }
 
     public CityState getStateOf(@Nonnull final CityId city) {
         return cityStates.get(city);
     }
 
-    public int numberOfCubes(final Disease disease) {
-        throw new RuntimeException("not implemented");
+    public int totalNumberOfCubes(final Disease disease) {
+        int count = 0;
+        for (CityId cityId : CityId.values()) {
+            count += cityStates.get(cityId).numberOfCubes(disease);
+        }
+        return count;
+    }
+
+    @Override
+    public CityStateView specializesViewFor(CityId cityId) {
+        return cityStates.get(cityId);
     }
 
     public Collection<CityId> citiesWithResearchCenters() {
