@@ -42,7 +42,7 @@ public class PlayerDrawPilePileDrawnEvent implements PlayerDrawPileEvent {
     public String toString() {
         return "PlayerDrawPilePileDrawnEvent[" + playerDrawCardId +
                 ", v" + version +
-                ", card=" + drawnCard +
+                ", " + drawnCard +
                 "]";
     }
 }

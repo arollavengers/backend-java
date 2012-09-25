@@ -199,6 +199,7 @@ public class WorldTest {
         w.registerMember(user, MemberRole.Medic);
 
         //Given -- the game is started
+        w.designateFirstPlayer(ownr, MemberRole.Dispatcher);
         w.startGame();
 
 
@@ -257,6 +258,7 @@ public class WorldTest {
 
 
         //When -- game is started
+        w.designateFirstPlayer(user, MemberRole.Medic);
         w.startGame();
 
 

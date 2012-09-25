@@ -1,7 +1,10 @@
 package arollavengers.core.domain.pandemic;
 
+import arollavengers.core.events.pandemic.CurrentPlayerDefinedEvent;
 import arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent;
 import arollavengers.core.events.pandemic.WorldEvent;
+import arollavengers.core.exceptions.pandemic.ActionNotAuthorizedException;
+import arollavengers.core.exceptions.pandemic.HandSizeLimitReachedException;
 import arollavengers.core.infrastructure.Aggregate;
 import arollavengers.core.infrastructure.AnnotationBasedEventHandler;
 import arollavengers.core.infrastructure.Entity;
@@ -20,8 +23,10 @@ public class Member extends Entity<WorldEvent> {
     //
     private final List<PlayerCard> hand = Lists.newArrayList();
     private final MemberKey memberKey;
+    private boolean currentPlayer;
+    private int nbActionRemaining;
 
-    public Member(@Nonnull Aggregate<WorldEvent> aggregate, @Nonnull Id entityId, Id userId, MemberRole role) {
+    public Member(@Nonnull Aggregate<WorldEvent> aggregate, @Nonnull Id entityId, @Nonnull Id userId, @Nonnull MemberRole role) {
         super(aggregate, entityId);
         this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
         this.memberKey = new MemberKey(userId, role);
@@ -32,25 +37,29 @@ public class Member extends Entity<WorldEvent> {
         return eventHandler;
     }
 
+    @Nonnull
     public MemberKey memberKey() {
         return memberKey;
     }
 
+    @Nonnull
     public MemberRole role() {
         return memberKey.role();
     }
 
     public void ensureActionIsAuthorized() {
-        throw new RuntimeException("not implemented");
+        if(!currentPlayer || nbActionRemaining<=0)
+            throw new ActionNotAuthorizedException(currentPlayer, nbActionRemaining);
     }
 
     public int handSize() {
         return hand.size();
     }
 
-    public void addToHand(final PlayerCard card) {
-        Preconditions.checkState(handSize() < 7, "hand size should be less than 7");
-        hand.add(card);
+    public void addToHand(@Nonnull PlayerCard card) {
+        if(handSize() >= 7)
+            throw new HandSizeLimitReachedException(entityId(), handSize());
+        applyNewEvent(new PlayerCardDrawnFromPileEvent(entityId(), card));
     }
 
     @OnEvent
@@ -61,6 +70,20 @@ public class Member extends Entity<WorldEvent> {
     @Override
     public String toString() {
         return "Member[" + memberKey.userId() + ", " + memberKey.role() + ']';
+    }
+
+    public boolean isCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void defineAsCurrentPlayer(int nbActions) {
+        applyNewEvent(new CurrentPlayerDefinedEvent(entityId(), nbActions));
+    }
+
+    @OnEvent
+    private void onCurrentPlayerDefined(CurrentPlayerDefinedEvent event) {
+        this.currentPlayer = true;
+        this.nbActionRemaining = event.nbActions();
     }
 
 }

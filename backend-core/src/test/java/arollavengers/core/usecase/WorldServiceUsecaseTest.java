@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import arollavengers.core.TestSettings;
 import arollavengers.core.domain.pandemic.Difficulty;
+import arollavengers.core.domain.pandemic.MemberKey;
 import arollavengers.core.domain.pandemic.MemberRole;
 import arollavengers.core.domain.pandemic.World;
 import arollavengers.core.domain.pandemic.WorldRepositorySupport;
@@ -99,7 +100,7 @@ public class WorldServiceUsecaseTest {
         givenAFreshNewWorldWithIdAndOwner(worldId, ownerId);
 
         // When
-        worldService.joinGame(worldId, ownerId, MemberRole.Medic);
+        worldService.joinGame(worldId, new MemberKey(ownerId, MemberRole.Medic));
 
         // Then
         eventStore.dump(System.out);
@@ -121,14 +122,18 @@ public class WorldServiceUsecaseTest {
         Id worldId = Id.next();
         givenAFreshNewWorldWithIdAndOwner(worldId, ownerId);
 
-        worldService.joinGame(worldId, ownerId, MemberRole.Medic);
-        worldService.joinGame(worldId, playerId1, MemberRole.OperationsExpert);
-        worldService.joinGame(worldId, playerId2, MemberRole.Dispatcher);
+        MemberKey memberKey0 = new MemberKey(ownerId, MemberRole.Medic);
+        MemberKey memberKey1 = new MemberKey(playerId1, MemberRole.OperationsExpert);
+        MemberKey memberKey2 = new MemberKey(playerId2, MemberRole.Dispatcher);
+        worldService.joinGame(worldId, memberKey0);
+        worldService.joinGame(worldId, memberKey1);
+        worldService.joinGame(worldId, memberKey2);
 
         UnitOfWork uow = unitOfWorkFactory.create();
         World world = worldRepository.getWorld(uow, worldId);
         assertThat(world).isNotNull();
 
+        world.designateFirstPlayer(memberKey1);
         world.startGame();
         uow.commit();
 

@@ -55,4 +55,11 @@ public class Team implements Iterable<Member> {
         return team.iterator();
     }
 
+    public boolean isCurrentPlayerDefined() {
+        for (Member member : team) {
+            if(member.isCurrentPlayer())
+                return true;
+        }
+        return false;
+    }
 }

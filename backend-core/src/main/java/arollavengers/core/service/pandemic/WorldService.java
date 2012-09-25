@@ -2,6 +2,7 @@ package arollavengers.core.service.pandemic;
 
 import arollavengers.core.domain.GameType;
 import arollavengers.core.domain.pandemic.Difficulty;
+import arollavengers.core.domain.pandemic.MemberKey;
 import arollavengers.core.domain.pandemic.MemberRole;
 import arollavengers.core.domain.pandemic.World;
 import arollavengers.core.domain.pandemic.WorldRepository;
@@ -31,9 +32,6 @@ public class WorldService {
 
     /**
      *
-     * @param worldId
-     * @param ownerId
-     * @param difficulty
      */
     public void createWorld(Id worldId, Id ownerId, Difficulty difficulty) {
         UnitOfWork uow = unitOfWorkFactory.create();
@@ -49,8 +47,11 @@ public class WorldService {
         uow.commit();
     }
 
-    public void joinGame(Id worldId, Id userId, MemberRole role) {
+    public void joinGame(Id worldId, MemberKey memberKey) {
         UnitOfWork uow = unitOfWorkFactory.create();
+
+        Id userId = memberKey.userId();
+        MemberRole role = memberKey.role();
 
         User user = userRepository.getUser(uow, userId);
         if (user == null) {
@@ -65,15 +66,11 @@ public class WorldService {
         world.registerMember(user, role);
         user.joinGame(worldId, GameType.Pandemic);
 
-        userRepository.addUser(uow, user);
-        worldRepository.addWorld(uow, world);
         uow.commit();
     }
 
     /**
      * Define the {@link UnitOfWorkFactory} used by the service.
-     *
-     * @param unitOfWorkFactory
      */
     @DependencyInjection
     public void setUnitOfWorkFactory(UnitOfWorkFactory unitOfWorkFactory) {
@@ -82,8 +79,6 @@ public class WorldService {
 
     /**
      * Define the {@link UserRepository} used by the service.
-     *
-     * @param userRepository
      */
     @DependencyInjection
     public void setUserRepository(UserRepository userRepository) {
@@ -92,8 +87,6 @@ public class WorldService {
 
     /**
      * Define the {@link WorldRepository} used by the service.
-     *
-     * @param worldRepository
      */
     @DependencyInjection
     public void setWorldRepository(WorldRepository worldRepository) {
