@@ -3,6 +3,7 @@ package arollavengers.core.domain.pandemic;
 import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserRepository;
 import arollavengers.core.events.pandemic.GameStartedEvent;
+import arollavengers.core.events.pandemic.PlayerDrawPileCreatedEvent;
 import arollavengers.core.events.pandemic.PlayerDrawnCardFromPileEvent;
 import arollavengers.core.events.pandemic.ResearchCenterBuiltEvent;
 import arollavengers.core.events.pandemic.WorldCityCuredEvent;
@@ -12,7 +13,6 @@ import arollavengers.core.events.pandemic.WorldDiseaseEradicatedEvent;
 import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.events.pandemic.WorldMemberActionSpentEvent;
 import arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent;
-import arollavengers.core.events.pandemic.WorldPlayerDrawPileCreatedEvent;
 import arollavengers.core.exceptions.EntityAlreadyCreatedException;
 import arollavengers.core.exceptions.pandemic.GameAlreadyStartedException;
 import arollavengers.core.exceptions.pandemic.InvalidUserException;
@@ -164,7 +164,7 @@ public class World extends AggregateRoot<WorldEvent> {
             throw new NotEnoughPlayerException(teamSize, MIN_TEAM_SIZE);
         }
 
-        applyNewEvent(new WorldPlayerDrawPileCreatedEvent(entityId(), Id.next()));
+        applyNewEvent(new PlayerDrawPileCreatedEvent(entityId(), Id.next()));
         playerDrawPile.initialize();
 
         int nbCardsPerPlayer = nbCardsPerPlayer(teamSize);
@@ -183,7 +183,7 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     @OnEvent
-    private void doCreateDrawPile(final WorldPlayerDrawPileCreatedEvent event) {
+    private void doCreateDrawPile(final PlayerDrawPileCreatedEvent event) {
         playerDrawPile = new PlayerDrawPile(aggregate(), event.drawPileId());
     }
 

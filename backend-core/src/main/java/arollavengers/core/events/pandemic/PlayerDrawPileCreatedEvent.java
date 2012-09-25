@@ -7,12 +7,12 @@ import arollavengers.core.infrastructure.Id;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class WorldPlayerDrawPileCreatedEvent implements WorldEvent {
+public class PlayerDrawPileCreatedEvent implements WorldEvent {
     private final Id worldId;
     private final Id drawPileId;
     private long version;
 
-    public WorldPlayerDrawPileCreatedEvent(final Id worldId, final Id playerDrawPileId) {
+    public PlayerDrawPileCreatedEvent(final Id worldId, final Id playerDrawPileId) {
         this.worldId = worldId;
         this.drawPileId = playerDrawPileId;
     }
@@ -38,7 +38,7 @@ public class WorldPlayerDrawPileCreatedEvent implements WorldEvent {
 
     @Override
     public String toString() {
-        return "WorldPlayerDrawPileCreatedEvent[" + worldId +
+        return "PlayerDrawPileCreatedEvent[" + worldId +
                 ", v" + version +
                 ", playerDrawPileId" + drawPileId +
                 "]";
