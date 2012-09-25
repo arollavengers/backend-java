@@ -12,17 +12,16 @@ import arollavengers.core.domain.pandemic.WorldRepositorySupport;
 import arollavengers.core.domain.user.UserLoginIndexSupport;
 import arollavengers.core.domain.user.UserRepositorySupport;
 import arollavengers.core.exceptions.user.UserNotFoundException;
-import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
+import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.UnitOfWorkFactory;
 import arollavengers.core.service.pandemic.WorldService;
 import arollavengers.core.service.user.UserService;
 import arollavengers.core.testutils.TypeOfEventStore;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import java.io.IOException;

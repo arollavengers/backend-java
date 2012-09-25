@@ -198,8 +198,15 @@ public class World extends AggregateRoot<WorldEvent> {
             }
         }
         playerDrawPile.completeForDifficulty(difficulty());
-        applyNewEvent(new ResearchCenterBuiltEvent(entityId(), CityId.Atlanta));
+        applyNewEvent(new ResearchCenterBuiltEvent(entityId(), startCity()));
+        for (Member member : team()) {
+            member.moveTo(startCity(), MoveType.Setup);
+        }
         applyNewEvent(new GameStartedEvent(entityId()));
+    }
+
+    private CityId startCity() {
+        return CityId.Atlanta;
     }
 
     private void ensureFirstPlayerHasBeenDesignated() {
