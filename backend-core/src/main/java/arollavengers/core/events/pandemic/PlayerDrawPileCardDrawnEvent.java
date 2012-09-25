@@ -2,21 +2,18 @@ package arollavengers.core.events.pandemic;
 
 import arollavengers.core.domain.pandemic.PlayerCard;
 import arollavengers.core.infrastructure.Id;
-import com.google.common.collect.Lists;
-
-import java.util.List;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPileEvent {
+public class PlayerDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
     private final Id drawPileId;
-    private final List<PlayerCard> cards;
+    private final PlayerCard drawnCard;
     private long version;
 
-    public PlayerDrawPileCompletedForDifficultyEvent(Id drawPileId, List<PlayerCard> cards) {
+    public PlayerDrawPileCardDrawnEvent(Id drawPileId, PlayerCard drawnCard) {
         this.drawPileId = drawPileId;
-        this.cards = Lists.newArrayList(cards);
+        this.drawnCard = drawnCard;
     }
 
     @Override
@@ -35,17 +32,17 @@ public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPile
     }
 
     /**
-     * @return an copy of the cards.
+     * @return the card drawn.
      */
-    public List<PlayerCard> cards() {
-        return Lists.newArrayList(cards);
+    public PlayerCard cardDrawn() {
+        return drawnCard;
     }
 
     @Override
     public String toString() {
-        return "PlayerDrawPileInitializedEvent[" + drawPileId +
+        return "PlayerDrawPileCardDrawnEvent[" + drawPileId +
                 ", v" + version +
-                ", " + cards +
+                ", " + drawnCard +
                 "]";
     }
 }

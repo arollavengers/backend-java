@@ -1,24 +1,24 @@
 package arollavengers.core.events.pandemic;
 
-import arollavengers.core.domain.pandemic.PlayerCard;
+import arollavengers.core.domain.pandemic.InfectionCard;
 import arollavengers.core.infrastructure.Id;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class PlayerDrawPilePileDrawnEvent implements PlayerDrawPileEvent {
-    private final Id playerDrawCardId;
-    private final PlayerCard drawnCard;
+public class InfectionDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
+    private final Id drawPileId;
+    private final InfectionCard drawnCard;
     private long version;
 
-    public PlayerDrawPilePileDrawnEvent(Id playerDrawCardId, PlayerCard drawnCard) {
-        this.playerDrawCardId = playerDrawCardId;
+    public InfectionDrawPileCardDrawnEvent(Id drawPileId, InfectionCard drawnCard) {
+        this.drawPileId = drawPileId;
         this.drawnCard = drawnCard;
     }
 
     @Override
     public Id entityId() {
-        return playerDrawCardId;
+        return drawPileId;
     }
 
     @Override
@@ -34,13 +34,13 @@ public class PlayerDrawPilePileDrawnEvent implements PlayerDrawPileEvent {
     /**
      * @return the card drawn.
      */
-    public PlayerCard cardDrawn() {
+    public InfectionCard cardDrawn() {
         return drawnCard;
     }
 
     @Override
     public String toString() {
-        return "PlayerDrawPilePileDrawnEvent[" + playerDrawCardId +
+        return "PlayerDrawPileCardDrawnEvent[" + drawPileId +
                 ", v" + version +
                 ", " + drawnCard +
                 "]";

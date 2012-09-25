@@ -1,6 +1,6 @@
 package arollavengers.core.events.pandemic;
 
-import arollavengers.core.domain.pandemic.PlayerCard;
+import arollavengers.core.domain.pandemic.InfectionCard;
 import arollavengers.core.infrastructure.Id;
 import com.google.common.collect.Lists;
 
@@ -9,12 +9,12 @@ import java.util.List;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPileEvent {
+public class InfectionDrawPileInitializedEvent implements PlayerDrawPileEvent {
     private final Id drawPileId;
-    private final List<PlayerCard> cards;
+    private final List<InfectionCard> cards;
     private long version;
 
-    public PlayerDrawPileCompletedForDifficultyEvent(Id drawPileId, List<PlayerCard> cards) {
+    public InfectionDrawPileInitializedEvent(Id drawPileId, List<InfectionCard> cards) {
         this.drawPileId = drawPileId;
         this.cards = Lists.newArrayList(cards);
     }
@@ -37,13 +37,13 @@ public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPile
     /**
      * @return an copy of the cards.
      */
-    public List<PlayerCard> cards() {
+    public List<InfectionCard> cards() {
         return Lists.newArrayList(cards);
     }
 
     @Override
     public String toString() {
-        return "PlayerDrawPileInitializedEvent[" + drawPileId +
+        return "InfectionDrawPileInitializedEvent[" + entityId() +
                 ", v" + version +
                 ", " + cards +
                 "]";

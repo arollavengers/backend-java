@@ -4,9 +4,9 @@ import static arollavengers.core.domain.pandemic.PlayerSpecialCard.Epidemic;
 
 import arollavengers.core.events.pandemic.PlayerDrawPileCompletedForDifficultyEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileInitializedEvent;
-import arollavengers.core.events.pandemic.PlayerDrawPilePileDrawnEvent;
+import arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent;
 import arollavengers.core.events.pandemic.WorldEvent;
-import arollavengers.core.exceptions.InfrastructureRuntimeException;
+import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
 import arollavengers.core.infrastructure.Aggregate;
 import arollavengers.core.infrastructure.AnnotationBasedEventHandler;
 import arollavengers.core.infrastructure.Entity;
@@ -73,12 +73,12 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
         ensureDrawPileHasBeenInitialized();
 
         PlayerCard card = cards.get(0);
-        applyNewEvent(new PlayerDrawPilePileDrawnEvent(entityId(), card));
+        applyNewEvent(new PlayerDrawPileCardDrawnEvent(entityId(), card));
         return card;
     }
 
     @OnEvent
-    private void onCardDrawn(PlayerDrawPilePileDrawnEvent event) {
+    private void onCardDrawn(PlayerDrawPileCardDrawnEvent event) {
         this.cards.remove(event.cardDrawn());
     }
 
@@ -143,12 +143,12 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
         }
     }
 
-    public static class PlayerDrawPileAlreadyInitializedException extends InfrastructureRuntimeException {
+    public static class PlayerDrawPileAlreadyInitializedException extends PandemicRuntimeException {
     }
 
-    public static class PlayerDrawPileNotYetInitializedException extends InfrastructureRuntimeException {
+    public static class PlayerDrawPileNotYetInitializedException extends PandemicRuntimeException {
     }
 
-    public static class PlayerDrawPileAlreadyAdjustedForDifficultyException extends InfrastructureRuntimeException {
+    public static class PlayerDrawPileAlreadyAdjustedForDifficultyException extends PandemicRuntimeException {
     }
 }

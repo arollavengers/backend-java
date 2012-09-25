@@ -8,12 +8,12 @@ import java.util.EnumSet;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class PlayerCityCardTest {
+public class InfectionCityCardTest {
 
     @Test
     public void each_city_has_its_own_card() {
         EnumSet<CityId> cityIds = EnumSet.allOf(CityId.class);
-        for(PlayerCityCard card : PlayerCityCard.values()) {
+        for(InfectionCityCard card : InfectionCityCard.values()) {
             assertThat(cityIds).contains(card.cityId());
             assertThat(cityIds.remove(card.cityId())).isTrue();
         }

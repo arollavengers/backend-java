@@ -1,18 +1,16 @@
 package arollavengers.core.events.pandemic;
 
-import arollavengers.core.domain.pandemic.CityId;
-import arollavengers.core.domain.pandemic.Disease;
 import arollavengers.core.infrastructure.Id;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class PlayerDrawPileCreatedEvent implements WorldEvent {
+public class InfectionDrawPileCreatedEvent implements WorldEvent {
     private final Id worldId;
     private final Id drawPileId;
     private long version;
 
-    public PlayerDrawPileCreatedEvent(final Id worldId, final Id drawPileId) {
+    public InfectionDrawPileCreatedEvent(final Id worldId, final Id drawPileId) {
         this.worldId = worldId;
         this.drawPileId = drawPileId;
     }
@@ -38,7 +36,7 @@ public class PlayerDrawPileCreatedEvent implements WorldEvent {
 
     @Override
     public String toString() {
-        return "PlayerDrawPileCreatedEvent[" + worldId +
+        return "InfectionDrawPileCreatedEvent[" + worldId +
                 ", v" + version +
                 ", " + drawPileId +
                 "]";

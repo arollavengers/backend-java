@@ -3,6 +3,7 @@ package arollavengers.core.domain.pandemic;
 import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserRepository;
 import arollavengers.core.events.pandemic.GameStartedEvent;
+import arollavengers.core.events.pandemic.InfectionDrawPileCreatedEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCreatedEvent;
 import arollavengers.core.events.pandemic.ResearchCenterBuiltEvent;
 import arollavengers.core.events.pandemic.WorldCityCuredEvent;
@@ -62,6 +63,7 @@ public class World extends AggregateRoot<WorldEvent> {
     private boolean started;
 
     private PlayerDrawPile playerDrawPile;
+    private InfectionDrawPile infectionDrawPile;
 
     private int infectionRate = -1;
 
@@ -198,6 +200,11 @@ public class World extends AggregateRoot<WorldEvent> {
             }
         }
         playerDrawPile.completeForDifficulty(difficulty());
+
+        applyNewEvent(new InfectionDrawPileCreatedEvent(entityId(), Id.next()));
+        infectionDrawPile.initialize();
+
+
         applyNewEvent(new ResearchCenterBuiltEvent(entityId(), startCity()));
         for (Member member : team()) {
             member.moveTo(startCity(), MoveType.Setup);
@@ -227,7 +234,13 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     @OnEvent
-    private void doCreateDrawPile(final PlayerDrawPileCreatedEvent event) {
+    private void doCreateInfectionDrawPile(final InfectionDrawPileCreatedEvent event) {
+        infectionDrawPile = new InfectionDrawPile(aggregate(), event.drawPileId());
+    }
+
+
+    @OnEvent
+    private void doCreatePlayerDrawPile(final PlayerDrawPileCreatedEvent event) {
         playerDrawPile = new PlayerDrawPile(aggregate(), event.drawPileId());
     }
 
