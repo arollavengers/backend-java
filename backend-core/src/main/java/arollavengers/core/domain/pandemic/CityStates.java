@@ -21,10 +21,10 @@ public class CityStates implements CityStatesView {
         return cityStates.get(city);
     }
 
-    public int totalNumberOfCubes(final Disease disease) {
+    public int numberOfCubes(final Disease disease) {
         int count = 0;
-        for (CityId cityId : CityId.values()) {
-            count += cityStates.get(cityId).numberOfCubes(disease);
+        for (CityState cityState : cityStates.values()) {
+            count += cityState.numberOfCubes(disease);
         }
         return count;
     }

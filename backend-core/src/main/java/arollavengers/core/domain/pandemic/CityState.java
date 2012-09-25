@@ -4,8 +4,6 @@ import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
 import com.google.common.base.Preconditions;
 
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CityState implements CityStateView {
 
@@ -54,7 +52,15 @@ public class CityState implements CityStateView {
         this.researchCenter = true;
     }
 
-    public void addCubes(Disease disease) {
-        cubes.put(disease, cubes.get(disease) + 1);
+    public void addOneCube(Disease disease) {
+        addCubes(disease, 1);
+    }
+
+    public void addCubes(Disease disease, int nbCubes) {
+        cubes.put(disease, cubes.get(disease) + nbCubes);
+    }
+
+    public void setCubes(Disease disease, Integer value) {
+        cubes.put(disease, value);
     }
 }

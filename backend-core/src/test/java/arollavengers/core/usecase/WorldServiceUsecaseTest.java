@@ -128,18 +128,29 @@ public class WorldServiceUsecaseTest {
         worldService.joinGame(worldId, memberKey1);
         worldService.joinGame(worldId, memberKey2);
 
-        UnitOfWork uow = unitOfWorkFactory.create();
-        World world = worldRepository.getWorld(uow, worldId);
-        assertThat(world).isNotNull();
+        {
+            UnitOfWork uow = unitOfWorkFactory.create();
+            World world = worldRepository.getWorld(uow, worldId);
+            assertThat(world).isNotNull();
 
-        world.designateFirstPlayer(memberKey1);
-        world.startGame();
-        uow.commit();
+            world.designateFirstPlayer(memberKey1);
+            world.startGame();
+            uow.commit();
+        }
+
+        {
+            UnitOfWork uow = unitOfWorkFactory.create();
+            World world = worldRepository.getWorld(uow, worldId);
+            assertThat(world).isNotNull();
+
+            world.startPlayerTurn();
+            uow.commit();
+        }
 
         // When
         collectorListener.dump(System.out);
     }
-    
+
     // ------------------------------------------------------------------------
 
     private void givenAFreshNewWorldWithIdAndOwner(Id worldId, Id ownerId) {
@@ -149,6 +160,7 @@ public class WorldServiceUsecaseTest {
     private void givenAFreshNewUserWithId(Id userId) {
         givenAFreshNewUserWithId(userId, "Travis");
     }
+
     private void givenAFreshNewUserWithId(Id userId, String login) {
         UnitOfWork uow = unitOfWorkFactory.create();
         userService.createUser(uow, userId, login, login.toCharArray());

@@ -13,6 +13,10 @@ import java.util.List;
  */
 public class CityGraph {
 
+    public static CityGraph getInstance() {
+        return new CityGraph();
+    }
+
     private List<Link> links = new ArrayList<Link>();
     private List<Link> unmodifiableRoutesView = Collections.unmodifiableList(links);
 
@@ -36,7 +40,7 @@ public class CityGraph {
      * @param cityId the city from which one wants to retrieve all the linked ones.
      * @return the list of the cities that are linked
      */
-    public EnumSet<CityId> listCitiesLinkedTo(CityId cityId) {
+    public EnumSet<CityId> adjacentCitiesOf(CityId cityId) {
         EnumSet<CityId> cityIds = EnumSet.noneOf(CityId.class);
         for (Link link : links) {
             if (link.contains(cityId)) {

@@ -2,6 +2,8 @@ package arollavengers.core.domain.pandemic;
 
 import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserRepository;
+import arollavengers.core.events.pandemic.CityInfectedEvent;
+import arollavengers.core.events.pandemic.CityInfectedWithOutbreakEvent;
 import arollavengers.core.events.pandemic.GameStartedEvent;
 import arollavengers.core.events.pandemic.InfectionDrawPileCreatedEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCreatedEvent;
@@ -32,10 +34,15 @@ import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class World extends AggregateRoot<WorldEvent> {
@@ -43,6 +50,7 @@ public class World extends AggregateRoot<WorldEvent> {
     public static final int MAX_TEAM_SIZE = 4;
     public static final int MIN_TEAM_SIZE = 2;
     public static final int NB_ACTIONS = 4;
+    public static final int OUTBREAK_THRESHOLD = OutbreakChain.OUTBREAK_THRESHOLD;
 
     private final UnitOfWork uow;
     private final EventHandler<WorldEvent> eventHandler;
@@ -127,7 +135,7 @@ public class World extends AggregateRoot<WorldEvent> {
         }
 
         // re-think of the rule, MemberKey is probably more flexible
-        if(userCannotBeRegisteredTwice) {
+        if (userCannotBeRegisteredTwice) {
             Optional<Member> member = team().findMember(user.entityId());
             if (member.isPresent()) {
                 throw new UserAlreadyRegisteredException(entityId(), user.entityId());
@@ -190,6 +198,71 @@ public class World extends AggregateRoot<WorldEvent> {
         ensureTeamSizeIsEnough();
         ensureFirstPlayerHasBeenDesignated();
 
+        preparePlayerCards();
+        prepareInfectionCards();
+
+        applyNewEvent(new ResearchCenterBuiltEvent(entityId(), startCity()));
+        for (Member member : team()) {
+            member.moveTo(startCity(), MoveType.Setup);
+        }
+        applyNewEvent(new GameStartedEvent(entityId()));
+    }
+
+    private void prepareInfectionCards() {
+        applyNewEvent(new InfectionDrawPileCreatedEvent(entityId(), Id.next()));
+        infectionDrawPile.initialize();
+
+        // TODO make city a dedicated entity?
+        for (Integer nbCubes : Arrays.asList(3, 3, 3, 2, 2, 2, 1, 1, 1)) {
+            InfectionCard card = infectionDrawPile.drawTop();
+            switch (card.cardType()) {
+                case City:
+                    infectCity(((InfectionCityCard)card).cityId(), nbCubes);
+                    break;
+                default:
+                    throw new IllegalStateException("unknown card type");
+            }
+        }
+    }
+
+    public void infectCity(CityId cityId, int nbCubes) {
+
+        Disease disease = cityId.defaultDisease();
+
+        // check for outbreak
+        CityState cityState = cityStates.getStateOf(cityId);
+        int nbActualCubes = cityState.numberOfCubes(disease);
+        if (nbActualCubes + nbCubes >= OUTBREAK_THRESHOLD) {
+            // booommm !
+            OutbreakGenerationChain outbreakChain = OutbreakGenerationChain.calculate(
+                    cityId, disease, CityGraph.getInstance(), cityStates);
+
+            EnumMap<CityId,Integer> resultingInfections = outbreakChain.getResultingInfections();
+            Multimap<Integer, CityId> generations = outbreakChain.toOutbreakGenerationMap();
+
+            applyNewEvent(new CityInfectedWithOutbreakEvent(entityId(), generations, disease, resultingInfections));
+        }
+        else {
+            applyNewEvent(new CityInfectedEvent(entityId(), cityId, disease, nbCubes));
+        }
+    }
+
+    @OnEvent
+    private void onCityInfected(CityInfectedEvent event) {
+        CityState cityState = cityStates.getStateOf(event.cityId());
+        cityState.addCubes(event.disease(), event.nbCubes());
+    }
+
+    @OnEvent
+    private void onCityInfected(CityInfectedWithOutbreakEvent event) {
+        EnumMap<CityId, Integer> resultingInfections = event.resultingInfections();
+        for (Map.Entry<CityId,Integer> entry : resultingInfections.entrySet()) {
+            CityState cityState = cityStates.getStateOf(entry.getKey());
+            cityState.setCubes(event.disease(), entry.getValue());
+        }
+    }
+
+    private void preparePlayerCards() {
         applyNewEvent(new PlayerDrawPileCreatedEvent(entityId(), Id.next()));
         playerDrawPile.initialize();
 
@@ -200,16 +273,6 @@ public class World extends AggregateRoot<WorldEvent> {
             }
         }
         playerDrawPile.completeForDifficulty(difficulty());
-
-        applyNewEvent(new InfectionDrawPileCreatedEvent(entityId(), Id.next()));
-        infectionDrawPile.initialize();
-
-
-        applyNewEvent(new ResearchCenterBuiltEvent(entityId(), startCity()));
-        for (Member member : team()) {
-            member.moveTo(startCity(), MoveType.Setup);
-        }
-        applyNewEvent(new GameStartedEvent(entityId()));
     }
 
     private CityId startCity() {
@@ -433,6 +496,9 @@ public class World extends AggregateRoot<WorldEvent> {
         return this.outbreaks;
     }
 
+    public void startPlayerTurn() {
+        //To change body of created methods use File | Settings | File Templates.
+    }
 }
 
 

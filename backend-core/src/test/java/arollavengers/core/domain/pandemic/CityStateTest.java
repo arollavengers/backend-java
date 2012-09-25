@@ -26,19 +26,19 @@ public class CityStateTest {
 
   @Test
   public void city_can_be_infected () {
-    state.addCubes(Disease.Blue);
+    state.addOneCube(Disease.Blue);
     assertThat(state.numberOfCubes(Disease.Blue)).isEqualTo(1);
     assertThat(state.numberOfCubes(Disease.Orange)).isEqualTo(0);
     assertThat(state.numberOfCubes(Disease.Black)).isEqualTo(0);
     assertThat(state.numberOfCubes(Disease.Yellow)).isEqualTo(0);
 
-    state.addCubes(Disease.Blue);
+    state.addOneCube(Disease.Blue);
     assertThat(state.numberOfCubes(Disease.Blue)).isEqualTo(2);
     assertThat(state.numberOfCubes(Disease.Orange)).isEqualTo(0);
     assertThat(state.numberOfCubes(Disease.Black)).isEqualTo(0);
     assertThat(state.numberOfCubes(Disease.Yellow)).isEqualTo(0);
 
-    state.addCubes(Disease.Orange);
+    state.addOneCube(Disease.Orange);
     assertThat(state.numberOfCubes(Disease.Blue)).isEqualTo(2);
     assertThat(state.numberOfCubes(Disease.Orange)).isEqualTo(1);
     assertThat(state.numberOfCubes(Disease.Black)).isEqualTo(0);
@@ -52,8 +52,8 @@ public class CityStateTest {
 
   @Test
   public void city_can_be_treated_when_cubes_are_presents () {
-    state.addCubes(Disease.Blue);
-    state.addCubes(Disease.Blue);
+    state.addOneCube(Disease.Blue);
+    state.addOneCube(Disease.Blue);
     assertThat(state.numberOfCubes(Disease.Blue)).isEqualTo(2);
 
     state.removeOneCube(Disease.Blue);
