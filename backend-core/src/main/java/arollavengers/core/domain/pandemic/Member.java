@@ -1,8 +1,10 @@
 package arollavengers.core.domain.pandemic;
 
-import arollavengers.core.events.pandemic.CurrentPlayerDefinedEvent;
+import arollavengers.core.events.pandemic.PlayerTurnStartedEvent;
 import arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent;
 import arollavengers.core.events.pandemic.PlayerMovedEvent;
+import arollavengers.core.events.pandemic.PlayerPositionOnTableDefinedEvent;
+import arollavengers.core.events.pandemic.PlayerTurnEndedEvent;
 import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.exceptions.pandemic.ActionNotAuthorizedException;
 import arollavengers.core.exceptions.pandemic.HandSizeLimitReachedException;
@@ -23,7 +25,7 @@ public class Member extends Entity<WorldEvent> {
     //
     private final List<PlayerCard> hand = Lists.newArrayList();
     private final MemberKey memberKey;
-    private boolean currentPlayer;
+    private int positionOnTable;
     private int nbActionRemaining;
     private CityId location;
 
@@ -49,8 +51,8 @@ public class Member extends Entity<WorldEvent> {
     }
 
     public void ensureActionIsAuthorized() {
-        if(!currentPlayer || nbActionRemaining<=0)
-            throw new ActionNotAuthorizedException(currentPlayer, nbActionRemaining);
+        if(nbActionRemaining<=0)
+            throw new ActionNotAuthorizedException(nbActionRemaining);
     }
 
     public int handSize() {
@@ -73,18 +75,22 @@ public class Member extends Entity<WorldEvent> {
         return "Member[" + memberKey.userId() + ", " + memberKey.role() + ']';
     }
 
-    public boolean isCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public void defineAsCurrentPlayer(int nbActions) {
-        applyNewEvent(new CurrentPlayerDefinedEvent(entityId(), nbActions));
+    public void startTurn(int nbActions) {
+        applyNewEvent(new PlayerTurnStartedEvent(entityId(), nbActions));
     }
 
     @OnEvent
-    private void onCurrentPlayerDefined(CurrentPlayerDefinedEvent event) {
-        this.currentPlayer = true;
+    private void onStartTurn(PlayerTurnStartedEvent event) {
         this.nbActionRemaining = event.nbActions();
+    }
+
+    public void endTurn() {
+        applyNewEvent(new PlayerTurnEndedEvent(entityId()));
+    }
+
+    @OnEvent
+    private void onEndTurn(PlayerTurnEndedEvent event) {
+        this.nbActionRemaining = 0;
     }
 
     public void moveTo(@Nonnull CityId cityId, @Nonnull MoveType moveType) {
@@ -99,4 +105,18 @@ public class Member extends Entity<WorldEvent> {
     public CityId location() {
         return location;
     }
+
+    public void setPositionOnTable(int positionOnTable) {
+        applyNewEvent(new PlayerPositionOnTableDefinedEvent(entityId(), positionOnTable));
+    }
+
+    @OnEvent
+    private void onPositionOnTable(PlayerPositionOnTableDefinedEvent event) {
+        this.positionOnTable = event.positionOnTable();
+    }
+
+    public int positionOnTable() {
+        return positionOnTable;
+    }
+
 }

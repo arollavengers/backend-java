@@ -4,6 +4,8 @@ import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserRepository;
 import arollavengers.core.events.pandemic.CityInfectedEvent;
 import arollavengers.core.events.pandemic.CityInfectedWithOutbreakEvent;
+import arollavengers.core.events.pandemic.CurrentPlayerDefinedEvent;
+import arollavengers.core.events.pandemic.FirstPlayerDesignatedEvent;
 import arollavengers.core.events.pandemic.GameStartedEvent;
 import arollavengers.core.events.pandemic.InfectionDrawPileCreatedEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCreatedEvent;
@@ -22,6 +24,7 @@ import arollavengers.core.exceptions.pandemic.InvalidUserException;
 import arollavengers.core.exceptions.pandemic.MemberNotFoundException;
 import arollavengers.core.exceptions.pandemic.NoDiseaseToCureException;
 import arollavengers.core.exceptions.pandemic.NotEnoughPlayerException;
+import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
 import arollavengers.core.exceptions.pandemic.UserAlreadyRegisteredException;
 import arollavengers.core.exceptions.pandemic.WorldNotYetCreatedException;
 import arollavengers.core.exceptions.pandemic.WorldNumberOfRoleLimitReachedException;
@@ -35,7 +38,6 @@ import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -51,6 +53,7 @@ public class World extends AggregateRoot<WorldEvent> {
     public static final int MIN_TEAM_SIZE = 2;
     public static final int NB_ACTIONS = 4;
     public static final int OUTBREAK_THRESHOLD = OutbreakChain.OUTBREAK_THRESHOLD;
+    public static final int NB_PLAYER_CARDS_PER_TURN = 2;
 
     private final UnitOfWork uow;
     private final EventHandler<WorldEvent> eventHandler;
@@ -76,6 +79,7 @@ public class World extends AggregateRoot<WorldEvent> {
     private int infectionRate = -1;
 
     private int outbreaks = -1;
+    private MemberKey currentMemberKey;
 
 
     public World(Id worldId, UnitOfWork uow) {
@@ -141,7 +145,11 @@ public class World extends AggregateRoot<WorldEvent> {
                 throw new UserAlreadyRegisteredException(entityId(), user.entityId());
             }
         }
+
         applyNewEvent(new WorldMemberJoinedTeamEvent(entityId(), Id.next(), user.entityId(), role));
+
+        MemberKey memberKey = new MemberKey(user.entityId(), role);
+        team().findMember(memberKey).get().setPositionOnTable(team.size() - 1);
     }
 
     private void ensureGameIsNotAlreadyStarted() {
@@ -174,7 +182,12 @@ public class World extends AggregateRoot<WorldEvent> {
         ensureGameIsNotAlreadyStarted();
 
         Member member = team().findMember(memberKey).or(memberNotFoundException(memberKey));
-        member.defineAsCurrentPlayer(NB_ACTIONS);
+        applyNewEvent(new FirstPlayerDesignatedEvent(entityId(), member.memberKey()));
+    }
+
+    @OnEvent
+    private void onDesignateFirstPlayer(FirstPlayerDesignatedEvent event) {
+        currentMemberKey = event.memberKey();
     }
 
     private static Supplier<? extends Member> memberNotFoundException(final MemberKey memberKey) {
@@ -196,7 +209,7 @@ public class World extends AggregateRoot<WorldEvent> {
         ensureWorldIsCreated();
         ensureGameIsNotAlreadyStarted();
         ensureTeamSizeIsEnough();
-        ensureFirstPlayerHasBeenDesignated();
+        ensureCurrentPlayerHasBeenDesignated();
 
         preparePlayerCards();
         prepareInfectionCards();
@@ -206,6 +219,8 @@ public class World extends AggregateRoot<WorldEvent> {
             member.moveTo(startCity(), MoveType.Setup);
         }
         applyNewEvent(new GameStartedEvent(entityId()));
+
+        startCurrentPlayerTurn();
     }
 
     private void prepareInfectionCards() {
@@ -215,13 +230,17 @@ public class World extends AggregateRoot<WorldEvent> {
         // TODO make city a dedicated entity?
         for (Integer nbCubes : Arrays.asList(3, 3, 3, 2, 2, 2, 1, 1, 1)) {
             InfectionCard card = infectionDrawPile.drawTop();
-            switch (card.cardType()) {
-                case City:
-                    infectCity(((InfectionCityCard)card).cityId(), nbCubes);
-                    break;
-                default:
-                    throw new IllegalStateException("unknown card type");
-            }
+            handleInfectionCard(card, nbCubes);
+        }
+    }
+
+    private void handleInfectionCard(InfectionCard card, int nbCubes) {
+        switch (card.cardType()) {
+            case City:
+                infectCity(((InfectionCityCard) card).cityId(), nbCubes);
+                break;
+            default:
+                throw new IllegalStateException("unknown card type");
         }
     }
 
@@ -237,7 +256,7 @@ public class World extends AggregateRoot<WorldEvent> {
             OutbreakGenerationChain outbreakChain = OutbreakGenerationChain.calculate(
                     cityId, disease, CityGraph.getInstance(), cityStates);
 
-            EnumMap<CityId,Integer> resultingInfections = outbreakChain.getResultingInfections();
+            EnumMap<CityId, Integer> resultingInfections = outbreakChain.getResultingInfections();
             Multimap<Integer, CityId> generations = outbreakChain.toOutbreakGenerationMap();
 
             applyNewEvent(new CityInfectedWithOutbreakEvent(entityId(), generations, disease, resultingInfections));
@@ -256,7 +275,7 @@ public class World extends AggregateRoot<WorldEvent> {
     @OnEvent
     private void onCityInfected(CityInfectedWithOutbreakEvent event) {
         EnumMap<CityId, Integer> resultingInfections = event.resultingInfections();
-        for (Map.Entry<CityId,Integer> entry : resultingInfections.entrySet()) {
+        for (Map.Entry<CityId, Integer> entry : resultingInfections.entrySet()) {
             CityState cityState = cityStates.getStateOf(entry.getKey());
             cityState.setCubes(event.disease(), entry.getValue());
         }
@@ -279,8 +298,8 @@ public class World extends AggregateRoot<WorldEvent> {
         return CityId.Atlanta;
     }
 
-    private void ensureFirstPlayerHasBeenDesignated() {
-        if (!team().isCurrentPlayerDefined()) {
+    private void ensureCurrentPlayerHasBeenDesignated() {
+        if (currentMemberKey == null) {
             throw new FirstPlayerNotDefinedException();
         }
     }
@@ -496,8 +515,55 @@ public class World extends AggregateRoot<WorldEvent> {
         return this.outbreaks;
     }
 
-    public void startPlayerTurn() {
-        //To change body of created methods use File | Settings | File Templates.
+    private Member currentPlayer() {
+        return team().findMember(currentMemberKey).or(memberNotFoundException(currentMemberKey));
+    }
+
+    public void endCurrentPlayerTurn() {
+        Member member = currentPlayer();
+        int positionOnTable = member.positionOnTable();
+        int nextPlayerPosition = (positionOnTable + 1) % team().size();
+
+
+        // ~~ Play the infestor
+        for (int i = 0; i < infectionRate; i++) {
+            if (infectionDrawPile.isEmpty()) {
+                throw new PandemicRuntimeException("What to do when there is no more cards?");
+            }
+            InfectionCard card = infectionDrawPile.drawTop();
+            handleInfectionCard (card, 1);
+        }
+
+        member.endTurn();
+
+        MemberKey newCurrentPlayerKey = team().getMemberAtPosition(nextPlayerPosition).memberKey();
+        applyNewEvent(new CurrentPlayerDefinedEvent(entityId(), newCurrentPlayerKey));
+        //
+        startCurrentPlayerTurn();
+    }
+
+    @OnEvent
+    private void onCurrentPlayerDefined(CurrentPlayerDefinedEvent event) {
+        currentMemberKey = event.memberKey();
+    }
+
+    private void startCurrentPlayerTurn() {
+        Member member = currentPlayer();
+        member.startTurn(NB_ACTIONS);
+
+        for (int i = 0; i < NB_PLAYER_CARDS_PER_TURN; i++) {
+            PlayerCard card = playerDrawPile.drawTop();
+            if (card.cardType() == PlayerCardType.Epidemic) {
+                triggerEpidemic();
+            }
+            else {
+                member.addToHand(card);
+            }
+        }
+    }
+
+    private void triggerEpidemic() {
+        // TODO
     }
 }
 

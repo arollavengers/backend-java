@@ -1,29 +1,22 @@
 package arollavengers.core.events.pandemic;
 
-import arollavengers.core.domain.pandemic.MemberKey;
 import arollavengers.core.infrastructure.Id;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class CurrentPlayerDefinedEvent implements MemberEvent {
+public class PlayerTurnEndedEvent implements MemberEvent {
 
     private long version;
-    private final Id worldId;
-    private final MemberKey memberKey;
+    private final Id memberId;
 
-    public CurrentPlayerDefinedEvent(Id worldId, MemberKey memberKey) {
-        this.worldId = worldId;
-        this.memberKey = memberKey;
+    public PlayerTurnEndedEvent(Id memberId) {
+        this.memberId = memberId;
     }
 
     @Override
     public Id entityId() {
-        return worldId;
-    }
-
-    public MemberKey memberKey() {
-        return memberKey;
+        return memberId;
     }
 
     @Override
@@ -38,9 +31,8 @@ public class CurrentPlayerDefinedEvent implements MemberEvent {
 
     @Override
     public String toString() {
-        return "CurrentPlayerDefinedEvent[" + worldId +
+        return "PlayerTurnEndedEvent[" + memberId +
                 ", v" + version +
-                ", " + memberKey +
                 "]";
     }
 }

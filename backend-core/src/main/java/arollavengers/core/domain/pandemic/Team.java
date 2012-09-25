@@ -1,27 +1,30 @@
 package arollavengers.core.domain.pandemic;
 
+import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
 import arollavengers.core.infrastructure.Id;
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 public class Team implements Iterable<Member> {
 
-    private final Set<Member> team = new HashSet<Member>();
+    private final Map<MemberKey, Member> team = Maps.newHashMap();
 
     public Set<MemberRole> roles() {
         Set<MemberRole> roles = new HashSet<MemberRole>();
-        for (Member member : team) {
+        for (Member member : team.values()) {
             roles.add(member.role());
         }
         return roles;
     }
 
     public Optional<Member> findMember(@Nonnull Id userId) {
-        for (Member member : team) {
+        for (Member member : team.values()) {
             if (member.memberKey().userId().equals(userId)) {
                 return Optional.of(member);
             }
@@ -30,12 +33,13 @@ public class Team implements Iterable<Member> {
     }
 
     public Optional<Member> findMember(@Nonnull MemberKey memberKey) {
-        for (Member member : team) {
-            if (member.memberKey().equals(memberKey)) {
-                return Optional.of(member);
-            }
+        Member member = team.get(memberKey);
+        if (member != null) {
+            return Optional.of(member);
         }
-        return Optional.absent();
+        else {
+            return Optional.absent();
+        }
     }
 
     public boolean hasRole(MemberRole role) {
@@ -43,7 +47,7 @@ public class Team implements Iterable<Member> {
     }
 
     void enrole(final Member member) {
-        team.add(member);
+        team.put(member.memberKey(), member);
     }
 
     public int size() {
@@ -52,14 +56,15 @@ public class Team implements Iterable<Member> {
 
     @Override
     public Iterator<Member> iterator() {
-        return team.iterator();
+        return team.values().iterator();
     }
 
-    public boolean isCurrentPlayerDefined() {
-        for (Member member : team) {
-            if(member.isCurrentPlayer())
-                return true;
+    public Member getMemberAtPosition(int position) {
+        for (Member member : team.values()) {
+            if (member.positionOnTable() == position) {
+                return member;
+            }
         }
-        return false;
+        throw new PandemicRuntimeException("No member defined at position " + position);
     }
 }

@@ -143,7 +143,7 @@ public class WorldServiceUsecaseTest {
             World world = worldRepository.getWorld(uow, worldId);
             assertThat(world).isNotNull();
 
-            world.startPlayerTurn();
+            world.endCurrentPlayerTurn();
             uow.commit();
         }
 

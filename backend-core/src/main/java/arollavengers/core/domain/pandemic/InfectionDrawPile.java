@@ -97,6 +97,10 @@ public class InfectionDrawPile extends Entity<WorldEvent> {
         }
     }
 
+    public boolean isEmpty() {
+        return cards.isEmpty();
+    }
+
     public static class InfectionDrawPileAlreadyInitializedException extends PandemicRuntimeException {
     }
 
