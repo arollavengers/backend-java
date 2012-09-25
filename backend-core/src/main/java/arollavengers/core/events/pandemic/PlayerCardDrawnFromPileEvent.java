@@ -1,28 +1,17 @@
 package arollavengers.core.events.pandemic;
 
-import arollavengers.core.domain.pandemic.Member;
 import arollavengers.core.domain.pandemic.PlayerCard;
 import arollavengers.core.infrastructure.Id;
 
-public class PlayerDrawnCardFromPileEvent implements WorldEvent {
+public class PlayerCardDrawnFromPileEvent implements WorldEvent {
 
-    private final Id worldId;
-    private final Member member;
+    private final Id memberId;
     private final PlayerCard playerCard;
     private long version;
 
-    public PlayerDrawnCardFromPileEvent(final Id worldId, final Member member, PlayerCard playerCard) {
-        this.worldId = worldId;
-        this.member = member;
+    public PlayerCardDrawnFromPileEvent(final Id memberId, PlayerCard playerCard) {
+        this.memberId = memberId;
         this.playerCard = playerCard;
-    }
-
-    public Member member() {
-        return member;
-    }
-
-    public PlayerCard playerCard() {
-        return playerCard;
     }
 
     @Override
@@ -32,7 +21,7 @@ public class PlayerDrawnCardFromPileEvent implements WorldEvent {
 
     @Override
     public Id entityId() {
-        return worldId;
+        return memberId;
     }
 
     @Override
@@ -40,11 +29,14 @@ public class PlayerDrawnCardFromPileEvent implements WorldEvent {
         this.version = newVersion;
     }
 
+    public PlayerCard playerCard() {
+        return playerCard;
+    }
+
     @Override
     public String toString() {
-        return "PlayerDrawnCardFromPileEvent[" + worldId +
+        return "PlayerCardDrawnFromPileEvent[" + memberId +
                 ", v" + version +
-                ", " + member +
                 ", " + playerCard +
                 "]";
     }

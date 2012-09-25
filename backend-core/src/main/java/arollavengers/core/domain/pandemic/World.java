@@ -4,7 +4,6 @@ import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserRepository;
 import arollavengers.core.events.pandemic.GameStartedEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCreatedEvent;
-import arollavengers.core.events.pandemic.PlayerDrawnCardFromPileEvent;
 import arollavengers.core.events.pandemic.ResearchCenterBuiltEvent;
 import arollavengers.core.events.pandemic.WorldCityCuredEvent;
 import arollavengers.core.events.pandemic.WorldCityTreatedEvent;
@@ -14,8 +13,10 @@ import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.events.pandemic.WorldMemberActionSpentEvent;
 import arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent;
 import arollavengers.core.exceptions.EntityAlreadyCreatedException;
+import arollavengers.core.exceptions.pandemic.FirstPlayerNotDefinedException;
 import arollavengers.core.exceptions.pandemic.GameAlreadyStartedException;
 import arollavengers.core.exceptions.pandemic.InvalidUserException;
+import arollavengers.core.exceptions.pandemic.MemberNotFoundException;
 import arollavengers.core.exceptions.pandemic.NoDiseaseToCureException;
 import arollavengers.core.exceptions.pandemic.NotEnoughPlayerException;
 import arollavengers.core.exceptions.pandemic.UserAlreadyRegisteredException;
@@ -29,8 +30,9 @@ import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,15 +41,16 @@ public class World extends AggregateRoot<WorldEvent> {
 
     public static final int MAX_TEAM_SIZE = 4;
     public static final int MIN_TEAM_SIZE = 2;
+    public static final int NB_ACTIONS = 4;
+
     private final UnitOfWork uow;
     private final EventHandler<WorldEvent> eventHandler;
 
     // ~~~ World state
+    public boolean userCannotBeRegisteredTwice = true;
     private Id ownerId = Id.undefined();
 
     private Difficulty difficulty;
-
-    private MemberStates memberStates;
 
     private Team team;
 
@@ -94,7 +97,6 @@ public class World extends AggregateRoot<WorldEvent> {
     private void doCreateWorld(WorldCreatedEvent event) {
         this.difficulty = event.difficulty();
         this.ownerId = event.ownerId();
-        this.memberStates = new MemberStates();
         this.cityStates = new CityStates();
         this.eradicatedDiseases = new HashSet<Disease>();
         this.curesDiscovered = new HashSet<Disease>();
@@ -122,11 +124,14 @@ public class World extends AggregateRoot<WorldEvent> {
             throw new WorldRoleAlreadyChosenException(entityId(), role);
         }
 
-        final Optional<Member> member = team().findMember(user.entityId());
-        if (member.isPresent()) {
-            throw new UserAlreadyRegisteredException(entityId(), member.get().userId());
+        // re-think of the rule, MemberKey is probably more flexible
+        if(userCannotBeRegisteredTwice) {
+            Optional<Member> member = team().findMember(user.entityId());
+            if (member.isPresent()) {
+                throw new UserAlreadyRegisteredException(entityId(), user.entityId());
+            }
         }
-        applyNewEvent(new WorldMemberJoinedTeamEvent(entityId(), user.entityId(), role));
+        applyNewEvent(new WorldMemberJoinedTeamEvent(entityId(), Id.next(), user.entityId(), role));
     }
 
     private void ensureGameIsNotAlreadyStarted() {
@@ -143,9 +148,32 @@ public class World extends AggregateRoot<WorldEvent> {
 
     @OnEvent
     private void doEnrole(final WorldMemberJoinedTeamEvent event) {
-        final Member newMember = new Member(event.newComerId(), event.role());
+        Member newMember = new Member(aggregate(), event.memberId(), event.newComerId(), event.role());
         team.enrole(newMember);
-        memberStates.createMemberState(newMember);
+    }
+
+    public void designateFirstPlayer(User user, MemberRole role) {
+        designateFirstPlayer(new MemberKey(user.entityId(), role));
+    }
+
+    /**
+     * @param memberKey
+     */
+    public void designateFirstPlayer(MemberKey memberKey) {
+        ensureWorldIsCreated();
+        ensureGameIsNotAlreadyStarted();
+
+        Member member = team().findMember(memberKey).or(memberNotFoundException(memberKey));
+        member.defineAsCurrentPlayer(NB_ACTIONS);
+    }
+
+    private static Supplier<? extends Member> memberNotFoundException(final MemberKey memberKey) {
+        return new Supplier<Member>() {
+            @Override
+            public Member get() {
+                throw new MemberNotFoundException(memberKey);
+            }
+        };
     }
 
     /**
@@ -155,27 +183,43 @@ public class World extends AggregateRoot<WorldEvent> {
      * - give initial hand to member
      */
     public void startGame() {
-
         ensureWorldIsCreated();
         ensureGameIsNotAlreadyStarted();
-
-        final int teamSize = team().size();
-        if (teamSize < MIN_TEAM_SIZE) {
-            throw new NotEnoughPlayerException(teamSize, MIN_TEAM_SIZE);
-        }
+        ensureTeamSizeIsEnough();
+        ensureFirstPlayerHasBeenDesignated();
 
         applyNewEvent(new PlayerDrawPileCreatedEvent(entityId(), Id.next()));
         playerDrawPile.initialize();
 
-        int nbCardsPerPlayer = nbCardsPerPlayer(teamSize);
+        int nbCardsPerPlayer = nbCardsPerPlayer(team().size());
         for (Member member : team()) {
             for (int i = 0; i < nbCardsPerPlayer; i++) {
-                applyNewEvent(new PlayerDrawnCardFromPileEvent(entityId(), member, playerDrawPile.drawTop()));
+                member.addToHand(playerDrawPile.drawTop());
             }
         }
         playerDrawPile.completeForDifficulty(difficulty());
-        applyNewEvent(new ResearchCenterBuiltEvent(entityId(), CityId.Atlanta));
+        applyNewEvent(new ResearchCenterBuiltEvent(entityId(), startCity()));
+        for (Member member : team()) {
+            member.moveTo(startCity(), MoveType.Setup);
+        }
         applyNewEvent(new GameStartedEvent(entityId()));
+    }
+
+    private CityId startCity() {
+        return CityId.Atlanta;
+    }
+
+    private void ensureFirstPlayerHasBeenDesignated() {
+        if (!team().isCurrentPlayerDefined()) {
+            throw new FirstPlayerNotDefinedException();
+        }
+    }
+
+    private void ensureTeamSizeIsEnough() {
+        final int teamSize = team().size();
+        if (teamSize < MIN_TEAM_SIZE) {
+            throw new NotEnoughPlayerException(teamSize, MIN_TEAM_SIZE);
+        }
     }
 
     private int nbCardsPerPlayer(int teamSize) {
@@ -204,7 +248,7 @@ public class World extends AggregateRoot<WorldEvent> {
         // ~~~ don't do this:
         // for (Member member : team()) {
         //     for (int i = team().size(); i < 6; i++) {
-        //         applyNewEvent(new PlayerDrawnCardFromPileEvent(entityId(), member));
+        //         applyNewEvent(new PlayerCardDrawnFromPileEvent(entityId(), member));
         //     }
         // }
         // applyNewEvent(new ResearchCenterBuiltEvent(entityId(), CityId.Atlanta));
@@ -217,26 +261,18 @@ public class World extends AggregateRoot<WorldEvent> {
         cityStates.buildResearchCenter(event.city());
     }
 
-    @OnEvent
-    private void doDrawCardInPlayerDrawCards(final PlayerDrawnCardFromPileEvent event) {
-        // no computation : only state assignments
-        // ~~~ don't do this:
-        // PlayerCard card = playerDrawPile.drawTop();
-
-        memberStates.getStateOf(event.member()).addToHand(event.playerCard());
-    }
-
     /**
      * Treat a city by a member of team removing one cube of given disease
      *
-     * @param member  Action doer
-     * @param city    City to treat
-     * @param disease Disease to treat
+     * @param memberKey Action doer
+     * @param city      City to treat
+     * @param disease   Disease to treat
      */
-    public void treatCity(Member member, CityId city, Disease disease) {
-        MemberState memberState = memberStates.getStateOf(member);
+    public void treatCity(MemberKey memberKey, CityId city, Disease disease) {
+        Member member = team().findMember(memberKey).or(memberNotFoundException(memberKey));
+
         // fail if it is not player's turn or no more action point
-        memberState.ensureActionIsAuthorized();
+        member.ensureActionIsAuthorized();
 
         CityState cityState = cityStates.getStateOf(city);
         int cityDiseaseCubes = cityState.numberOfCubes(disease);
@@ -244,20 +280,20 @@ public class World extends AggregateRoot<WorldEvent> {
             throw new NoDiseaseToCureException(entityId(), city, disease);
         }
 
-        applyNewEvent(new WorldMemberActionSpentEvent(entityId(), member.userId()));
+        applyNewEvent(new WorldMemberActionSpentEvent(entityId(), member.entityId()));
 
         int nbCubeTreated;
         if (hasCureFor(disease) || member.role() == MemberRole.Medic) {
             nbCubeTreated = cityDiseaseCubes;
             applyNewEvent(new WorldCityCuredEvent(entityId(),
-                    member.userId(),
+                    member.entityId(),
                     city,
                     disease));
         }
         else {
             nbCubeTreated = 1;
             applyNewEvent(new WorldCityTreatedEvent(entityId(),
-                    member.userId(),
+                    member.entityId(),
                     city,
                     disease));
         }
@@ -266,7 +302,7 @@ public class World extends AggregateRoot<WorldEvent> {
         int worldDiseaseCubes = cityStates.numberOfCubes(disease);
         if (worldDiseaseCubes == nbCubeTreated) {
             applyNewEvent(new WorldDiseaseEradicatedEvent(entityId(),
-                    member.userId(),
+                    member.entityId(),
                     disease));
         }
     }
@@ -367,14 +403,13 @@ public class World extends AggregateRoot<WorldEvent> {
         return cityStates.citiesWithResearchCenters();
     }
 
-    public int memberHandSize(final Id userId) {
-        Preconditions.checkNotNull(userId);
+    public int memberHandSize(@Nonnull MemberKey memberKey) {
+        Optional<Member> memberOpt = team().findMember(memberKey);
+        if (!memberOpt.isPresent()) {
+            throw new MemberNotFoundException(memberKey);
+        }
 
-        final Optional<Member> member = team().findMember(userId);
-        Preconditions.checkState(member.isPresent());
-
-        return memberStates.getStateOf(member.get()).handSize();
-
+        return memberOpt.get().handSize();
     }
 
     public int infectionRate() {
@@ -384,6 +419,7 @@ public class World extends AggregateRoot<WorldEvent> {
     public int outbreaks() {
         return this.outbreaks;
     }
+
 }
 
 

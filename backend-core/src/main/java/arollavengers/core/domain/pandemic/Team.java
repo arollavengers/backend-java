@@ -2,8 +2,8 @@ package arollavengers.core.domain.pandemic;
 
 import arollavengers.core.infrastructure.Id;
 import com.google.common.base.Optional;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -22,16 +22,16 @@ public class Team implements Iterable<Member> {
 
     public Optional<Member> findMember(@Nonnull Id userId) {
         for (Member member : team) {
-            if (member.userId().equals(userId)) {
+            if (member.memberKey().userId().equals(userId)) {
                 return Optional.of(member);
             }
         }
         return Optional.absent();
     }
 
-    public Optional<Member> findMember(@Nonnull MemberRole memberRole) {
+    public Optional<Member> findMember(@Nonnull MemberKey memberKey) {
         for (Member member : team) {
-            if (member.role().equals(memberRole)) {
+            if (member.memberKey().equals(memberKey)) {
                 return Optional.of(member);
             }
         }
@@ -53,5 +53,13 @@ public class Team implements Iterable<Member> {
     @Override
     public Iterator<Member> iterator() {
         return team.iterator();
+    }
+
+    public boolean isCurrentPlayerDefined() {
+        for (Member member : team) {
+            if(member.isCurrentPlayer())
+                return true;
+        }
+        return false;
     }
 }

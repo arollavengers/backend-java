@@ -5,23 +5,23 @@ import static org.junit.Assert.fail;
 
 import arollavengers.core.TestSettings;
 import arollavengers.core.domain.pandemic.Difficulty;
+import arollavengers.core.domain.pandemic.MemberKey;
 import arollavengers.core.domain.pandemic.MemberRole;
 import arollavengers.core.domain.pandemic.World;
 import arollavengers.core.domain.pandemic.WorldRepositorySupport;
 import arollavengers.core.domain.user.UserLoginIndexSupport;
 import arollavengers.core.domain.user.UserRepositorySupport;
 import arollavengers.core.exceptions.user.UserNotFoundException;
-import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
+import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.UnitOfWorkFactory;
 import arollavengers.core.service.pandemic.WorldService;
 import arollavengers.core.service.user.UserService;
 import arollavengers.core.testutils.TypeOfEventStore;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import java.io.IOException;
@@ -99,7 +99,7 @@ public class WorldServiceUsecaseTest {
         givenAFreshNewWorldWithIdAndOwner(worldId, ownerId);
 
         // When
-        worldService.joinGame(worldId, ownerId, MemberRole.Medic);
+        worldService.joinGame(worldId, new MemberKey(ownerId, MemberRole.Medic));
 
         // Then
         eventStore.dump(System.out);
@@ -121,14 +121,18 @@ public class WorldServiceUsecaseTest {
         Id worldId = Id.next();
         givenAFreshNewWorldWithIdAndOwner(worldId, ownerId);
 
-        worldService.joinGame(worldId, ownerId, MemberRole.Medic);
-        worldService.joinGame(worldId, playerId1, MemberRole.OperationsExpert);
-        worldService.joinGame(worldId, playerId2, MemberRole.Dispatcher);
+        MemberKey memberKey0 = new MemberKey(ownerId, MemberRole.Medic);
+        MemberKey memberKey1 = new MemberKey(playerId1, MemberRole.OperationsExpert);
+        MemberKey memberKey2 = new MemberKey(playerId2, MemberRole.Dispatcher);
+        worldService.joinGame(worldId, memberKey0);
+        worldService.joinGame(worldId, memberKey1);
+        worldService.joinGame(worldId, memberKey2);
 
         UnitOfWork uow = unitOfWorkFactory.create();
         World world = worldRepository.getWorld(uow, worldId);
         assertThat(world).isNotNull();
 
+        world.designateFirstPlayer(memberKey1);
         world.startGame();
         uow.commit();
 

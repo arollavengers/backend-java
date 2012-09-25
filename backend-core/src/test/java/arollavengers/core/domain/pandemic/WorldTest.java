@@ -199,6 +199,7 @@ public class WorldTest {
         w.registerMember(user, MemberRole.Medic);
 
         //Given -- the game is started
+        w.designateFirstPlayer(ownr, MemberRole.Dispatcher);
         w.startGame();
 
 
@@ -257,6 +258,7 @@ public class WorldTest {
 
 
         //When -- game is started
+        w.designateFirstPlayer(user, MemberRole.Medic);
         w.startGame();
 
 
@@ -265,8 +267,10 @@ public class WorldTest {
 
         //Then -- each players has 4 PlayerCard
         final int initialCardsPerMember = 4;
-        assertThat(w.memberHandSize(ownr.entityId())).isEqualTo(initialCardsPerMember);
-        assertThat(w.memberHandSize(user.entityId())).isEqualTo(initialCardsPerMember);
+        MemberKey ownrKey = new MemberKey(ownr.entityId(), MemberRole.Dispatcher);
+        MemberKey userKey = new MemberKey(user.entityId(), MemberRole.Medic);
+        assertThat(w.memberHandSize(ownrKey)).isEqualTo(initialCardsPerMember);
+        assertThat(w.memberHandSize(userKey)).isEqualTo(initialCardsPerMember);
 
         //Then -- the player draw cards is initialized
 // TODO       final int remainingDrawPlayerCards = CityId.values().length - (initialCardsPerMember * 2);
