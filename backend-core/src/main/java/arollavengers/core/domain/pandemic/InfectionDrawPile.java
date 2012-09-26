@@ -2,7 +2,7 @@ package arollavengers.core.domain.pandemic;
 
 import arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent;
 import arollavengers.core.events.pandemic.InfectionDrawPileInitializedEvent;
-import arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent;
+import arollavengers.core.events.pandemic.IntensityOfInfectionIncreasedEvent;
 import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
 import arollavengers.core.infrastructure.Aggregate;
@@ -11,10 +11,10 @@ import arollavengers.core.infrastructure.Entity;
 import arollavengers.core.infrastructure.EventHandler;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.annotation.OnEvent;
+import arollavengers.core.util.ShuffleAlgorithm;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nonnull;
-import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +26,7 @@ public class InfectionDrawPile extends Entity<WorldEvent> {
     private final EventHandler<WorldEvent> eventHandler;
     //
     private List<InfectionCard> cards;
+    private List<InfectionCard> discardedCards;
 
     public InfectionDrawPile(@Nonnull Aggregate<WorldEvent> aggregate, @Nonnull Id entityId) {
         super(aggregate, entityId);
@@ -51,7 +52,7 @@ public class InfectionDrawPile extends Entity<WorldEvent> {
         Collections.addAll(cards, InfectionCityCard.values());
 
         // then shuffle them
-        Collections.shuffle(cards, new SecureRandom());
+        ShuffleAlgorithm.Random.shuffle(cards);
 
         applyNewEvent(new InfectionDrawPileInitializedEvent(entityId(), cards));
     }
@@ -59,6 +60,7 @@ public class InfectionDrawPile extends Entity<WorldEvent> {
     @OnEvent
     private void onPileInitialized(InfectionDrawPileInitializedEvent event) {
         this.cards = event.cards();
+        this.discardedCards = Lists.newArrayList();
     }
 
     /**
@@ -77,9 +79,10 @@ public class InfectionDrawPile extends Entity<WorldEvent> {
 
     @OnEvent
     private void onCardDrawn(InfectionDrawPileCardDrawnEvent event) {
-        this.cards.remove(event.cardDrawn());
+        InfectionCard card = event.cardDrawn();
+        this.cards.remove(card);
+        this.discardedCards.add(card);
     }
-
 
     public int size() {
         return cards.size();
@@ -99,6 +102,31 @@ public class InfectionDrawPile extends Entity<WorldEvent> {
 
     public boolean isEmpty() {
         return cards.isEmpty();
+    }
+
+    public List<InfectionCard> getDiscardedCards() {
+        return discardedCards;
+    }
+
+    /**
+     * Increase the intensity of infection:
+     * Take the Infection Discard Pile, thoroughly shuffle it,
+     * then place it on top of the remaining Infection Draw Pile.
+     */
+    public void increaseTheIntensityOfInfection() {
+        List<InfectionCard> discardedCards = getDiscardedCards();
+        ShuffleAlgorithm.GSR.shuffle(discardedCards, 2);
+
+        applyNewEvent(new IntensityOfInfectionIncreasedEvent(entityId(), discardedCards));
+    }
+
+    @OnEvent
+    private void onIntensityOfInfectionIncreasedEvent(IntensityOfInfectionIncreasedEvent event) {
+        List<InfectionCard> newCards = event.cards();
+        newCards.addAll(this.cards);
+
+        this.cards = newCards;
+        this.discardedCards.clear();
     }
 
     public static class InfectionDrawPileAlreadyInitializedException extends PandemicRuntimeException {

@@ -13,7 +13,7 @@ import java.util.EnumMap;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class CityInfectedWithOutbreakEvent implements CityEvent {
+public class OutbreakChainTriggeredEvent implements CityEvent {
 
     private long version;
     private final Id worldId;
@@ -21,9 +21,9 @@ public class CityInfectedWithOutbreakEvent implements CityEvent {
     private final Disease disease;
     private final EnumMap<CityId, Integer> resultingInfections;
 
-    public CityInfectedWithOutbreakEvent(Id worldId,
-                                         Multimap<Integer, CityId> generations, Disease disease,
-                                         EnumMap<CityId, Integer> resultingInfections)
+    public OutbreakChainTriggeredEvent(Id worldId,
+                                       Multimap<Integer, CityId> generations, Disease disease,
+                                       EnumMap<CityId, Integer> resultingInfections)
     {
         this.worldId = worldId;
         this.generations = generations;
@@ -60,6 +60,6 @@ public class CityInfectedWithOutbreakEvent implements CityEvent {
 
     @Override
     public String toString() {
-        return "CityInfectedWithOutbreakEvent[" + worldId + ", v" + version + ", " + generations + ", " + resultingInfections + "]";
+        return "OutbreakChainTriggeredEvent[" + worldId + ", v" + version + ", " + generations + ", " + resultingInfections + "]";
     }
 }

@@ -1,9 +1,7 @@
 package arollavengers.core.domain.pandemic;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -78,9 +76,14 @@ public class OutbreakGenerationChain {
         return resultingInfections;
     }
 
+    /**
+     * Number of generation would be given by <code>multimap.size()</code> whereas the number
+     * of outbreaks in the chain would be given by <code>multimap.values().size()</code>.
+     */
+    // TODO replace Multimap by a custom datastructure with #numberOfGeneration() & #numberOfOutbreaks()...
     public Multimap<Integer, CityId> toOutbreakGenerationMap() {
-        Multimap<Integer,CityId> map = ArrayListMultimap.create();
-        for(OutbreakGeneration generation : outbreakedCities.values()) {
+        Multimap<Integer, CityId> map = ArrayListMultimap.create();
+        for (OutbreakGeneration generation : outbreakedCities.values()) {
             map.put(generation.generation(), generation.cityId);
         }
         return map;

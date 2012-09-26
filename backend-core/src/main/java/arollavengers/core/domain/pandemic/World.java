@@ -1,13 +1,12 @@
 package arollavengers.core.domain.pandemic;
 
 import arollavengers.core.domain.user.User;
-import arollavengers.core.domain.user.UserRepository;
 import arollavengers.core.events.pandemic.CityInfectedEvent;
-import arollavengers.core.events.pandemic.CityInfectedWithOutbreakEvent;
 import arollavengers.core.events.pandemic.CurrentPlayerDefinedEvent;
 import arollavengers.core.events.pandemic.FirstPlayerDesignatedEvent;
 import arollavengers.core.events.pandemic.GameStartedEvent;
 import arollavengers.core.events.pandemic.InfectionDrawPileCreatedEvent;
+import arollavengers.core.events.pandemic.OutbreakChainTriggeredEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCreatedEvent;
 import arollavengers.core.events.pandemic.ResearchCenterBuiltEvent;
 import arollavengers.core.events.pandemic.WorldCityCuredEvent;
@@ -37,13 +36,16 @@ import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -76,7 +78,7 @@ public class World extends AggregateRoot<WorldEvent> {
     private PlayerDrawPile playerDrawPile;
     private InfectionDrawPile infectionDrawPile;
 
-    private int infectionRate = -1;
+    private InfectionRate infectionRate;
 
     private int outbreaks = -1;
     private MemberKey currentMemberKey;
@@ -115,7 +117,7 @@ public class World extends AggregateRoot<WorldEvent> {
         this.eradicatedDiseases = new HashSet<Disease>();
         this.curesDiscovered = new HashSet<Disease>();
         this.team = new Team();
-        this.infectionRate = 2;
+        this.infectionRate = InfectionRate.first;
         this.outbreaks = 0;
     }
 
@@ -175,7 +177,7 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     /**
-     * @param memberKey
+     * @param memberKey member's key designated as the first player to play.
      */
     public void designateFirstPlayer(MemberKey memberKey) {
         ensureWorldIsCreated();
@@ -259,11 +261,24 @@ public class World extends AggregateRoot<WorldEvent> {
             EnumMap<CityId, Integer> resultingInfections = outbreakChain.getResultingInfections();
             Multimap<Integer, CityId> generations = outbreakChain.toOutbreakGenerationMap();
 
-            applyNewEvent(new CityInfectedWithOutbreakEvent(entityId(), generations, disease, resultingInfections));
+            // Each time a city outbreaks, move the Outbreaks Marker up one space on the Outbreak Indicator.
+            // If the number of outbreaks ever reaches 8 (and the Outbreaks Marker reaches the skull symbol),
+            // the game immediately ends in defeat for all players.
+            applyNewEvent(new OutbreakChainTriggeredEvent(entityId(), generations, disease, resultingInfections));
+
+            // TODO add in the generation order:
+            //   per outbreaked city:
+            //     CityOutbreakedEvent(cityId, generation) (which is merely more a notification than an event)
+            //     CityInfectedEvent(infestedCity...)
         }
         else {
             applyNewEvent(new CityInfectedEvent(entityId(), cityId, disease, nbCubes));
         }
+
+        // TODO
+        // Also, if there are not enough cubes to
+        // add to the board when infecting, the game
+        // immediately ends in defeat for all players.
     }
 
     @OnEvent
@@ -273,12 +288,15 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     @OnEvent
-    private void onCityInfected(CityInfectedWithOutbreakEvent event) {
+    private void onOutbreakTriggered(OutbreakChainTriggeredEvent event) {
         EnumMap<CityId, Integer> resultingInfections = event.resultingInfections();
         for (Map.Entry<CityId, Integer> entry : resultingInfections.entrySet()) {
             CityState cityState = cityStates.getStateOf(entry.getKey());
             cityState.setCubes(event.disease(), entry.getValue());
         }
+
+
+        outbreaks += event.generations().values().size();
     }
 
     private void preparePlayerCards() {
@@ -426,16 +444,6 @@ public class World extends AggregateRoot<WorldEvent> {
         return ownerId;
     }
 
-    /**
-     * @param repository Repository used to retrieve the user
-     * @return the world's owner. User returns will be automatically attached
-     *         to the world's unit of work.
-     * @see #ownerId()
-     */
-    User owner(UserRepository repository) {
-        return repository.getUser(uow, ownerId);
-    }
-
     boolean hasCureFor(final Disease disease) {
         return curesDiscovered.contains(disease);
     }
@@ -498,6 +506,9 @@ public class World extends AggregateRoot<WorldEvent> {
         return cityStates.citiesWithResearchCenters();
     }
 
+    /**
+     * Return the member's hand size. That is the number of cards the member currently has in its hand.
+     */
     public int memberHandSize(@Nonnull MemberKey memberKey) {
         Optional<Member> memberOpt = team().findMember(memberKey);
         if (!memberOpt.isPresent()) {
@@ -507,7 +518,10 @@ public class World extends AggregateRoot<WorldEvent> {
         return memberOpt.get().handSize();
     }
 
-    public int infectionRate() {
+    /**
+     * @return the current's infection rate of the game
+     */
+    public InfectionRate infectionRate() {
         return this.infectionRate;
     }
 
@@ -521,12 +535,13 @@ public class World extends AggregateRoot<WorldEvent> {
 
     public void endCurrentPlayerTurn() {
         Member member = currentPlayer();
-        int positionOnTable = member.positionOnTable();
-        int nextPlayerPosition = (positionOnTable + 1) % team().size();
 
-
-        // ~~ Play the infestor
-        for (int i = 0; i < infectionRate; i++) {
+        // Play the infestor
+        // Draw cards from the Infection Draw Pile equal to
+        // the current Infection Rate and add one cube to the
+        // pictured cities, using a cube of the same color
+        // as each card.
+        for (int i = 0; i < infectionRate.amount(); i++) {
             if (infectionDrawPile.isEmpty()) {
                 throw new PandemicRuntimeException("What to do when there is no more cards?");
             }
@@ -535,6 +550,15 @@ public class World extends AggregateRoot<WorldEvent> {
         }
 
         member.endTurn();
+
+        // After all of the Infection Cards are resolved,
+        // place them into the Infection Discard Pile.
+        // Your turn is over.
+        // The player to the left now begins his turn.
+
+        // TODO move positionOnTable usage into Team#nextPlayerKeyOf(member)
+        int positionOnTable = member.positionOnTable();
+        int nextPlayerPosition = (positionOnTable + 1) % team().size();
 
         MemberKey newCurrentPlayerKey = team().getMemberAtPosition(nextPlayerPosition).memberKey();
         applyNewEvent(new CurrentPlayerDefinedEvent(entityId(), newCurrentPlayerKey));
@@ -563,7 +587,32 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     private void triggerEpidemic() {
-        // TODO
+        // 1. Increase the Infection Rate
+        infectionRate = infectionRate.next();
+
+        // 2. Infect: Take the bottom card from the Infection Draw Pile
+        // and add 3 cubes to the city pictured on the card, then place
+        // the card into the Infection Discard Pile. Note: No city can
+        // contain more than 3 cubes of any one color. If the Epidemic
+        // would cause the city to exceed that limit, any excess cubes
+        // are returned to the stock and an outbreak is triggered.
+        InfectionCard card = infectionDrawPile.drawTop();
+        handleInfectionCard(card, 3);
+
+        // 3. Increase the intensity of infection:
+        // Take the Infection Discard Pile, thoroughly shuffle it, then
+        // place it on top of the remaining Infection Draw Pile. (Don’t
+        // shuffle these cards into the Infection Draw Pile.)
+        infectionDrawPile.increaseTheIntensityOfInfection();
+    }
+
+    /**
+     * Because Pandemic is a test of cooperation and mettle (and not of memory), players may freely
+     * examine the contents of the Player Discard Pile and the Infection Discard Pile at any time.
+     * @return (a copy of) of the cards that have been currently been discarded
+     */
+    public List<InfectionCard> getInfectionDiscardPile() {
+        return Lists.newArrayList(infectionDrawPile.getDiscardedCards());
     }
 }
 

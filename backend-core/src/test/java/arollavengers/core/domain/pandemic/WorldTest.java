@@ -281,7 +281,7 @@ public class WorldTest {
         assertThat(w.citiesWithResearchCenters()).contains(CityId.Atlanta);
 
         //Then -- Infection rate is 2
-        assertThat(w.infectionRate()).isEqualTo(2);
+        assertThat(w.infectionRate()).isEqualTo(InfectionRate.first);
 
         //Then -- Number of outbreaks
         assertThat(w.outbreaks()).isEqualTo(0);

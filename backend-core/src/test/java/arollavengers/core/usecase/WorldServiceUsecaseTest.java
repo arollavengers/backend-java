@@ -144,6 +144,10 @@ public class WorldServiceUsecaseTest {
             assertThat(world).isNotNull();
 
             world.endCurrentPlayerTurn();
+            world.endCurrentPlayerTurn();
+            world.endCurrentPlayerTurn();
+            world.endCurrentPlayerTurn();
+            world.endCurrentPlayerTurn();
             uow.commit();
         }
 
