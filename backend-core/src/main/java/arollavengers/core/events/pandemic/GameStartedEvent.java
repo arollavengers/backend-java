@@ -2,13 +2,24 @@ package arollavengers.core.events.pandemic;
 
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class GameStartedEvent implements WorldEvent {
 
+    @JsonProperty
     private long version;
 
+    @JsonProperty
     private final Id worldId;
 
-    public GameStartedEvent(final Id worldId) {
+    @JsonCreator
+    public GameStartedEvent(@JsonProperty("worldId") Id worldId) {
         this.worldId = worldId;
     }
 

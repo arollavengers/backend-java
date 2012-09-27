@@ -3,17 +3,33 @@ package arollavengers.core.events.pandemic;
 import arollavengers.core.domain.pandemic.InfectionCard;
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class InfectionDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
+    @JsonProperty
     private final Id drawPileId;
-    private final InfectionCard drawnCard;
+
+    @JsonProperty
+    private final InfectionCard cardDrawn;
+
+    @JsonProperty
     private long version;
 
-    public InfectionDrawPileCardDrawnEvent(Id drawPileId, InfectionCard drawnCard) {
+    @JsonCreator
+    public InfectionDrawPileCardDrawnEvent(@JsonProperty("drawPileId") Id drawPileId,
+                                           @JsonProperty("cardDrawn") InfectionCard cardDrawn)
+    {
         this.drawPileId = drawPileId;
-        this.drawnCard = drawnCard;
+        this.cardDrawn = cardDrawn;
     }
 
     @Override
@@ -35,14 +51,14 @@ public class InfectionDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
      * @return the card drawn.
      */
     public InfectionCard cardDrawn() {
-        return drawnCard;
+        return cardDrawn;
     }
 
     @Override
     public String toString() {
         return "PlayerDrawPileCardDrawnEvent[" + drawPileId +
                 ", v" + version +
-                ", " + drawnCard +
+                ", " + cardDrawn +
                 "]";
     }
 }

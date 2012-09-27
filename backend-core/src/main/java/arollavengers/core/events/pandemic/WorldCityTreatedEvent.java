@@ -4,17 +4,33 @@ import arollavengers.core.domain.pandemic.CityId;
 import arollavengers.core.domain.pandemic.Disease;
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class WorldCityTreatedEvent implements WorldEvent {
 
+    @JsonProperty
     private final Id worldId;
+
+    @JsonProperty
     private final Id memberId;
+
+    @JsonProperty
     private final CityId treatedCity;
+
+    @JsonProperty
     private final Disease treatedDisease;
 
-    public WorldCityTreatedEvent(final Id worldId,
-                                 final Id memberId,
-                                 final CityId treatedCity,
-                                 final Disease treatedDisease)
+    @JsonCreator
+    public WorldCityTreatedEvent(@JsonProperty("worldId") Id worldId,
+                                 @JsonProperty("memberId") Id memberId,
+                                 @JsonProperty("treatedCity") CityId treatedCity,
+                                 @JsonProperty("treatedDisease") Disease treatedDisease)
     {
         this.worldId = worldId;
         this.memberId = memberId;

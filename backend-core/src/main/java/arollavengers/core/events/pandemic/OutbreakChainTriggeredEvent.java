@@ -7,23 +7,41 @@ import arollavengers.core.domain.pandemic.OutbreakGenerationChain;
 import arollavengers.core.infrastructure.Id;
 import com.google.common.collect.Multimap;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import java.util.Collection;
 import java.util.EnumMap;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class OutbreakChainTriggeredEvent implements CityEvent {
 
+    @JsonProperty
     private long version;
+
+    @JsonProperty
     private final Id worldId;
+
+    @JsonProperty
     private final Multimap<Integer, CityId> generations;
+
+    @JsonProperty
     private final Disease disease;
+
+    @JsonProperty
     private final EnumMap<CityId, Integer> resultingInfections;
 
-    public OutbreakChainTriggeredEvent(Id worldId,
-                                       Multimap<Integer, CityId> generations, Disease disease,
-                                       EnumMap<CityId, Integer> resultingInfections)
+    @JsonCreator
+    public OutbreakChainTriggeredEvent(@JsonProperty("worldId") Id worldId,
+                                       @JsonProperty("generations") Multimap<Integer, CityId> generations,
+                                       @JsonProperty("diseasz") Disease disease,
+                                       @JsonProperty("resultinInfections") EnumMap<CityId, Integer> resultingInfections)
     {
         this.worldId = worldId;
         this.generations = generations;

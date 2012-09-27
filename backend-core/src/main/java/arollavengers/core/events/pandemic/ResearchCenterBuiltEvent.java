@@ -3,14 +3,28 @@ package arollavengers.core.events.pandemic;
 import arollavengers.core.domain.pandemic.CityId;
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class ResearchCenterBuiltEvent implements WorldEvent {
+
+    @JsonProperty
     private long version;
 
+    @JsonProperty
     private final Id worldId;
+
+    @JsonProperty
     private final CityId cityId;
 
-
-    public ResearchCenterBuiltEvent(final Id worldId, final CityId cityId) {
+    @JsonCreator
+    public ResearchCenterBuiltEvent(@JsonProperty("worldId") Id worldId,
+                                    @JsonProperty("cityId") CityId cityId) {
         this.worldId = worldId;
         this.cityId = cityId;
     }

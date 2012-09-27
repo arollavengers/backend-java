@@ -1,23 +1,38 @@
 package arollavengers.core.events.pandemic;
 
 import arollavengers.core.domain.pandemic.MemberRole;
-import arollavengers.core.domain.pandemic.PlayerCard;
 import arollavengers.core.infrastructure.Id;
-import com.google.common.collect.Lists;
 
-import java.util.List;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class MemberCreatedEvent implements MemberEvent {
 
+    @JsonProperty
     private long version;
+
+    @JsonProperty
     private final Id memberId;
+
+    @JsonProperty
     private final Id userId;
+
+    @JsonProperty
     private final MemberRole role;
 
-    public MemberCreatedEvent(Id memberId, Id userId, MemberRole role) {
+    @JsonCreator
+    public MemberCreatedEvent(@JsonProperty("memberId") Id memberId,
+                              @JsonProperty("userId") Id userId,
+                              @JsonProperty("role") MemberRole role)
+    {
         this.memberId = memberId;
         this.userId = userId;
         this.role = role;

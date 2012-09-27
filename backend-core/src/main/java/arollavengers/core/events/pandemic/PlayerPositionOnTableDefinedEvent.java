@@ -2,16 +2,31 @@ package arollavengers.core.events.pandemic;
 
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class PlayerPositionOnTableDefinedEvent implements MemberEvent {
 
+    @JsonProperty
     private final Id memberId;
+
+    @JsonProperty
     private final int positionOnTable;
+
+    @JsonProperty
     private long version;
 
-    public PlayerPositionOnTableDefinedEvent(Id memberId, int positionOnTable) {
+    @JsonCreator
+    public PlayerPositionOnTableDefinedEvent(@JsonProperty("memberId") Id memberId,
+                                             @JsonProperty("positionOnTable") int positionOnTable) {
         this.memberId = memberId;
         this.positionOnTable = positionOnTable;
     }

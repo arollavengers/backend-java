@@ -3,15 +3,30 @@ package arollavengers.core.events.pandemic;
 import arollavengers.core.domain.pandemic.PlayerCard;
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class PlayerCardDrawnFromPileEvent implements WorldEvent {
 
+    @JsonProperty
     private final Id memberId;
-    private final PlayerCard playerCard;
+
+    @JsonProperty
+    private final PlayerCard card;
+
+    @JsonProperty
     private long version;
 
-    public PlayerCardDrawnFromPileEvent(final Id memberId, PlayerCard playerCard) {
+    @JsonCreator
+    public PlayerCardDrawnFromPileEvent(@JsonProperty("memberId") Id memberId,
+                                        @JsonProperty("card") PlayerCard card) {
         this.memberId = memberId;
-        this.playerCard = playerCard;
+        this.card = card;
     }
 
     @Override
@@ -30,14 +45,14 @@ public class PlayerCardDrawnFromPileEvent implements WorldEvent {
     }
 
     public PlayerCard playerCard() {
-        return playerCard;
+        return card;
     }
 
     @Override
     public String toString() {
         return "PlayerCardDrawnFromPileEvent[" + memberId +
                 ", v" + version +
-                ", " + playerCard +
+                ", " + card +
                 "]";
     }
 }

@@ -3,17 +3,34 @@ package arollavengers.core.events.pandemic;
 import arollavengers.core.domain.pandemic.Difficulty;
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class WorldCreatedEvent implements WorldEvent {
 
+    @JsonProperty
     private long version;
 
+    @JsonProperty
     private final Id newWorldId;
-    private final Id userId;
+
+    @JsonProperty
+    private final Id ownerId;
+
+    @JsonProperty
     private final Difficulty difficulty;
 
-    public WorldCreatedEvent(final Id newWorldId, final Id userId, final Difficulty difficulty) {
+    @JsonCreator
+    public WorldCreatedEvent(@JsonProperty("newWorldId") Id newWorldId,
+                             @JsonProperty("ownerId") Id ownerId,
+                             @JsonProperty("difficulty") Difficulty difficulty) {
         this.newWorldId = newWorldId;
-        this.userId = userId;
+        this.ownerId = ownerId;
         this.difficulty = difficulty;
     }
 
@@ -37,12 +54,12 @@ public class WorldCreatedEvent implements WorldEvent {
     }
 
     public Id ownerId() {
-        return userId;
+        return ownerId;
     }
 
     @Override
     public String toString() {
-        return "WorldCreatedEvent[" + newWorldId + ", v" + version + ", owner: " + userId + ", difficulty: " + difficulty + "]";
+        return "WorldCreatedEvent[" + newWorldId + ", v" + version + ", owner: " + ownerId + ", difficulty: " + difficulty + "]";
     }
 
 

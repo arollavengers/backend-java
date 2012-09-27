@@ -4,19 +4,35 @@ import arollavengers.core.domain.pandemic.InfectionCard;
 import arollavengers.core.infrastructure.Id;
 import com.google.common.collect.Lists;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class InfectionDrawPileInitializedEvent implements PlayerDrawPileEvent {
+    @JsonProperty
     private final Id drawPileId;
-    private final List<InfectionCard> cards;
+
+    @JsonProperty
+    private final InfectionCard[] cards;
+
+    @JsonProperty
     private long version;
 
-    public InfectionDrawPileInitializedEvent(Id drawPileId, List<InfectionCard> cards) {
+    @JsonCreator
+    public InfectionDrawPileInitializedEvent(@JsonProperty("drawPileId") Id drawPileId,
+                                             @JsonProperty("cards") InfectionCard[] cards)
+    {
         this.drawPileId = drawPileId;
-        this.cards = Lists.newArrayList(cards);
+        this.cards = cards;
     }
 
     @Override
@@ -45,7 +61,7 @@ public class InfectionDrawPileInitializedEvent implements PlayerDrawPileEvent {
     public String toString() {
         return "InfectionDrawPileInitializedEvent[" + entityId() +
                 ", v" + version +
-                ", " + cards +
+                ", " + Arrays.toString(cards) +
                 "]";
     }
 }

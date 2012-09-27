@@ -2,15 +2,31 @@ package arollavengers.core.events.pandemic;
 
 import arollavengers.core.infrastructure.Id;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class InfectionDrawPileCreatedEvent implements WorldEvent {
+    @JsonProperty
     private final Id worldId;
+
+    @JsonProperty
     private final Id drawPileId;
+
+    @JsonProperty
     private long version;
 
-    public InfectionDrawPileCreatedEvent(final Id worldId, final Id drawPileId) {
+    @JsonCreator
+    public InfectionDrawPileCreatedEvent(@JsonProperty("worldId") Id worldId,
+                                         @JsonProperty("drawPileId") Id drawPileId)
+    {
         this.worldId = worldId;
         this.drawPileId = drawPileId;
     }

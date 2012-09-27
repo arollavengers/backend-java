@@ -4,19 +4,36 @@ import arollavengers.core.domain.pandemic.PlayerCard;
 import arollavengers.core.infrastructure.Id;
 import com.google.common.collect.Lists;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class")
 public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPileEvent {
+
+    @JsonProperty
     private final Id drawPileId;
-    private final List<PlayerCard> cards;
+
+    @JsonProperty
+    private final PlayerCard[] cards;
+
+    @JsonProperty
     private long version;
 
-    public PlayerDrawPileCompletedForDifficultyEvent(Id drawPileId, List<PlayerCard> cards) {
+    @JsonCreator
+    public PlayerDrawPileCompletedForDifficultyEvent(@JsonProperty("drawPileId") Id drawPileId,
+                                                     @JsonProperty("cards") PlayerCard[] cards)
+    {
         this.drawPileId = drawPileId;
-        this.cards = Lists.newArrayList(cards);
+        this.cards = cards;
     }
 
     @Override
@@ -45,7 +62,7 @@ public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPile
     public String toString() {
         return "PlayerDrawPileInitializedEvent[" + drawPileId +
                 ", v" + version +
-                ", " + cards +
+                ", " + Arrays.toString(cards) +
                 "]";
     }
 }
