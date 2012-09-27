@@ -1,12 +1,45 @@
 package arollavengers.core.domain.pandemic;
 
-import static arollavengers.core.domain.pandemic.CityId.*;
+import static arollavengers.core.domain.pandemic.CityId.Algiers;
+import static arollavengers.core.domain.pandemic.CityId.Atlanta;
+import static arollavengers.core.domain.pandemic.CityId.Baghdad;
+import static arollavengers.core.domain.pandemic.CityId.Bangkok;
+import static arollavengers.core.domain.pandemic.CityId.Cairo;
+import static arollavengers.core.domain.pandemic.CityId.Chennai;
+import static arollavengers.core.domain.pandemic.CityId.Chicago;
+import static arollavengers.core.domain.pandemic.CityId.Delhi;
+import static arollavengers.core.domain.pandemic.CityId.Essen;
+import static arollavengers.core.domain.pandemic.CityId.HongKong;
+import static arollavengers.core.domain.pandemic.CityId.Istanbul;
+import static arollavengers.core.domain.pandemic.CityId.Jakarta;
+import static arollavengers.core.domain.pandemic.CityId.Karachi;
+import static arollavengers.core.domain.pandemic.CityId.Khartoum;
+import static arollavengers.core.domain.pandemic.CityId.Kolkata;
+import static arollavengers.core.domain.pandemic.CityId.London;
+import static arollavengers.core.domain.pandemic.CityId.LosAngeles;
+import static arollavengers.core.domain.pandemic.CityId.Madrid;
+import static arollavengers.core.domain.pandemic.CityId.Manila;
+import static arollavengers.core.domain.pandemic.CityId.MexicoCity;
+import static arollavengers.core.domain.pandemic.CityId.Miami;
+import static arollavengers.core.domain.pandemic.CityId.Milan;
+import static arollavengers.core.domain.pandemic.CityId.Moscow;
+import static arollavengers.core.domain.pandemic.CityId.Mumbai;
+import static arollavengers.core.domain.pandemic.CityId.NewYork;
+import static arollavengers.core.domain.pandemic.CityId.Paris;
+import static arollavengers.core.domain.pandemic.CityId.Riyadh;
+import static arollavengers.core.domain.pandemic.CityId.SaintPetersburg;
+import static arollavengers.core.domain.pandemic.CityId.SanFrancisco;
+import static arollavengers.core.domain.pandemic.CityId.SaoPaulo;
+import static arollavengers.core.domain.pandemic.CityId.Tehran;
+import static arollavengers.core.domain.pandemic.CityId.Tokyo;
+import static arollavengers.core.domain.pandemic.CityId.Toronto;
+import static arollavengers.core.domain.pandemic.CityId.Washington;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collections;
+import com.google.common.collect.Maps;
+
+import java.util.BitSet;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -14,24 +47,25 @@ import java.util.List;
 public class CityGraph {
 
     public static CityGraph getInstance() {
-        return new CityGraph();
+        return new CityGraph().initializeDefaultLinks();
     }
 
-    private List<Link> links = new ArrayList<Link>();
-    private List<Link> unmodifiableRoutesView = Collections.unmodifiableList(links);
+    private final Map<CityId, BitSet> adjacencyMatrix = Maps.newHashMap();
 
+    /**
+     * Create a new and empty graph.
+     *
+     * @see #initializeDefaultLinks()
+     */
     public CityGraph() {
+    }
+
+    public CityGraph initializeDefaultLinks() {
         initializeBlackLinks();
         initializeBlueLinks();
         initializeOrangeLinks();
         initializeYellowLinks();
-    }
-
-    /**
-     * @return an unmodifiable view of all the links currently defined.
-     */
-    public List<Link> getLinks() {
-        return unmodifiableRoutesView;
+        return this;
     }
 
     /**
@@ -41,13 +75,22 @@ public class CityGraph {
      * @return the list of the cities that are linked
      */
     public EnumSet<CityId> adjacentCitiesOf(CityId cityId) {
+        CityId[] cities = CityId.values();
+
         EnumSet<CityId> cityIds = EnumSet.noneOf(CityId.class);
-        for (Link link : links) {
-            if (link.contains(cityId)) {
-                cityIds.add(link.other(cityId));
-            }
+        BitSet bs = getOrCreateBitSet(cityId);
+        for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
+             // operate on index i here
+            CityId linked = cities[i];
+            if(linked!=cityId)
+                cityIds.add(linked);
         }
         return cityIds;
+    }
+
+    public boolean areAdjacent(CityId one, CityId two) {
+        BitSet bitSet = getOrCreateBitSet(one);
+        return bitSet.get(two.ordinal());
     }
 
     protected void initializeBlueLinks() {
@@ -167,54 +210,19 @@ public class CityGraph {
 
 
     private void define(CityId cityIdOne, CityId cityIdTwo) {
-        Link r = new Link(cityIdOne, cityIdTwo);
-        for (Link link : links) {
-            if (link.sameAs(r)) {
-                return;
-            }
-        }
-        links.add(r);
+        BitSet bitSetOne = getOrCreateBitSet(cityIdOne);
+        bitSetOne.set(cityIdTwo.ordinal());
+        BitSet bitSetTwo = getOrCreateBitSet(cityIdTwo);
+        bitSetTwo.set(cityIdOne.ordinal());
     }
 
-    /**
-     * Describe a connection between two cities.
-     */
-    public static class Link {
-        private final CityId cityIdOne;
-        private final CityId cityIdTwo;
-
-        public Link(CityId cityIdOne, CityId cityIdTwo) {
-            this.cityIdOne = cityIdOne;
-            this.cityIdTwo = cityIdTwo;
+    private BitSet getOrCreateBitSet(CityId cityId) {
+        BitSet bitSet = adjacencyMatrix.get(cityId);
+        if (bitSet == null) {
+            bitSet = new BitSet(CityId.nbCities());
+            adjacencyMatrix.put(cityId, bitSet);
         }
-
-        /**
-         * Indicates whether or not this route is connected to the specified cityId.
-         *
-         * @param cityId the specified cityId
-         * @return <code>true</code> if this route is connected to the specified cityId.
-         */
-        public boolean contains(CityId cityId) {
-            return cityIdOne == cityId || cityIdTwo == cityId;
-        }
-
-        public boolean sameAs(Link link) {
-            return (link.cityIdOne == cityIdOne && link.cityIdTwo == cityIdTwo)
-                    || (link.cityIdTwo == cityIdOne && link.cityIdOne == cityIdTwo);
-        }
-
-        @Override
-        public String toString() {
-            return "Link{" + cityIdOne + " <--> " + cityIdTwo + '}';
-        }
-
-        public CityId other(CityId cityId) {
-            if (cityId == cityIdOne) {
-                return cityIdTwo;
-            }
-            else {
-                return cityIdOne;
-            }
-        }
+        return bitSet;
     }
+
 }
