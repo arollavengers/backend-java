@@ -3,6 +3,7 @@ package arollavengers.core.domain.pandemic;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.pattern.annotation.ValueObject;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 import javax.annotation.Nonnull;
 
 /**
@@ -10,10 +11,14 @@ import javax.annotation.Nonnull;
  */
 @ValueObject
 public class MemberKey {
+    @JsonProperty
     private final Id userId;
+
+    @JsonProperty
     private final MemberRole role;
 
-    public MemberKey(@Nonnull Id userId, @Nonnull MemberRole role) {
+    public MemberKey(@Nonnull @JsonProperty("userId") Id userId,
+                     @Nonnull @JsonProperty("role") MemberRole role) {
         this.userId = userId;
         this.role = role;
     }

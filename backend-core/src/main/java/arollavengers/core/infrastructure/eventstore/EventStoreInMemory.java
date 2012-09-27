@@ -85,4 +85,15 @@ public class EventStoreInMemory implements EventStore {
             }
         }
     }
+
+    /**
+     * Caution: return direct access to the underlying data structure.
+     */
+    public ConcurrentMap<Id, List<DomainEvent>> getEventsPerStream() {
+        return eventsPerStream;
+    }
+
+    public void setEventsPerStream(Map<Id, List<DomainEvent>> eventsPerStream) {
+        this.eventsPerStream.putAll(eventsPerStream);
+    }
 }

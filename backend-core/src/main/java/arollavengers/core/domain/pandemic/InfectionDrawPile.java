@@ -54,7 +54,11 @@ public class InfectionDrawPile extends Entity<WorldEvent> {
         // then shuffle them
         ShuffleAlgorithm.Random.shuffle(cards);
 
-        applyNewEvent(new InfectionDrawPileInitializedEvent(entityId(), cards));
+        applyNewEvent(new InfectionDrawPileInitializedEvent(entityId(), toArray(cards)));
+    }
+
+    private static InfectionCard[] toArray(List<InfectionCard> cards) {
+        return cards.toArray(new InfectionCard[cards.size()]);
     }
 
     @OnEvent
@@ -117,7 +121,7 @@ public class InfectionDrawPile extends Entity<WorldEvent> {
         List<InfectionCard> discardedCards = getDiscardedCards();
         ShuffleAlgorithm.GSR.shuffle(discardedCards, 2);
 
-        applyNewEvent(new IntensityOfInfectionIncreasedEvent(entityId(), discardedCards));
+        applyNewEvent(new IntensityOfInfectionIncreasedEvent(entityId(), toArray(discardedCards)));
     }
 
     @OnEvent

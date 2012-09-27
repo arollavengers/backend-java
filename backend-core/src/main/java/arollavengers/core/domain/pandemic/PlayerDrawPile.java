@@ -55,7 +55,11 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
         // then shuffle them
         Collections.shuffle(cards, new SecureRandom());
 
-        applyNewEvent(new PlayerDrawPileInitializedEvent(entityId(), cards));
+        applyNewEvent(new PlayerDrawPileInitializedEvent(entityId(), toArray(cards)));
+    }
+
+    private static PlayerCard[] toArray(List<PlayerCard> cards) {
+        return cards.toArray(new PlayerCard[cards.size()]);
     }
 
     @OnEvent
@@ -113,7 +117,7 @@ public class PlayerDrawPile extends Entity<WorldEvent> {
             // Stack the piles together to form the Player Draw Pile.
             cards.addAll(pile);
         }
-        applyNewEvent(new PlayerDrawPileCompletedForDifficultyEvent(entityId(), cards));
+        applyNewEvent(new PlayerDrawPileCompletedForDifficultyEvent(entityId(), toArray(cards)));
     }
 
     @OnEvent

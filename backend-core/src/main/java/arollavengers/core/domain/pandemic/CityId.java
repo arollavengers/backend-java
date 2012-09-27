@@ -66,4 +66,8 @@ public enum CityId {
     public Disease defaultDisease() {
         return disease;
     }
+
+    public static int nbCities() {
+        return values().length;
+    }
 }

@@ -19,6 +19,8 @@ import arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent;
 import arollavengers.core.exceptions.EntityAlreadyCreatedException;
 import arollavengers.core.exceptions.pandemic.FirstPlayerNotDefinedException;
 import arollavengers.core.exceptions.pandemic.GameAlreadyStartedException;
+import arollavengers.core.exceptions.pandemic.InvalidMoveException;
+import arollavengers.core.exceptions.pandemic.InvalidPlayerTurnException;
 import arollavengers.core.exceptions.pandemic.InvalidUserException;
 import arollavengers.core.exceptions.pandemic.MemberNotFoundException;
 import arollavengers.core.exceptions.pandemic.NoDiseaseToCureException;
@@ -42,7 +44,6 @@ import com.google.common.collect.Multimap;
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -217,12 +218,15 @@ public class World extends AggregateRoot<WorldEvent> {
         prepareInfectionCards();
 
         applyNewEvent(new ResearchCenterBuiltEvent(entityId(), startCity()));
-        for (Member member : team()) {
-            member.moveTo(startCity(), MoveType.Setup);
-        }
+        moveAllMembersToStartCity();
         applyNewEvent(new GameStartedEvent(entityId()));
-
         startCurrentPlayerTurn();
+    }
+
+    private void moveAllMembersToStartCity() {
+        for (Member member : team()) {
+            member.moveTo(startCity(), MoveType.Setup, Optional.<PlayerCard>absent());
+        }
     }
 
     private void prepareInfectionCards() {
@@ -279,6 +283,15 @@ public class World extends AggregateRoot<WorldEvent> {
         // Also, if there are not enough cubes to
         // add to the board when infecting, the game
         // immediately ends in defeat for all players.
+
+        // TODO
+        // Outbreak : Each time a city outbreaks, move
+        // the Outbreaks Marker up one space on the Outbreak Indicator.
+        // If the number of outbreaks ever reaches 8 (and the Outbreaks
+        // Marker reaches the skull symbol), the game immediately ends
+        // in defeat for all players. Also, if there are not enough
+        // cubes to add to the board when infecting, the game immediately
+        // ends in defeat for all players.
     }
 
     @OnEvent
@@ -546,7 +559,7 @@ public class World extends AggregateRoot<WorldEvent> {
                 throw new PandemicRuntimeException("What to do when there is no more cards?");
             }
             InfectionCard card = infectionDrawPile.drawTop();
-            handleInfectionCard (card, 1);
+            handleInfectionCard(card, 1);
         }
 
         member.endTurn();
@@ -609,10 +622,52 @@ public class World extends AggregateRoot<WorldEvent> {
     /**
      * Because Pandemic is a test of cooperation and mettle (and not of memory), players may freely
      * examine the contents of the Player Discard Pile and the Infection Discard Pile at any time.
+     *
      * @return (a copy of) of the cards that have been currently been discarded
      */
     public List<InfectionCard> getInfectionDiscardPile() {
         return Lists.newArrayList(infectionDrawPile.getDiscardedCards());
+    }
+
+    public boolean isMoveAllowed(CityId from, CityId destination, Optional<PlayerCard> cardOpt) {
+        MoveService moveService = getMoveService();
+        MoveType moveType = moveService.moveTypeFor(from, destination, cardOpt);
+        return (moveType != MoveType.None);
+    }
+
+    public void move(MemberKey movedMemberKey, CityId destination, Optional<PlayerCard> cardOpt) {
+        Member member = getIfCurrentPlayerAndEnoughActionOrFail(movedMemberKey);
+        member.ensurePlayerCardIsPresent(cardOpt);
+        MoveType moveType = computeMoveTypeOrFail(member, destination, cardOpt);
+
+        member.moveTo(destination, moveType, cardOpt);
+    }
+
+    private MoveType computeMoveTypeOrFail(Member member, CityId destination, Optional<PlayerCard> cardOpt) {
+        MoveService moveService = getMoveService();
+        CityId cityFrom = member.location();
+
+        MoveType moveType = moveService.moveTypeFor(cityFrom, destination, cardOpt);
+        if(moveType == MoveType.None) {
+            throw new InvalidMoveException(member.memberKey(), cityFrom, destination);
+        }
+        return moveType;
+    }
+
+    private MoveService getMoveService() {
+        return new MoveService(cityStates, CityGraph.getInstance());
+    }
+
+    private Member getIfCurrentPlayerAndEnoughActionOrFail(MemberKey memberKey) {
+        // fail if it is not player's turn...
+        if(!memberKey.equals(this.currentMemberKey))
+            throw new InvalidPlayerTurnException(currentMemberKey, memberKey);
+
+        Member member = team().findMember(memberKey).or(memberNotFoundException(memberKey));
+
+        // ...or no more action point
+        member.ensureActionIsAuthorized();
+        return member;
     }
 }
 

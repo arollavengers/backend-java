@@ -12,19 +12,28 @@ import arollavengers.core.domain.pandemic.WorldRepositorySupport;
 import arollavengers.core.domain.user.UserLoginIndexSupport;
 import arollavengers.core.domain.user.UserRepositorySupport;
 import arollavengers.core.exceptions.user.UserNotFoundException;
+import arollavengers.core.infrastructure.DomainEvent;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
+import arollavengers.core.infrastructure.JacksonSerializer;
+import arollavengers.core.infrastructure.Serializer;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.UnitOfWorkFactory;
+import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
 import arollavengers.core.service.pandemic.WorldService;
 import arollavengers.core.service.user.UserService;
 import arollavengers.core.testutils.TypeOfEventStore;
 
 import org.junit.Before;
 import org.junit.Test;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -136,6 +145,19 @@ public class WorldServiceUsecaseTest {
             world.designateFirstPlayer(memberKey1);
             world.startGame();
             uow.commit();
+
+            File basedir = new File(testSettings.getProperty("memory.event-store.basedir"));
+            basedir.mkdirs();
+
+            JacksonSerializer serializer = new JacksonSerializer();
+            serializer.postConstruct();
+
+            ConcurrentMap<Id,List<DomainEvent>> eventsPerStream = ((EventStoreInMemory) eventStore).getEventsPerStream();
+            for (Map.Entry<Id,List<DomainEvent>> stream : eventsPerStream.entrySet()) {
+                FileOutputStream streamOut = new FileOutputStream(new File(basedir, stream.getKey().toUUID()));
+                serializer.writeObject(streamOut, stream.getValue().toArray());
+                streamOut.close();
+            }
         }
 
         {

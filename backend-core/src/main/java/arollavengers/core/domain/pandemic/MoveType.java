@@ -4,5 +4,11 @@ package arollavengers.core.domain.pandemic;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public enum MoveType {
-    Setup
+    None,
+    Setup,
+    Drive,
+    ShuttleFlight,
+    DirectFlight,
+    CharterFlight,
+    Airlift;
 }
