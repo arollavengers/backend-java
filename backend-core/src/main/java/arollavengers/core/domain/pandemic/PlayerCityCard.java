@@ -1,5 +1,8 @@
 package arollavengers.core.domain.pandemic;
 
+import org.codehaus.jackson.annotate.JsonTypeName;
+
+@JsonTypeName("city")
 public enum PlayerCityCard implements PlayerCard {
     Algiers(CityId.Algiers),
     Baghdad(CityId.Baghdad),

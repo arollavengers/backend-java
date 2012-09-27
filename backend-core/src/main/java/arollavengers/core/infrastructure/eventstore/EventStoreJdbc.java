@@ -104,7 +104,7 @@ public class EventStoreJdbc implements EventStore {
         if (firstEvent.version() == 1) {
             PreparedStatement pStmt = connection.prepareStatement("insert into streams (stream_id, stream_version) values (?,?)");
             try {
-                pStmt.setString(1, streamId.toUUID());
+                pStmt.setString(1, streamId.asString());
                 pStmt.setLong(2, lastEvent.version());
                 if (pStmt.executeUpdate() != 1)
                 //TODO better exception!
@@ -120,7 +120,7 @@ public class EventStoreJdbc implements EventStore {
             PreparedStatement pStmt = connection.prepareStatement("update streams set stream_version = ? where stream_id = ? and stream_version = ?");
             try {
                 pStmt.setLong(1, lastEvent.version());
-                pStmt.setString(2, streamId.toUUID());
+                pStmt.setString(2, streamId.asString());
                 pStmt.setLong(3, firstEvent.version() - 1);
                 if (pStmt.executeUpdate() != 1)
                 //TODO better exception!
@@ -138,7 +138,7 @@ public class EventStoreJdbc implements EventStore {
             for (DomainEvent event : events) {
                 String eventAsString = serializer.serializeAsString(event);
 
-                pStmt.setString(1, streamId.toUUID());
+                pStmt.setString(1, streamId.asString());
                 pStmt.setLong(2, event.version());
                 pStmt.setString(3, eventAsString);
                 if (pStmt.executeUpdate() != 1)
@@ -170,7 +170,7 @@ public class EventStoreJdbc implements EventStore {
                     throw new RuntimeException("Failed to deserialize event from content: " + eventData, e);
                 }
             }
-        }, streamId.toUUID());
+        }, streamId.asString());
         return Streams.from(events);
     }
 

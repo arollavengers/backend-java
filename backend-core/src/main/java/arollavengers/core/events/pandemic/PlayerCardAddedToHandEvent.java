@@ -11,7 +11,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
         use = JsonTypeInfo.Id.CLASS,
         include = JsonTypeInfo.As.PROPERTY,
         property = "@class")
-public class PlayerCardDrawnFromPileEvent implements WorldEvent {
+public class PlayerCardAddedToHandEvent implements WorldEvent {
 
     @JsonProperty
     private final Id memberId;
@@ -23,8 +23,8 @@ public class PlayerCardDrawnFromPileEvent implements WorldEvent {
     private long version;
 
     @JsonCreator
-    public PlayerCardDrawnFromPileEvent(@JsonProperty("memberId") Id memberId,
-                                        @JsonProperty("card") PlayerCard card) {
+    public PlayerCardAddedToHandEvent(@JsonProperty("memberId") Id memberId,
+                                      @JsonProperty("card") PlayerCard card) {
         this.memberId = memberId;
         this.card = card;
     }
@@ -50,7 +50,7 @@ public class PlayerCardDrawnFromPileEvent implements WorldEvent {
 
     @Override
     public String toString() {
-        return "PlayerCardDrawnFromPileEvent[" + memberId +
+        return "PlayerCardAddedToHandEvent[" + memberId +
                 ", v" + version +
                 ", " + card +
                 "]";

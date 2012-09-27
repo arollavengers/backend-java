@@ -1,10 +1,12 @@
 package arollavengers.core.domain.pandemic;
 
+import org.codehaus.jackson.annotate.JsonTypeName;
 import java.util.EnumSet;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeName("special")
 public enum PlayerSpecialCard implements PlayerCard {
     /**
      *

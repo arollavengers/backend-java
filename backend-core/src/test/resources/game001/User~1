@@ -1,0 +1,14 @@
+[ {
+  "@class" : "arollavengers.core.events.user.UserCreatedEvent",
+  "newUserId" : "User~1",
+  "login" : "Travis",
+  "passwordDigest" : "moXwg0SnyGm+GT6baEJCWZbQSzcB8VCBB3Y1YEC2iM+QtHINLCPLazQAEsbjQb+s4qmG//4IptjHhPOwLRWLsg==",
+  "salt" : "eqrPvjq+Qa3aiKS/QsEuiXrpponeY4IjJqRAu1SJbTE=",
+  "version" : 1
+}, {
+  "@class" : "arollavengers.core.events.user.GameJoinedEvent",
+  "userId" : "User~1",
+  "gameId" : "World~1",
+  "gameType" : "Pandemic",
+  "version" : 2
+} ]

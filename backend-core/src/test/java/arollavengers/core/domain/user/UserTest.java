@@ -33,7 +33,7 @@ public class UserTest {
 
     @Test
     public void create_then_password_is_digested() {
-        Id userId = Id.next();
+        Id userId = Id.next(User.class);
 
         User user = new User(userId, uow);
         user.createUser("Travis", "Pacman".toCharArray(), "hop".getBytes());
@@ -49,7 +49,7 @@ public class UserTest {
 
     @Test
     public void checkPassword() {
-        Id userId = Id.next();
+        Id userId = Id.next(User.class);
 
         User user = new User(userId, uow);
         user.createUser("Travis", "Pacman".toCharArray(), "hop".getBytes());

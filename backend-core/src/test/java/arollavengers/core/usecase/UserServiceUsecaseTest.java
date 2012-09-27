@@ -58,7 +58,7 @@ public class UserServiceUsecaseTest {
 
         // When
         UnitOfWork uow = unitOfWorkFactory.create();
-        Id newUserId = Id.next();
+        Id newUserId = Id.next(User.class);
         userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
         uow.commit();
 
@@ -81,7 +81,7 @@ public class UserServiceUsecaseTest {
 
         // When
         UnitOfWork uow = unitOfWorkFactory.create();
-        Id newUserId = Id.next();
+        Id newUserId = Id.next(User.class);
         User userCreated = userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
 
         // Then
@@ -96,7 +96,7 @@ public class UserServiceUsecaseTest {
         prepareEnvironment();
 
         // When
-        Id newUserId = Id.next();
+        Id newUserId = Id.next(User.class);
         UnitOfWork uow = unitOfWorkFactory.create();
         userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
         uow.commit();
@@ -117,7 +117,7 @@ public class UserServiceUsecaseTest {
         prepareEnvironment();
 
         // When
-        Id newUserId = Id.next();
+        Id newUserId = Id.next(User.class);
         UnitOfWork uow = unitOfWorkFactory.create();
         userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
         uow.commit();
@@ -125,7 +125,7 @@ public class UserServiceUsecaseTest {
         collectorListener.clearMessages();
 
         // Then
-        Id newUserId2 = Id.next();
+        Id newUserId2 = Id.next(User.class);
         uow = unitOfWorkFactory.create();
         try {
             userService.createUser(uow, newUserId2, "Travis", "Wahouu".toCharArray());
@@ -142,7 +142,7 @@ public class UserServiceUsecaseTest {
         // Given
         prepareEnvironment();
 
-        Id newUserId = Id.next();
+        Id newUserId = Id.next(User.class);
         UnitOfWork uow = unitOfWorkFactory.create();
         userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
         uow.commit();
@@ -171,7 +171,7 @@ public class UserServiceUsecaseTest {
         // Given
         prepareEnvironment();
 
-        Id newUserId = Id.next();
+        Id newUserId = Id.next(User.class);
         UnitOfWork uow = unitOfWorkFactory.create();
         userService.createUser(uow, newUserId, "Travis", "Pacman".toCharArray());
         uow.commit();

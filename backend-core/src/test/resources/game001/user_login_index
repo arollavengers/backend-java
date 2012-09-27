@@ -1,0 +1,23 @@
+[ {
+  "@class" : "arollavengers.core.domain.user.UserLoginIndexSupport$LoginIndexCreatedEvent",
+  "indexId" : "user_login_index",
+  "version" : 1
+}, {
+  "@class" : "arollavengers.core.domain.user.UserLoginIndexSupport$LoginAddedEvent",
+  "indexId" : "user_login_index",
+  "login" : "Travis",
+  "userId" : "User~1",
+  "version" : 2
+}, {
+  "@class" : "arollavengers.core.domain.user.UserLoginIndexSupport$LoginAddedEvent",
+  "indexId" : "user_login_index",
+  "login" : "Vlad",
+  "userId" : "User~2",
+  "version" : 3
+}, {
+  "@class" : "arollavengers.core.domain.user.UserLoginIndexSupport$LoginAddedEvent",
+  "indexId" : "user_login_index",
+  "login" : "Thundercat",
+  "userId" : "User~3",
+  "version" : 4
+} ]

@@ -44,9 +44,7 @@ public class LearnJacksonByTest {
     String event = "{\n" +
             "  \"@class\" : \"arollavengers.core.infrastructure.LearnJacksonByTest$MyEvent\",\n" +
             "  \"version\" : 0,\n" +
-            "  \"id\" : {\n" +
-            "    \"uuid\" : \"4241febf-4901-43b6-b8ed-c9a75770fbb6\"\n" +
-            "  },\n" +
+            "  \"id\" : \"4241febf-4901-43b6-b8ed-c9a75770fbb6\",\n" +
             "  \"login\" : \"Travis\",\n" +
             "  \"password\" : \"Pacman\"\n" +
             "}";
@@ -69,9 +67,7 @@ public class LearnJacksonByTest {
     String event = "{\n" +
             "  \"@class\" : \"arollavengers.core.infrastructure.LearnJacksonByTest$MyEvent\",\n" +
             "  \"version\" : 0,\n" +
-            "  \"id\" : {\n" +
-            "    \"uuid\" : \"4241febf-4901-43b6-b8ed-c9a75770fbb6\"\n" +
-            "  },\n" +
+            "  \"id\" :  \"4241febf-4901-43b6-b8ed-c9a75770fbb6\",\n" +
             "  \"login\" : \"Travis\",\n" +
             "  \"password\" : \"Pacman\"\n" +
             "}";
@@ -139,7 +135,7 @@ public class LearnJacksonByTest {
     private long version;
 
     @JsonProperty
-    private Id id = Id.next();
+    private Id id = Id.next(MyEvent.class);
 
     @JsonProperty
     private final String login;

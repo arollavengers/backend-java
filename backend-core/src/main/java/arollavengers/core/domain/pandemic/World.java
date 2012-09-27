@@ -149,7 +149,7 @@ public class World extends AggregateRoot<WorldEvent> {
             }
         }
 
-        applyNewEvent(new WorldMemberJoinedTeamEvent(entityId(), Id.next(), user.entityId(), role));
+        applyNewEvent(new WorldMemberJoinedTeamEvent(entityId(), Id.next(Member.class), user.entityId(), role));
 
         MemberKey memberKey = new MemberKey(user.entityId(), role);
         team().findMember(memberKey).get().setPositionOnTable(team.size() - 1);
@@ -230,7 +230,7 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     private void prepareInfectionCards() {
-        applyNewEvent(new InfectionDrawPileCreatedEvent(entityId(), Id.next()));
+        applyNewEvent(new InfectionDrawPileCreatedEvent(entityId(), Id.next(InfectionDrawPile.class)));
         infectionDrawPile.initialize();
 
         // TODO make city a dedicated entity?
@@ -313,7 +313,7 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     private void preparePlayerCards() {
-        applyNewEvent(new PlayerDrawPileCreatedEvent(entityId(), Id.next()));
+        applyNewEvent(new PlayerDrawPileCreatedEvent(entityId(), Id.next(PlayerDrawPile.class)));
         playerDrawPile.initialize();
 
         int nbCardsPerPlayer = nbCardsPerPlayer(team().size());
@@ -374,7 +374,7 @@ public class World extends AggregateRoot<WorldEvent> {
         // ~~~ don't do this:
         // for (Member member : team()) {
         //     for (int i = team().size(); i < 6; i++) {
-        //         applyNewEvent(new PlayerCardDrawnFromPileEvent(entityId(), member));
+        //         applyNewEvent(new PlayerCardAddedToHandEvent(entityId(), member));
         //     }
         // }
         // applyNewEvent(new ResearchCenterBuiltEvent(entityId(), CityId.Atlanta));

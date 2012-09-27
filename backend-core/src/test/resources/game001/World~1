@@ -1,0 +1,329 @@
+[ {
+  "@class" : "arollavengers.core.events.pandemic.WorldCreatedEvent",
+  "newWorldId" : "World~1",
+  "ownerId" : "User~1",
+  "difficulty" : "Normal",
+  "version" : 1
+}, {
+  "@class" : "arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent",
+  "worldId" : "World~1",
+  "memberId" : "Member~1",
+  "newComerId" : "User~1",
+  "role" : "Medic",
+  "version" : 2
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerPositionOnTableDefinedEvent",
+  "memberId" : "Member~1",
+  "positionOnTable" : 0,
+  "version" : 3
+}, {
+  "@class" : "arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent",
+  "worldId" : "World~1",
+  "memberId" : "Member~2",
+  "newComerId" : "User~2",
+  "role" : "OperationsExpert",
+  "version" : 4
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerPositionOnTableDefinedEvent",
+  "memberId" : "Member~2",
+  "positionOnTable" : 1,
+  "version" : 5
+}, {
+  "@class" : "arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent",
+  "worldId" : "World~1",
+  "memberId" : "Member~3",
+  "newComerId" : "User~3",
+  "role" : "Dispatcher",
+  "version" : 6
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerPositionOnTableDefinedEvent",
+  "memberId" : "Member~3",
+  "positionOnTable" : 2,
+  "version" : 7
+}, {
+  "@class" : "arollavengers.core.events.pandemic.FirstPlayerDesignatedEvent",
+  "worldId" : "World~1",
+  "memberKey" : {
+    "userId" : "User~2",
+    "role" : "OperationsExpert"
+  },
+  "version" : 8
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCreatedEvent",
+  "worldId" : "World~1",
+  "drawPileId" : "PlayerDrawPile~1",
+  "version" : 9
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileInitializedEvent",
+  "playerDrawPileId" : "PlayerDrawPile~1",
+  "cards" : [ [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Taipei" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "HongKong" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Manila" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Paris" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "HoChiMinhCity" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Shanghai" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "SaoPaulo" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Delhi" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "BuenosAires" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Chicago" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Toronto" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "London" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Bangkok" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "GovernmentGrant" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Baghdad" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Seoul" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Karachi" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Miami" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Cairo" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Lima" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Algiers" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Chennai" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Sydney" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Milan" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Essen" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Khartoum" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "SanFrancisco" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "NewYork" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "LosAngeles" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "ResilientPopulation" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Airlift" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Atlanta" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Mumbai" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Forecast" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Riyadh" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Kolkata" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Istanbul" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Jakarta" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Tehran" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "SaintPetersburg" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "OneQuietNight" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Osaka" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Johannesburg" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Tokyo" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Washington" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Beijing" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Lagos" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Santiago" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Bogota" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "MexicoCity" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Madrid" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Moscow" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Kinshasa" ] ],
+  "version" : 10
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Taipei" ],
+  "version" : 11
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~3",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Taipei" ],
+  "version" : 12
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "HongKong" ],
+  "version" : 13
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~3",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "HongKong" ],
+  "version" : 14
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Manila" ],
+  "version" : 15
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~3",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Manila" ],
+  "version" : 16
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Paris" ],
+  "version" : 17
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~2",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Paris" ],
+  "version" : 18
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "HoChiMinhCity" ],
+  "version" : 19
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~2",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "HoChiMinhCity" ],
+  "version" : 20
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Shanghai" ],
+  "version" : 21
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~2",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Shanghai" ],
+  "version" : 22
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "SaoPaulo" ],
+  "version" : 23
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~1",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "SaoPaulo" ],
+  "version" : 24
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Delhi" ],
+  "version" : 25
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~1",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Delhi" ],
+  "version" : 26
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "BuenosAires" ],
+  "version" : 27
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~1",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "BuenosAires" ],
+  "version" : 28
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCompletedForDifficultyEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cards" : [ [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Chicago" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Toronto" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "London" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Bangkok" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "GovernmentGrant" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Baghdad" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Seoul" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Karachi" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Epidemic" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Miami" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Cairo" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Lima" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Algiers" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Chennai" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Sydney" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Milan" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Essen" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Khartoum" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Epidemic" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "SanFrancisco" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "NewYork" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "LosAngeles" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Epidemic" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "ResilientPopulation" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Airlift" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Atlanta" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Mumbai" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Forecast" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Riyadh" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Kolkata" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Istanbul" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Epidemic" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Jakarta" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Tehran" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "SaintPetersburg" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "OneQuietNight" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Osaka" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Johannesburg" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Tokyo" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Washington" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Beijing" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Lagos" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Santiago" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Bogota" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "MexicoCity" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Madrid" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Moscow" ], [ "arollavengers.core.domain.pandemic.PlayerSpecialCard", "Epidemic" ], [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Kinshasa" ] ],
+  "version" : 29
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCreatedEvent",
+  "worldId" : "World~1",
+  "drawPileId" : "InfectionDrawPile~1",
+  "version" : 30
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileInitializedEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cards" : [ [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Karachi" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "London" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Delhi" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Madrid" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Kolkata" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Jakarta" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Toronto" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Osaka" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Manila" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Moscow" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Bangkok" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Taipei" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "LosAngeles" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Atlanta" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Sydney" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Chicago" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "NewYork" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Beijing" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Bogota" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Lagos" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Paris" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Johannesburg" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Tehran" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Algiers" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Santiago" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Mumbai" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Riyadh" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Milan" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Washington" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "HongKong" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Tokyo" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "SanFrancisco" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "MexicoCity" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Kinshasa" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Istanbul" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "HoChiMinhCity" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Essen" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Khartoum" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "SaoPaulo" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Cairo" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Baghdad" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Miami" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Seoul" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "SaintPetersburg" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Lima" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "BuenosAires" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Shanghai" ], [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Chennai" ] ],
+  "version" : 31
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Karachi" ],
+  "version" : 32
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "Karachi",
+  "disease" : "Black",
+  "nbCubes" : 3,
+  "version" : 33
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "London" ],
+  "version" : 34
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "London",
+  "disease" : "Blue",
+  "nbCubes" : 3,
+  "version" : 35
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Delhi" ],
+  "version" : 36
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "Delhi",
+  "disease" : "Black",
+  "nbCubes" : 3,
+  "version" : 37
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Madrid" ],
+  "version" : 38
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "Madrid",
+  "disease" : "Blue",
+  "nbCubes" : 2,
+  "version" : 39
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Kolkata" ],
+  "version" : 40
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "Kolkata",
+  "disease" : "Black",
+  "nbCubes" : 2,
+  "version" : 41
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Jakarta" ],
+  "version" : 42
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "Jakarta",
+  "disease" : "Orange",
+  "nbCubes" : 2,
+  "version" : 43
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Toronto" ],
+  "version" : 44
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "Toronto",
+  "disease" : "Blue",
+  "nbCubes" : 1,
+  "version" : 45
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Osaka" ],
+  "version" : 46
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "Osaka",
+  "disease" : "Orange",
+  "nbCubes" : 1,
+  "version" : 47
+}, {
+  "@class" : "arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.InfectionCityCard", "Manila" ],
+  "version" : 48
+}, {
+  "@class" : "arollavengers.core.events.pandemic.CityInfectedEvent",
+  "worldId" : "World~1",
+  "cityId" : "Manila",
+  "disease" : "Orange",
+  "nbCubes" : 1,
+  "version" : 49
+}, {
+  "@class" : "arollavengers.core.events.pandemic.ResearchCenterBuiltEvent",
+  "worldId" : "World~1",
+  "cityId" : "Atlanta",
+  "version" : 50
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerMovedEvent",
+  "memberId" : "Member~3",
+  "city" : "Atlanta",
+  "moveType" : "Setup",
+  "cardUsed" : null,
+  "version" : 51
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerMovedEvent",
+  "memberId" : "Member~2",
+  "city" : "Atlanta",
+  "moveType" : "Setup",
+  "cardUsed" : null,
+  "version" : 52
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerMovedEvent",
+  "memberId" : "Member~1",
+  "city" : "Atlanta",
+  "moveType" : "Setup",
+  "cardUsed" : null,
+  "version" : 53
+}, {
+  "@class" : "arollavengers.core.events.pandemic.GameStartedEvent",
+  "worldId" : "World~1",
+  "version" : 54
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerTurnStartedEvent",
+  "memberId" : "Member~2",
+  "nbActions" : 4,
+  "version" : 55
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Chicago" ],
+  "version" : 56
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~2",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Chicago" ],
+  "version" : 57
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Toronto" ],
+  "version" : 58
+}, {
+  "@class" : "arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent",
+  "memberId" : "Member~2",
+  "card" : [ "arollavengers.core.domain.pandemic.PlayerCityCard", "Toronto" ],
+  "version" : 59
+} ]

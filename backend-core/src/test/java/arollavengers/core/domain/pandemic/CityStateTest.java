@@ -2,6 +2,8 @@ package arollavengers.core.domain.pandemic;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,7 +47,7 @@ public class CityStateTest {
     assertThat(state.numberOfCubes(Disease.Yellow)).isEqualTo(0);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = PandemicRuntimeException.class)
   public void city_cannot_be_treated_when_no_cube () {
     state.removeOneCube(Disease.Blue);
   }

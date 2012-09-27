@@ -1,8 +1,11 @@
 package arollavengers.core.domain.pandemic;
 
+import org.codehaus.jackson.annotate.JsonTypeName;
+
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@JsonTypeName("city")
 public enum InfectionCityCard implements InfectionCard {
 
     Algiers(CityId.Algiers),

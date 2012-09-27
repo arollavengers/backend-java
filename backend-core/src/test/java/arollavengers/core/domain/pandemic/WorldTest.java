@@ -4,7 +4,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
 
 import arollavengers.core.domain.user.User;
-import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.exceptions.EntityAlreadyCreatedException;
 import arollavengers.core.exceptions.pandemic.GameAlreadyStartedException;
 import arollavengers.core.exceptions.pandemic.NotEnoughPlayerException;
@@ -15,6 +14,8 @@ import arollavengers.core.exceptions.pandemic.WorldRoleAlreadyChosenException;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
+import arollavengers.core.infrastructure.UnitOfWorkDefault;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class WorldTest {
         //See @Before
 
         //When -- A world is created
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
 
@@ -67,7 +68,7 @@ public class WorldTest {
     @Test(expected = EntityAlreadyCreatedException.class)
     public void testCreateWorld_When_AlreadyCreated() {
         //Given -- A world is created
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
 
@@ -87,7 +88,7 @@ public class WorldTest {
     @Test
     public void testRegisterRole() {
         //Given -- a new instance of a world
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
 
@@ -103,7 +104,7 @@ public class WorldTest {
     public void testRegisterRole_WhenGameNotYetCreated() {
         //Given -- a new instance of a world
         //See @Before
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         assertThat(w.isStarted()).isFalse();
 
@@ -114,7 +115,7 @@ public class WorldTest {
     @Test(expected = WorldRoleAlreadyChosenException.class)
     public void testRegisterRole_WhenRoleAlreadyRegistered() {
         //Given -- a new instance of a world
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
         // with a medic already registerd
@@ -136,7 +137,7 @@ public class WorldTest {
     @Test(expected = UserAlreadyRegisteredException.class)
     public void testRegisterRole_WhenPlayerAlreadyRegistered_withADifferentRole() {
         //Given -- a new instance of a world
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
         // with a medic already registerd
@@ -164,7 +165,7 @@ public class WorldTest {
         User user4 = createUser(uow, "John");
         uow.clearUncommitted();
 
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
         // with 4 roles registered
@@ -190,7 +191,7 @@ public class WorldTest {
     @Test(expected = GameAlreadyStartedException.class)
     public void testRegisterRole_WhenGameIsAlreadyStarted() {
         //Given -- a world created
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
 
@@ -213,7 +214,7 @@ public class WorldTest {
     public void startGame_WhenGameNotCreated() {
 
         //Given -- a new instance of a world
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
 
         //When -- the game is started but not yet created
@@ -225,7 +226,7 @@ public class WorldTest {
     public void startGame_WhenNotEnoughMember() {
 
         //Given -- a world created
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
 
@@ -248,7 +249,7 @@ public class WorldTest {
     @Test
     public void startGame_With2Players() {
         //Given -- a world created
-        final Id worldId = Id.next();
+        final Id worldId = Id.next(World.class);
         w = new World(worldId, uow);
         w.createWorld(ownr, Difficulty.Heroic);
 
@@ -270,7 +271,7 @@ public class WorldTest {
         MemberKey ownrKey = new MemberKey(ownr.entityId(), MemberRole.Dispatcher);
         MemberKey userKey = new MemberKey(user.entityId(), MemberRole.Medic);
         assertThat(w.memberHandSize(ownrKey)).isEqualTo(initialCardsPerMember);
-        assertThat(w.memberHandSize(userKey)).isEqualTo(initialCardsPerMember);
+        assertThat(w.memberHandSize(userKey)).isEqualTo(initialCardsPerMember + 2);
 
         //Then -- the player draw cards is initialized
 // TODO       final int remainingDrawPlayerCards = CityId.values().length - (initialCardsPerMember * 2);
@@ -289,7 +290,7 @@ public class WorldTest {
     }
 
     private static User createUser(UnitOfWork uow, String login) {
-        User user = new User(Id.next(), uow);
+        User user = new User(Id.next(User.class), uow);
         user.createUser(login, "password".toCharArray(), "salt".getBytes());
         return user;
     }

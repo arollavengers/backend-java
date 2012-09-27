@@ -1,6 +1,6 @@
 package arollavengers.core.domain.pandemic;
 
-import arollavengers.core.events.pandemic.PlayerCardDrawnFromPileEvent;
+import arollavengers.core.events.pandemic.PlayerCardAddedToHandEvent;
 import arollavengers.core.events.pandemic.PlayerMovedEvent;
 import arollavengers.core.events.pandemic.PlayerPositionOnTableDefinedEvent;
 import arollavengers.core.events.pandemic.PlayerTurnEndedEvent;
@@ -75,11 +75,11 @@ public class Member extends Entity<WorldEvent> {
         if (handSize() >= HAND_SIZE_THRESHOLD) {
             throw new HandSizeLimitReachedException(entityId(), handSize());
         }
-        applyNewEvent(new PlayerCardDrawnFromPileEvent(entityId(), card));
+        applyNewEvent(new PlayerCardAddedToHandEvent(entityId(), card));
     }
 
     @OnEvent
-    private void onCardDrawn(final PlayerCardDrawnFromPileEvent event) {
+    private void onCardDrawn(final PlayerCardAddedToHandEvent event) {
         hand.add(event.playerCard());
     }
 

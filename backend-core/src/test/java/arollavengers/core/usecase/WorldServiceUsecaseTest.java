@@ -9,14 +9,12 @@ import arollavengers.core.domain.pandemic.MemberKey;
 import arollavengers.core.domain.pandemic.MemberRole;
 import arollavengers.core.domain.pandemic.World;
 import arollavengers.core.domain.pandemic.WorldRepositorySupport;
+import arollavengers.core.domain.user.User;
 import arollavengers.core.domain.user.UserLoginIndexSupport;
 import arollavengers.core.domain.user.UserRepositorySupport;
 import arollavengers.core.exceptions.user.UserNotFoundException;
-import arollavengers.core.infrastructure.DomainEvent;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
-import arollavengers.core.infrastructure.JacksonSerializer;
-import arollavengers.core.infrastructure.Serializer;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.UnitOfWorkDefault;
@@ -24,16 +22,12 @@ import arollavengers.core.infrastructure.UnitOfWorkFactory;
 import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
 import arollavengers.core.service.pandemic.WorldService;
 import arollavengers.core.service.user.UserService;
+import arollavengers.core.testutils.EventStoreInMemoryWriter;
 import arollavengers.core.testutils.TypeOfEventStore;
 
 import org.junit.Before;
 import org.junit.Test;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -71,11 +65,11 @@ public class WorldServiceUsecaseTest {
         // Given
         prepareEnvironment();
 
-        Id userId = Id.next();
+        Id userId = Id.next(User.class);
         givenAFreshNewUserWithId(userId);
 
         // When
-        Id worldId = Id.next();
+        Id worldId = Id.next(User.class);
         worldService.createWorld(worldId, userId, Difficulty.Normal);
 
         // Then
@@ -87,10 +81,10 @@ public class WorldServiceUsecaseTest {
         // Given
         prepareEnvironment();
 
-        Id userId = Id.next();
+        Id userId = Id.next(User.class);
 
         // When
-        Id worldId = Id.next();
+        Id worldId = Id.next(User.class);
         worldService.createWorld(worldId, userId, Difficulty.Normal);
 
         // Then
@@ -102,9 +96,9 @@ public class WorldServiceUsecaseTest {
         // Given
         prepareEnvironment();
 
-        Id ownerId = Id.next();
+        Id ownerId = Id.next(User.class);
         givenAFreshNewUserWithId(ownerId);
-        Id worldId = Id.next();
+        Id worldId = Id.next(User.class);
         givenAFreshNewWorldWithIdAndOwner(worldId, ownerId);
 
         // When
@@ -117,17 +111,20 @@ public class WorldServiceUsecaseTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void start_a_game() throws Exception {
+        Id.Strategy.TypedSequence.reset();
+        Id.setDefaultStrategy(Id.Strategy.TypedSequence);
+
         // Given
         prepareEnvironment();
 
-        Id ownerId = Id.next();
-        Id playerId1 = Id.next();
-        Id playerId2 = Id.next();
+        Id ownerId = Id.next(User.class);
+        Id playerId1 = Id.next(User.class);
+        Id playerId2 = Id.next(User.class);
         givenAFreshNewUserWithId(ownerId, "Travis");
         givenAFreshNewUserWithId(playerId1, "Vlad");
         givenAFreshNewUserWithId(playerId2, "Thundercat");
 
-        Id worldId = Id.next();
+        Id worldId = Id.next(World.class);
         givenAFreshNewWorldWithIdAndOwner(worldId, ownerId);
 
         MemberKey memberKey0 = new MemberKey(ownerId, MemberRole.Medic);
@@ -146,17 +143,9 @@ public class WorldServiceUsecaseTest {
             world.startGame();
             uow.commit();
 
-            File basedir = new File(testSettings.getProperty("memory.event-store.basedir"));
-            basedir.mkdirs();
-
-            JacksonSerializer serializer = new JacksonSerializer();
-            serializer.postConstruct();
-
-            ConcurrentMap<Id,List<DomainEvent>> eventsPerStream = ((EventStoreInMemory) eventStore).getEventsPerStream();
-            for (Map.Entry<Id,List<DomainEvent>> stream : eventsPerStream.entrySet()) {
-                FileOutputStream streamOut = new FileOutputStream(new File(basedir, stream.getKey().toUUID()));
-                serializer.writeObject(streamOut, stream.getValue().toArray());
-                streamOut.close();
+            if (eventStore instanceof EventStoreInMemory) {
+                new EventStoreInMemoryWriter(testSettings.getProperty("memory.event-store.basedir"))
+                        .write((EventStoreInMemory) eventStore);
             }
         }
 
