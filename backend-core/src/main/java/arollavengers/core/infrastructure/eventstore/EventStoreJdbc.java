@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -155,6 +156,7 @@ public class EventStoreJdbc implements EventStore {
     }
 
     @Override
+    @Nullable
     public <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, Class<E> eventType) {
         String sql = "select stream_id, event_id, event_data from stream_events where stream_id = ? order by event_id";
         List<E> events = jdbcTemplate.query(sql, new RowMapper<E>() {
@@ -171,6 +173,9 @@ public class EventStoreJdbc implements EventStore {
                 }
             }
         }, streamId.asString());
+
+        if(events.isEmpty())
+            return null;
         return Streams.from(events);
     }
 

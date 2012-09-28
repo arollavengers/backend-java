@@ -1,5 +1,6 @@
 package arollavengers.core.domain.pandemic;
 
+import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
@@ -9,6 +10,9 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
         property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = InfectionCityCard.class)
+})
 public interface InfectionCard {
     InfectionCardType cardType();
 }

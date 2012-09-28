@@ -39,7 +39,6 @@ import arollavengers.core.infrastructure.annotation.OnEvent;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -263,7 +262,7 @@ public class World extends AggregateRoot<WorldEvent> {
                     cityId, disease, CityGraph.getInstance(), cityStates);
 
             EnumMap<CityId, Integer> resultingInfections = outbreakChain.getResultingInfections();
-            Multimap<Integer, CityId> generations = outbreakChain.toOutbreakGenerationMap();
+            OutbreakGenerationChain.OutbreakGenerationMap generations = outbreakChain.toOutbreakGenerationMap();
 
             // Each time a city outbreaks, move the Outbreaks Marker up one space on the Outbreak Indicator.
             // If the number of outbreaks ever reaches 8 (and the Outbreaks Marker reaches the skull symbol),
@@ -309,7 +308,7 @@ public class World extends AggregateRoot<WorldEvent> {
         }
 
 
-        outbreaks += event.generations().values().size();
+        outbreaks += event.generations().numberOfOutbreaks();
     }
 
     private void preparePlayerCards() {
@@ -648,7 +647,7 @@ public class World extends AggregateRoot<WorldEvent> {
         CityId cityFrom = member.location();
 
         MoveType moveType = moveService.moveTypeFor(cityFrom, destination, cardOpt);
-        if(moveType == MoveType.None) {
+        if (moveType == MoveType.None) {
             throw new InvalidMoveException(member.memberKey(), cityFrom, destination);
         }
         return moveType;
@@ -660,8 +659,9 @@ public class World extends AggregateRoot<WorldEvent> {
 
     private Member getIfCurrentPlayerAndEnoughActionOrFail(MemberKey memberKey) {
         // fail if it is not player's turn...
-        if(!memberKey.equals(this.currentMemberKey))
+        if (!memberKey.equals(this.currentMemberKey)) {
             throw new InvalidPlayerTurnException(currentMemberKey, memberKey);
+        }
 
         Member member = team().findMember(memberKey).or(memberNotFoundException(memberKey));
 

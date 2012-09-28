@@ -84,11 +84,11 @@ public class WorldServiceUsecaseTest {
         Id userId = Id.next(User.class);
 
         // When
-        Id worldId = Id.next(User.class);
+        Id worldId = Id.next(World.class);
         worldService.createWorld(worldId, userId, Difficulty.Normal);
 
         // Then
-        fail("An exception should have been raised");
+        fail("An exception should have been raised (" + userId + ")");
     }
 
     @Test

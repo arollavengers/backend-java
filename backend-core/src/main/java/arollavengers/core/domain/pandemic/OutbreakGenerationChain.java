@@ -3,9 +3,13 @@ package arollavengers.core.domain.pandemic;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * <p>An outbreak occurs if a player is required to add a cube to a city that already has 3 cubes in it
@@ -76,17 +80,64 @@ public class OutbreakGenerationChain {
         return resultingInfections;
     }
 
+    public static class OutbreakGenerationMap {
+        @JsonProperty
+        private final CityId[][] generations;
+
+        @JsonCreator
+        public OutbreakGenerationMap(@JsonProperty("generations") CityId[][] generations) {
+            this.generations = generations;
+        }
+
+        public CityId[] outbreaksForGeneration(int generation) {
+            return generations[generation];
+        }
+
+        public int numberOfGenerations() {
+            return generations.length;
+        }
+
+        public int numberOfOutbreaks() {
+            int nb = 0;
+            for(CityId[] cities : generations) {
+                nb += cities.length;
+            }
+            return nb;
+        }
+
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            for(int i=0;i<generations.length;i++) {
+                builder.append("Generation #").append(i).append("[");
+                for(CityId city : generations[i]) {
+                    builder.append(city).append(", ");
+                }
+                builder.setLength(builder.length()-2); // remove last ', '
+                builder.append("], ");
+            }
+            builder.setLength(builder.length()-2); // remove last ', '
+            return builder.toString();
+        }
+    }
+
     /**
      * Number of generation would be given by <code>multimap.size()</code> whereas the number
      * of outbreaks in the chain would be given by <code>multimap.values().size()</code>.
      */
-    // TODO replace Multimap by a custom datastructure with #numberOfGeneration() & #numberOfOutbreaks()...
-    public Multimap<Integer, CityId> toOutbreakGenerationMap() {
+    public OutbreakGenerationMap toOutbreakGenerationMap() {
+        // TODO think of finding a smarter way to not create an intermediate multimap?
+
         Multimap<Integer, CityId> map = ArrayListMultimap.create();
         for (OutbreakGeneration generation : outbreakedCities.values()) {
             map.put(generation.generation(), generation.cityId);
         }
-        return map;
+        CityId[][] generations = new CityId[map.size()][];
+        for(int i=0,n=map.size(); i<n; i++) {
+            Collection<CityId> cityIds = map.get(i);
+            generations[i] = cityIds.toArray(new CityId[cityIds.size()]);
+        }
+
+        return new OutbreakGenerationMap(generations);
     }
 
     public OutbreakGeneration getOutbreakGeneration(CityId cityId) {

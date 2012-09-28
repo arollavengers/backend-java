@@ -2,7 +2,6 @@ package arollavengers.core.events.pandemic;
 
 import arollavengers.core.domain.pandemic.CityId;
 import arollavengers.core.domain.pandemic.Disease;
-import arollavengers.core.domain.pandemic.OutbreakChain;
 import arollavengers.core.domain.pandemic.OutbreakGenerationChain;
 import arollavengers.core.infrastructure.Id;
 import com.google.common.collect.Multimap;
@@ -10,7 +9,6 @@ import com.google.common.collect.Multimap;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
-import java.util.Collection;
 import java.util.EnumMap;
 
 /**
@@ -29,7 +27,7 @@ public class OutbreakChainTriggeredEvent implements CityEvent {
     private final Id worldId;
 
     @JsonProperty
-    private final Multimap<Integer, CityId> generations;
+    private final OutbreakGenerationChain.OutbreakGenerationMap generationMap;
 
     @JsonProperty
     private final Disease disease;
@@ -39,12 +37,12 @@ public class OutbreakChainTriggeredEvent implements CityEvent {
 
     @JsonCreator
     public OutbreakChainTriggeredEvent(@JsonProperty("worldId") Id worldId,
-                                       @JsonProperty("generations") Multimap<Integer, CityId> generations,
+                                       @JsonProperty("generations") OutbreakGenerationChain.OutbreakGenerationMap generationMap,
                                        @JsonProperty("diseasz") Disease disease,
                                        @JsonProperty("resultinInfections") EnumMap<CityId, Integer> resultingInfections)
     {
         this.worldId = worldId;
-        this.generations = generations;
+        this.generationMap = generationMap;
         this.disease = disease;
         this.resultingInfections = resultingInfections;
     }
@@ -68,8 +66,8 @@ public class OutbreakChainTriggeredEvent implements CityEvent {
         return disease;
     }
 
-    public Multimap<Integer, CityId> generations() {
-        return generations;
+    public OutbreakGenerationChain.OutbreakGenerationMap generations() {
+        return generationMap;
     }
 
     public EnumMap<CityId, Integer> resultingInfections() {
@@ -78,6 +76,6 @@ public class OutbreakChainTriggeredEvent implements CityEvent {
 
     @Override
     public String toString() {
-        return "OutbreakChainTriggeredEvent[" + worldId + ", v" + version + ", " + generations + ", " + resultingInfections + "]";
+        return "OutbreakChainTriggeredEvent[" + worldId + ", v" + version + ", " + generationMap + ", " + resultingInfections + "]";
     }
 }

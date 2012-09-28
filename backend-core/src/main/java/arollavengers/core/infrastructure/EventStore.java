@@ -22,8 +22,6 @@ public interface EventStore {
      *
      * @param streamId the id of the stream the events will be appended to
      * @param eventType type of the events (for generics...)
-     * @param <E>
-     * @return
      */
     @Nullable
     <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, Class<E> eventType);

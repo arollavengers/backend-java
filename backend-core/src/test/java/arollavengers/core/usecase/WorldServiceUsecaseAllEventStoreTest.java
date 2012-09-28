@@ -14,7 +14,6 @@ import java.util.List;
  */
 @SuppressWarnings("ConstantConditions")
 @RunWith(LabeledParameterized.class)
-@Ignore
 public class WorldServiceUsecaseAllEventStoreTest extends WorldServiceUsecaseTest {
 
     /**
