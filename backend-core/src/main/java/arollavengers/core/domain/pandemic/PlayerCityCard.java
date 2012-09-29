@@ -1,5 +1,7 @@
 package arollavengers.core.domain.pandemic;
 
+import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
+
 import org.codehaus.jackson.annotate.JsonTypeName;
 
 @JsonTypeName("city")
@@ -69,5 +71,13 @@ public enum PlayerCityCard implements PlayerCard {
     @Override
     public PlayerCardType cardType() {
         return PlayerCardType.City;
+    }
+
+    public static PlayerCityCard cardOf(CityId cityId) {
+        for(PlayerCityCard card : values()) {
+            if(card.cityId() == cityId)
+                return card;
+        }
+        throw new PandemicRuntimeException("Weird! No card belongs to " + cityId);
     }
 }
