@@ -3,7 +3,7 @@ package arollavengers.core.domain.pandemic;
 import arollavengers.core.events.pandemic.InfectionDrawPileCardDrawnEvent;
 import arollavengers.core.events.pandemic.InfectionDrawPileInitializedEvent;
 import arollavengers.core.events.pandemic.IntensityOfInfectionIncreasedEvent;
-import arollavengers.core.events.pandemic.WorldEvent;
+import arollavengers.core.events.pandemic.PandemicEvent;
 import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
 import arollavengers.core.infrastructure.Aggregate;
 import arollavengers.core.infrastructure.AnnotationBasedEventHandler;
@@ -21,20 +21,20 @@ import java.util.List;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class InfectionDrawPile extends Entity<WorldEvent> {
+public class InfectionDrawPile extends Entity<PandemicEvent> {
 
-    private final EventHandler<WorldEvent> eventHandler;
+    private final EventHandler<PandemicEvent> eventHandler;
     //
     private List<InfectionCard> cards;
     private List<InfectionCard> discardedCards;
 
-    public InfectionDrawPile(@Nonnull Aggregate<WorldEvent> aggregate, @Nonnull Id entityId) {
+    public InfectionDrawPile(@Nonnull Aggregate<PandemicEvent> aggregate, @Nonnull Id entityId) {
         super(aggregate, entityId);
-        this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
+        this.eventHandler = new AnnotationBasedEventHandler<PandemicEvent>(this);
     }
 
     @Override
-    protected EventHandler<WorldEvent> internalEventHandler() {
+    protected EventHandler<PandemicEvent> internalEventHandler() {
         return eventHandler;
     }
 

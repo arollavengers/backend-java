@@ -10,7 +10,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
         use = JsonTypeInfo.Id.CLASS,
         include = JsonTypeInfo.As.PROPERTY,
         property = "@class")
-public class GameStartedEvent implements WorldEvent {
+public class GameStartedEvent implements PandemicEvent {
 
     @JsonProperty
     private long version;

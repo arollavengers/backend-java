@@ -11,7 +11,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
         use = JsonTypeInfo.Id.CLASS,
         include = JsonTypeInfo.As.PROPERTY,
         property = "@class")
-public class PlayerCardAddedToHandEvent implements WorldEvent {
+public class PlayerCardAddedToHandEvent implements PandemicEvent {
 
     @JsonProperty
     private final Id memberId;

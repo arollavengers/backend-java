@@ -1,11 +1,11 @@
 package arollavengers.core.domain.pandemic;
 
+import arollavengers.core.events.pandemic.PandemicEvent;
 import arollavengers.core.events.pandemic.PlayerCardAddedToHandEvent;
 import arollavengers.core.events.pandemic.PlayerMovedEvent;
 import arollavengers.core.events.pandemic.PlayerPositionOnTableDefinedEvent;
 import arollavengers.core.events.pandemic.PlayerTurnEndedEvent;
 import arollavengers.core.events.pandemic.PlayerTurnStartedEvent;
-import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.exceptions.pandemic.ActionNotAuthorizedException;
 import arollavengers.core.exceptions.pandemic.HandSizeLimitReachedException;
 import arollavengers.core.exceptions.pandemic.PlayerCardNotFoundException;
@@ -21,11 +21,11 @@ import com.google.common.collect.Lists;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class Member extends Entity<WorldEvent> {
+public class Member extends Entity<PandemicEvent> {
 
     public static final int HAND_SIZE_THRESHOLD = 7;
     //
-    private final EventHandler<WorldEvent> eventHandler;
+    private final EventHandler<PandemicEvent> eventHandler;
     //
     private final List<PlayerCard> hand = Lists.newArrayList();
     private final MemberKey memberKey;
@@ -33,18 +33,18 @@ public class Member extends Entity<WorldEvent> {
     private int nbActionRemaining;
     private CityId location;
 
-    public Member(@Nonnull Aggregate<WorldEvent> aggregate,
+    public Member(@Nonnull Aggregate<PandemicEvent> aggregate,
                   @Nonnull Id entityId,
                   @Nonnull Id userId,
                   @Nonnull MemberRole role)
     {
         super(aggregate, entityId);
-        this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
+        this.eventHandler = new AnnotationBasedEventHandler<PandemicEvent>(this);
         this.memberKey = new MemberKey(userId, role);
     }
 
     @Override
-    protected EventHandler<WorldEvent> internalEventHandler() {
+    protected EventHandler<PandemicEvent> internalEventHandler() {
         return eventHandler;
     }
 

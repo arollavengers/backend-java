@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
         use = JsonTypeInfo.Id.CLASS,
         include = JsonTypeInfo.As.PROPERTY,
         property = "@class")
-public class WorldMemberActionSpentEvent implements WorldEvent {
+public class WorldMemberActionSpentEvent implements PandemicEvent {
 
   public WorldMemberActionSpentEvent(final Object p0, final Object id) {
   }

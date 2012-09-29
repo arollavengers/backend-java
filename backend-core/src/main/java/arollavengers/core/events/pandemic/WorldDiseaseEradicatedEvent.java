@@ -11,7 +11,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
         use = JsonTypeInfo.Id.CLASS,
         include = JsonTypeInfo.As.PROPERTY,
         property = "@class")
-public class WorldDiseaseEradicatedEvent implements WorldEvent {
+public class WorldDiseaseEradicatedEvent implements PandemicEvent {
 
     @JsonProperty
     private final Id worldId;

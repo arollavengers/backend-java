@@ -7,13 +7,13 @@ import arollavengers.core.events.pandemic.FirstPlayerDesignatedEvent;
 import arollavengers.core.events.pandemic.GameStartedEvent;
 import arollavengers.core.events.pandemic.InfectionDrawPileCreatedEvent;
 import arollavengers.core.events.pandemic.OutbreakChainTriggeredEvent;
+import arollavengers.core.events.pandemic.PandemicEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCreatedEvent;
 import arollavengers.core.events.pandemic.ResearchCenterBuiltEvent;
 import arollavengers.core.events.pandemic.WorldCityCuredEvent;
 import arollavengers.core.events.pandemic.WorldCityTreatedEvent;
 import arollavengers.core.events.pandemic.WorldCreatedEvent;
 import arollavengers.core.events.pandemic.WorldDiseaseEradicatedEvent;
-import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.events.pandemic.WorldMemberActionSpentEvent;
 import arollavengers.core.events.pandemic.WorldMemberJoinedTeamEvent;
 import arollavengers.core.exceptions.EntityAlreadyCreatedException;
@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class World extends AggregateRoot<WorldEvent> {
+public class World extends AggregateRoot<PandemicEvent> {
 
     public static final int MAX_TEAM_SIZE = 4;
     public static final int MIN_TEAM_SIZE = 2;
@@ -58,7 +58,7 @@ public class World extends AggregateRoot<WorldEvent> {
     public static final int NB_PLAYER_CARDS_PER_TURN = 2;
 
     private final UnitOfWork uow;
-    private final EventHandler<WorldEvent> eventHandler;
+    private final EventHandler<PandemicEvent> eventHandler;
 
     // ~~~ World state
     public boolean userCannotBeRegisteredTwice = true;
@@ -87,7 +87,7 @@ public class World extends AggregateRoot<WorldEvent> {
     public World(Id worldId, UnitOfWork uow) {
         super(worldId);
         this.uow = uow;
-        this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
+        this.eventHandler = new AnnotationBasedEventHandler<PandemicEvent>(this);
     }
 
     /**
@@ -485,7 +485,7 @@ public class World extends AggregateRoot<WorldEvent> {
     }
 
     @Override
-    protected EventHandler<WorldEvent> internalEventHandler() {
+    protected EventHandler<PandemicEvent> internalEventHandler() {
         return eventHandler;
     }
 

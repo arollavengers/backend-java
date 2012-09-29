@@ -2,10 +2,10 @@ package arollavengers.core.domain.pandemic;
 
 import static arollavengers.core.domain.pandemic.PlayerSpecialCard.Epidemic;
 
+import arollavengers.core.events.pandemic.PandemicEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCompletedForDifficultyEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileInitializedEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent;
-import arollavengers.core.events.pandemic.WorldEvent;
 import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
 import arollavengers.core.infrastructure.Aggregate;
 import arollavengers.core.infrastructure.AnnotationBasedEventHandler;
@@ -22,19 +22,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class PlayerDrawPile extends Entity<WorldEvent> {
+public class PlayerDrawPile extends Entity<PandemicEvent> {
 
-    private final EventHandler<WorldEvent> eventHandler;
+    private final EventHandler<PandemicEvent> eventHandler;
     //
     private List<PlayerCard> cards;
 
-    public PlayerDrawPile(@Nonnull Aggregate<WorldEvent> aggregate, @Nonnull Id entityId) {
+    public PlayerDrawPile(@Nonnull Aggregate<PandemicEvent> aggregate, @Nonnull Id entityId) {
         super(aggregate, entityId);
-        this.eventHandler = new AnnotationBasedEventHandler<WorldEvent>(this);
+        this.eventHandler = new AnnotationBasedEventHandler<PandemicEvent>(this);
     }
 
     @Override
-    protected EventHandler<WorldEvent> internalEventHandler() {
+    protected EventHandler<PandemicEvent> internalEventHandler() {
         return eventHandler;
     }
 

@@ -1,6 +1,6 @@
 package arollavengers.core.domain.pandemic;
 
-import arollavengers.core.events.pandemic.WorldEvent;
+import arollavengers.core.events.pandemic.PandemicEvent;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Stream;
@@ -42,7 +42,7 @@ public class WorldRepositorySupport implements WorldRepository {
     public World getWorld(@Nonnull UnitOfWork uow, @Nonnull Id worldId) {
         World world = uow.getAggregate(worldId);
         if (world == null) {
-            Stream<WorldEvent> stream = eventStore.openStream(worldId, WorldEvent.class);
+            Stream<PandemicEvent> stream = eventStore.openStream(worldId, PandemicEvent.class);
             if (stream == null) {
                 return null;
             }
