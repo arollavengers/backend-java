@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -15,7 +14,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.MapperConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jackson.map.deser.std.StdDeserializer;
@@ -23,11 +21,8 @@ import org.codehaus.jackson.map.introspect.Annotated;
 import org.codehaus.jackson.map.introspect.AnnotatedClass;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.map.jsontype.NamedType;
-import org.codehaus.jackson.map.jsontype.TypeResolverBuilder;
-import org.codehaus.jackson.map.jsontype.impl.StdTypeResolverBuilder;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.node.ObjectNode;
-import org.codehaus.jackson.type.JavaType;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,11 +183,11 @@ public class LearnJacksonByTest {
         objectMapper.setAnnotationIntrospector(new CustomJacksonAnnotationIntrospector());
         objectMapper
                 .getDeserializationConfig()
-        .addMixInAnnotations(DomainEvent.class, PolymorphicEventMixIn3.class)
+                .addMixInAnnotations(DomainEvent.class, PolymorphicEventMixIn3.class)
         ;
         objectMapper
                 .getSerializationConfig()
-        .addMixInAnnotations(DomainEvent.class, PolymorphicEventMixIn3.class)
+                .addMixInAnnotations(DomainEvent.class, PolymorphicEventMixIn3.class)
         ;
 
         Object o = objectMapper.readValue(event, DomainEvent.class);
@@ -417,7 +412,7 @@ public class LearnJacksonByTest {
         @Override
         public DomainEvent deserialize(
                 JsonParser jp, DeserializationContext ctxt)
-                throws IOException, JsonProcessingException
+                throws IOException
         {
             ObjectMapper mapper = (ObjectMapper) jp.getCodec();
             ObjectNode root = (ObjectNode) mapper.readTree(jp);
