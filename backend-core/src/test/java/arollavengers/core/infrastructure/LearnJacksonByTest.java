@@ -2,6 +2,7 @@ package arollavengers.core.infrastructure;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import arollavengers.core.util.Strings;
 import com.google.common.collect.Maps;
 
 import org.codehaus.jackson.JsonNode;
@@ -458,34 +459,10 @@ public class LearnJacksonByTest {
         public String findTypeName(AnnotatedClass ac) {
             System.out.println(
                     "LearnJacksonByTest$CustomJacksonAnnotationIntrospector.findTypeName(" + ac.getRawType() + ")");
-            return separate(ac.getRawType().getSimpleName(), '-');
+            return Strings.separate(ac.getRawType().getSimpleName(), '-');
 //            return super.findTypeName(ac);
         }
 
     }
 
-    /**
-     * Converts a camelCase string to a separated one. Receives the separator character
-     *
-     * @param text      the text to transform
-     * @param separator the separator character to use
-     * @return the separated text.
-     */
-    public static String separate(String text, char separator) {
-        StringBuilder builder = new StringBuilder(text.length() + text.length() / 2);
-        int l = text.length();
-        for (int i = 0; i < l; i++) {
-            char c = text.charAt(i);
-            if (Character.isUpperCase(c)) {
-                if (i != 0) {
-                    builder.append(separator);
-                }
-                builder.append(Character.toLowerCase(c));
-            }
-            else {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
-    }
 }

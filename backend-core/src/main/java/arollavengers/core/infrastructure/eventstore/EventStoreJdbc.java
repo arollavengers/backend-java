@@ -165,7 +165,7 @@ public class EventStoreJdbc implements EventStore {
             public E mapRow(ResultSet rs, int rowNum) throws SQLException {
                 String eventData = rs.getString(3);
                 try {
-                    return (E) serializer.deserializeFomString(eventData);
+                    return (E) serializer.deserializeFomString(eventData, DomainEvent.class);
                 }
                 catch (Serializer.SerializationException e) {
                     // TODO better exception...

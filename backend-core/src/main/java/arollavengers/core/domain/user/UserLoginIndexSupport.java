@@ -1,9 +1,12 @@
 package arollavengers.core.domain.user;
 
+import arollavengers.core.events.user.LoginAddedEvent;
+import arollavengers.core.events.user.LoginEvent;
+import arollavengers.core.events.user.LoginIndexCreatedEvent;
+import arollavengers.core.events.user.LoginRemovedEvent;
 import arollavengers.core.exceptions.user.LoginAlreadyInUseException;
 import arollavengers.core.infrastructure.AggregateRoot;
 import arollavengers.core.infrastructure.AnnotationBasedEventHandler;
-import arollavengers.core.infrastructure.DomainEvent;
 import arollavengers.core.infrastructure.EventHandler;
 import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
@@ -13,9 +16,6 @@ import arollavengers.core.infrastructure.annotation.OnEvent;
 import arollavengers.pattern.annotation.DependencyInjection;
 import com.google.common.collect.Maps;
 
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 import javax.inject.Inject;
 import java.util.SortedMap;
 
@@ -69,8 +69,8 @@ public class UserLoginIndexSupport implements UserLoginIndex {
     /**
      * Aggregate root used to manage index.
      *
-     * @see LoginAddedEvent
-     * @see LoginRemovedEvent
+     * @see arollavengers.core.events.user.LoginAddedEvent
+     * @see arollavengers.core.events.user.LoginRemovedEvent
      */
     private static class Index extends AggregateRoot<LoginEvent> {
 
@@ -130,110 +130,4 @@ public class UserLoginIndexSupport implements UserLoginIndex {
 
     }
 
-    public static abstract class LoginEvent implements DomainEvent {
-
-        @JsonProperty
-        private long version;
-
-        @JsonProperty
-        private final Id indexId;
-
-        protected LoginEvent(Id indexId) {
-            if (indexId.isUndefined()) {
-                throw new IllegalArgumentException("Id is undefied!");
-            }
-            this.indexId = indexId;
-        }
-
-        public long version() {
-            return version;
-        }
-
-        public void assignVersion(final long version) {
-            this.version = version;
-        }
-
-        @Override
-        public Id entityId() {
-            return indexId;
-        }
-    }
-
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.CLASS,
-            include = JsonTypeInfo.As.PROPERTY,
-            property = "@class")
-    public static class LoginAddedEvent extends LoginEvent {
-
-        @JsonProperty
-        private final String login;
-
-        @JsonProperty
-        private final Id userId;
-
-        @JsonCreator
-        public LoginAddedEvent(@JsonProperty("indexId") Id indexId,
-                               @JsonProperty("login") String login,
-                               @JsonProperty("userId") Id userId)
-        {
-            super(indexId);
-            this.login = login;
-            this.userId = userId;
-        }
-
-        public String login() {
-            return login;
-        }
-
-        @Override
-        public String toString() {
-            return "LoginAddedEvent[" + entityId() + ", v" + version() + ", " + login() + "]";
-        }
-
-        public Id userId() {
-            return userId;
-        }
-    }
-
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.CLASS,
-            include = JsonTypeInfo.As.PROPERTY,
-            property = "@class")
-    public static class LoginRemovedEvent extends LoginEvent {
-
-        @JsonProperty
-        private final String login;
-
-        @JsonCreator
-        public LoginRemovedEvent(@JsonProperty("indexId") Id indexId, @JsonProperty("login") String login) {
-            super(indexId);
-            this.login = login;
-        }
-
-        public String login() {
-            return login;
-        }
-
-        @Override
-        public String toString() {
-            return "LoginRemovedEvent[" + entityId() + ", v" + version() + ", " + login() + "]";
-        }
-    }
-
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.CLASS,
-            include = JsonTypeInfo.As.PROPERTY,
-            property = "@class")
-    public static class LoginIndexCreatedEvent extends LoginEvent {
-
-        @JsonCreator
-        public LoginIndexCreatedEvent(@JsonProperty("indexId") Id indexId) {
-            super(indexId);
-        }
-
-        @Override
-        public String toString() {
-            return "LoginIndexCreatedEvent[" + entityId() + ", v" + version() + "]";
-        }
-    }
 }

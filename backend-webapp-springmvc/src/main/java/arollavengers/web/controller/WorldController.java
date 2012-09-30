@@ -1,6 +1,7 @@
 package arollavengers.web.controller;
 
 import arollavengers.core.domain.pandemic.Difficulty;
+import arollavengers.core.domain.pandemic.World;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.service.pandemic.WorldService;
 
@@ -22,7 +23,7 @@ public class WorldController {
         Assert.notNull(ownerId, "Owner is mandatory");
         Assert.notNull(difficulty, "difficulty is mandatory");
 
-        Id worldId = Id.next();
+        Id worldId = Id.next(World.class);
         worldService.createWorld(worldId, ownerId, difficulty);
         return worldId;
     }

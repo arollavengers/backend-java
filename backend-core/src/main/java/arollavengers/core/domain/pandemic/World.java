@@ -628,6 +628,11 @@ public class World extends AggregateRoot<PandemicEvent> {
         return Lists.newArrayList(infectionDrawPile.getDiscardedCards());
     }
 
+    public List<PlayerCard> getPlayerDiscardPile() {
+        return Lists.newArrayList(playerDrawPile.getDiscardedCards());
+    }
+
+
     public boolean isMoveAllowed(CityId from, CityId destination, Optional<PlayerCard> cardOpt) {
         MoveService moveService = getMoveService();
         MoveType moveType = moveService.moveTypeFor(from, destination, cardOpt);
@@ -669,6 +674,7 @@ public class World extends AggregateRoot<PandemicEvent> {
         member.ensureActionIsAuthorized();
         return member;
     }
+
 }
 
 

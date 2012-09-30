@@ -13,10 +13,6 @@ import java.util.List;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.CLASS,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "@class")
 public class IntensityOfInfectionIncreasedEvent implements PlayerDrawPileEvent {
 
     @JsonProperty

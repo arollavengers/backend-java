@@ -3,9 +3,9 @@ package arollavengers.core.domain.pandemic;
 import static arollavengers.core.domain.pandemic.PlayerSpecialCard.Epidemic;
 
 import arollavengers.core.events.pandemic.PandemicEvent;
+import arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileCompletedForDifficultyEvent;
 import arollavengers.core.events.pandemic.PlayerDrawPileInitializedEvent;
-import arollavengers.core.events.pandemic.PlayerDrawPileCardDrawnEvent;
 import arollavengers.core.exceptions.pandemic.PandemicRuntimeException;
 import arollavengers.core.infrastructure.Aggregate;
 import arollavengers.core.infrastructure.AnnotationBasedEventHandler;
@@ -14,6 +14,7 @@ import arollavengers.core.infrastructure.EventHandler;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import arollavengers.core.util.ListUtils;
+import arollavengers.core.util.ShuffleAlgorithm;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nonnull;
@@ -27,6 +28,7 @@ public class PlayerDrawPile extends Entity<PandemicEvent> {
     private final EventHandler<PandemicEvent> eventHandler;
     //
     private List<PlayerCard> cards;
+    private List<PlayerCard> discardedCards;
 
     public PlayerDrawPile(@Nonnull Aggregate<PandemicEvent> aggregate, @Nonnull Id entityId) {
         super(aggregate, entityId);
@@ -53,7 +55,7 @@ public class PlayerDrawPile extends Entity<PandemicEvent> {
         cards.addAll(PlayerSpecialCard.allExcept(Epidemic));
 
         // then shuffle them
-        Collections.shuffle(cards, new SecureRandom());
+        ShuffleAlgorithm.Random.shuffle(cards);
 
         applyNewEvent(new PlayerDrawPileInitializedEvent(entityId(), toArray(cards)));
     }
@@ -65,6 +67,7 @@ public class PlayerDrawPile extends Entity<PandemicEvent> {
     @OnEvent
     private void onPileInitialized(PlayerDrawPileInitializedEvent event) {
         this.cards = event.cards();
+        this.discardedCards = Lists.newArrayList();
     }
 
     /**
@@ -83,7 +86,9 @@ public class PlayerDrawPile extends Entity<PandemicEvent> {
 
     @OnEvent
     private void onCardDrawn(PlayerDrawPileCardDrawnEvent event) {
-        this.cards.remove(event.cardDrawn());
+        PlayerCard card = event.cardDrawn();
+        this.cards.remove(card);
+        this.discardedCards.add(card);
     }
 
     /**
@@ -145,6 +150,10 @@ public class PlayerDrawPile extends Entity<PandemicEvent> {
         if (cards.contains(PlayerSpecialCard.Epidemic)) {
             throw new PlayerDrawPileAlreadyAdjustedForDifficultyException();
         }
+    }
+
+    public List<PlayerCard> getDiscardedCards() {
+        return discardedCards;
     }
 
     public static class PlayerDrawPileAlreadyInitializedException extends PandemicRuntimeException {

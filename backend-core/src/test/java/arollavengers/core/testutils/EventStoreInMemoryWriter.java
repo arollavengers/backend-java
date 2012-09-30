@@ -6,7 +6,6 @@ import arollavengers.core.infrastructure.JacksonSerializer;
 import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -32,7 +31,8 @@ public class EventStoreInMemoryWriter {
         ConcurrentMap<Id,List<DomainEvent>> eventsPerStream = eventStore.getEventsPerStream();
         for (Map.Entry<Id,List<DomainEvent>> stream : eventsPerStream.entrySet()) {
             FileOutputStream streamOut = new FileOutputStream(new File(basedir, stream.getKey().asString()));
-            serializer.writeObject(streamOut, stream.getValue().toArray());
+            List<DomainEvent> events = stream.getValue();
+            serializer.writeObject(streamOut, events.toArray(new DomainEvent[events.size()]));
             streamOut.close();
         }
     }

@@ -109,7 +109,7 @@ public class EventStorePrevayler implements EventStore {
 
             @Override
             public Object readObject(InputStream stream) throws Exception {
-                return serializer.readObject(stream);
+                return serializer.readObject(stream, Object.class);
             }
         };
     }

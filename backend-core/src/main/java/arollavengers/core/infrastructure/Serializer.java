@@ -12,25 +12,15 @@ public interface Serializer {
 
     String serializeAsString(Object object) throws SerializationException;
 
-    Object deserializeFomString(String serialized) throws SerializationException;
-
-
-    Object readObject(InputStream inputStream) throws SerializationException;
+    Object deserializeFomString(String serialized, Class<?> type) throws SerializationException;
 
     void writeObject(OutputStream outputStream, Object object) throws SerializationException;
 
+    Object readObject(InputStream inputStream, Class<?> type) throws SerializationException;
 
     public static class SerializationException extends InfrastructureRuntimeException {
-        public SerializationException() {
-            super();
-        }
-
         public SerializationException(String message) {
             super(message);
-        }
-
-        public SerializationException(String message, Throwable cause) {
-            super(message, cause);
         }
 
         public SerializationException(Throwable cause) {

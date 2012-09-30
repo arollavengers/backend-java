@@ -18,6 +18,7 @@ import arollavengers.core.infrastructure.UnitOfWorkDefault;
 
 import org.junit.Before;
 import org.junit.Test;
+import java.util.List;
 
 public class WorldTest {
 
@@ -262,7 +263,6 @@ public class WorldTest {
         w.designateFirstPlayer(user, MemberRole.Medic);
         w.startGame();
 
-
         //Then -- game is started (no kidding)
         assertThat(w.isStarted()).isTrue();
 
@@ -271,7 +271,15 @@ public class WorldTest {
         MemberKey ownrKey = new MemberKey(ownr.entityId(), MemberRole.Dispatcher);
         MemberKey userKey = new MemberKey(user.entityId(), MemberRole.Medic);
         assertThat(w.memberHandSize(ownrKey)).isEqualTo(initialCardsPerMember);
-        assertThat(w.memberHandSize(userKey)).isEqualTo(initialCardsPerMember + 2);
+
+        int cardDrawn = 2;
+        List<PlayerCard> playerDiscardPile = w.getPlayerDiscardPile();
+        if(playerDiscardPile.get(playerDiscardPile.size()-1) == PlayerSpecialCard.Epidemic)
+            cardDrawn--;
+        if(playerDiscardPile.get(playerDiscardPile.size()-2) == PlayerSpecialCard.Epidemic)
+            cardDrawn--;
+
+        assertThat(w.memberHandSize(userKey)).isEqualTo(initialCardsPerMember + cardDrawn);
 
         //Then -- the player draw cards is initialized
 // TODO       final int remainingDrawPlayerCards = CityId.values().length - (initialCardsPerMember * 2);
