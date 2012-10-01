@@ -27,7 +27,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
     @Inject
     private EventStore eventStore;
 
-    private Id loginIndexAggregateId = Id.create("user_login_index");
+    private Id loginIndexAggregateId = Id.create("user_login_index.evt");
 
     @Override
     public void useLogin(UnitOfWork uow, String login, Id userId) {

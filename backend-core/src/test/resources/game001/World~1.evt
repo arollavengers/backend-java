@@ -1,0 +1,337 @@
+[ {
+  "type" : "world-created",
+  "newWorldId" : "World~1",
+  "ownerId" : "User~1",
+  "difficulty" : "Normal",
+  "conf" : {
+    "minTeamSize" : 2,
+    "maxTeamSize" : 4,
+    "nbPlayerActionsPerTurn" : 4,
+    "nbPlayerCardsPerTurn" : 2,
+    "maxPlayerHandSize" : 7,
+    "nbCubesOutbreakThreshold" : 4
+  },
+  "version" : 1
+}, {
+  "type" : "world-member-joined-team",
+  "worldId" : "World~1",
+  "memberId" : "Member~1",
+  "newComerId" : "User~1",
+  "role" : "Medic",
+  "version" : 2
+}, {
+  "type" : "player-position-on-table-defined",
+  "memberId" : "Member~1",
+  "positionOnTable" : 0,
+  "version" : 3
+}, {
+  "type" : "world-member-joined-team",
+  "worldId" : "World~1",
+  "memberId" : "Member~2",
+  "newComerId" : "User~2",
+  "role" : "OperationsExpert",
+  "version" : 4
+}, {
+  "type" : "player-position-on-table-defined",
+  "memberId" : "Member~2",
+  "positionOnTable" : 1,
+  "version" : 5
+}, {
+  "type" : "world-member-joined-team",
+  "worldId" : "World~1",
+  "memberId" : "Member~3",
+  "newComerId" : "User~3",
+  "role" : "Dispatcher",
+  "version" : 6
+}, {
+  "type" : "player-position-on-table-defined",
+  "memberId" : "Member~3",
+  "positionOnTable" : 2,
+  "version" : 7
+}, {
+  "type" : "first-player-designated",
+  "worldId" : "World~1",
+  "memberKey" : {
+    "userId" : "User~2",
+    "role" : "OperationsExpert"
+  },
+  "version" : 8
+}, {
+  "type" : "player-draw-pile-created",
+  "worldId" : "World~1",
+  "drawPileId" : "PlayerDrawPile~1",
+  "version" : 9
+}, {
+  "type" : "player-draw-pile-initialized",
+  "playerDrawPileId" : "PlayerDrawPile~1",
+  "cards" : [ [ "city", "Beijing" ], [ "city", "Jakarta" ], [ "city", "Mumbai" ], [ "city", "Essen" ], [ "city", "Khartoum" ], [ "city", "Toronto" ], [ "special", "Airlift" ], [ "city", "Delhi" ], [ "city", "SaintPetersburg" ], [ "special", "ResilientPopulation" ], [ "city", "Paris" ], [ "city", "Cairo" ], [ "city", "Karachi" ], [ "city", "HongKong" ], [ "city", "NewYork" ], [ "special", "Forecast" ], [ "city", "LosAngeles" ], [ "city", "Lagos" ], [ "city", "Madrid" ], [ "city", "Istanbul" ], [ "city", "Sydney" ], [ "city", "Chennai" ], [ "city", "Milan" ], [ "city", "Kinshasa" ], [ "city", "Bangkok" ], [ "city", "Taipei" ], [ "city", "London" ], [ "special", "OneQuietNight" ], [ "city", "Shanghai" ], [ "city", "Lima" ], [ "city", "BuenosAires" ], [ "city", "Manila" ], [ "city", "Chicago" ], [ "city", "Miami" ], [ "city", "Atlanta" ], [ "city", "Washington" ], [ "city", "Bogota" ], [ "city", "HoChiMinhCity" ], [ "city", "SaoPaulo" ], [ "city", "Johannesburg" ], [ "city", "Santiago" ], [ "special", "GovernmentGrant" ], [ "city", "Kolkata" ], [ "city", "MexicoCity" ], [ "city", "SanFrancisco" ], [ "city", "Seoul" ], [ "city", "Algiers" ], [ "city", "Tehran" ], [ "city", "Tokyo" ], [ "city", "Moscow" ], [ "city", "Baghdad" ], [ "city", "Riyadh" ], [ "city", "Osaka" ] ],
+  "version" : 10
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "Beijing" ],
+  "version" : 11
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~3",
+  "card" : [ "city", "Beijing" ],
+  "version" : 12
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "Jakarta" ],
+  "version" : 13
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~3",
+  "card" : [ "city", "Jakarta" ],
+  "version" : 14
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "Mumbai" ],
+  "version" : 15
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~3",
+  "card" : [ "city", "Mumbai" ],
+  "version" : 16
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "Essen" ],
+  "version" : 17
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~1",
+  "card" : [ "city", "Essen" ],
+  "version" : 18
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "Khartoum" ],
+  "version" : 19
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~1",
+  "card" : [ "city", "Khartoum" ],
+  "version" : 20
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "Toronto" ],
+  "version" : 21
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~1",
+  "card" : [ "city", "Toronto" ],
+  "version" : 22
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "special", "Airlift" ],
+  "version" : 23
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~2",
+  "card" : [ "special", "Airlift" ],
+  "version" : 24
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "Delhi" ],
+  "version" : 25
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~2",
+  "card" : [ "city", "Delhi" ],
+  "version" : 26
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "SaintPetersburg" ],
+  "version" : 27
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~2",
+  "card" : [ "city", "SaintPetersburg" ],
+  "version" : 28
+}, {
+  "type" : "player-draw-pile-completed-for-difficulty",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cards" : [ [ "special", "ResilientPopulation" ], [ "city", "Paris" ], [ "city", "Cairo" ], [ "city", "Karachi" ], [ "city", "HongKong" ], [ "special", "Epidemic" ], [ "city", "NewYork" ], [ "special", "Forecast" ], [ "city", "LosAngeles" ], [ "city", "Lagos" ], [ "city", "Madrid" ], [ "city", "Istanbul" ], [ "city", "Sydney" ], [ "special", "Epidemic" ], [ "city", "Chennai" ], [ "city", "Milan" ], [ "city", "Kinshasa" ], [ "city", "Bangkok" ], [ "city", "Taipei" ], [ "city", "London" ], [ "special", "OneQuietNight" ], [ "special", "Epidemic" ], [ "city", "Shanghai" ], [ "city", "Lima" ], [ "city", "BuenosAires" ], [ "city", "Manila" ], [ "city", "Chicago" ], [ "city", "Miami" ], [ "city", "Atlanta" ], [ "city", "Washington" ], [ "city", "Bogota" ], [ "city", "HoChiMinhCity" ], [ "city", "SaoPaulo" ], [ "special", "Epidemic" ], [ "city", "Johannesburg" ], [ "city", "Santiago" ], [ "special", "GovernmentGrant" ], [ "city", "Kolkata" ], [ "city", "MexicoCity" ], [ "city", "SanFrancisco" ], [ "city", "Seoul" ], [ "city", "Algiers" ], [ "city", "Tehran" ], [ "special", "Epidemic" ], [ "city", "Tokyo" ], [ "city", "Moscow" ], [ "city", "Baghdad" ], [ "city", "Riyadh" ], [ "city", "Osaka" ] ],
+  "version" : 29
+}, {
+  "type" : "infection-draw-pile-created",
+  "worldId" : "World~1",
+  "drawPileId" : "InfectionDrawPile~1",
+  "version" : 30
+}, {
+  "type" : "infection-draw-pile-initialized",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cards" : [ [ "city", "Chicago" ], [ "city", "Lagos" ], [ "city", "Cairo" ], [ "city", "Osaka" ], [ "city", "BuenosAires" ], [ "city", "Paris" ], [ "city", "Kolkata" ], [ "city", "Bogota" ], [ "city", "Bangkok" ], [ "city", "SaoPaulo" ], [ "city", "Beijing" ], [ "city", "Taipei" ], [ "city", "Tehran" ], [ "city", "Essen" ], [ "city", "NewYork" ], [ "city", "Washington" ], [ "city", "Moscow" ], [ "city", "Algiers" ], [ "city", "Chennai" ], [ "city", "Santiago" ], [ "city", "Riyadh" ], [ "city", "Khartoum" ], [ "city", "Sydney" ], [ "city", "Shanghai" ], [ "city", "HongKong" ], [ "city", "SanFrancisco" ], [ "city", "HoChiMinhCity" ], [ "city", "Baghdad" ], [ "city", "Karachi" ], [ "city", "SaintPetersburg" ], [ "city", "Miami" ], [ "city", "Tokyo" ], [ "city", "Johannesburg" ], [ "city", "Madrid" ], [ "city", "Delhi" ], [ "city", "Lima" ], [ "city", "Manila" ], [ "city", "Kinshasa" ], [ "city", "Milan" ], [ "city", "London" ], [ "city", "Toronto" ], [ "city", "LosAngeles" ], [ "city", "Seoul" ], [ "city", "Atlanta" ], [ "city", "Mumbai" ], [ "city", "MexicoCity" ], [ "city", "Istanbul" ], [ "city", "Jakarta" ] ],
+  "version" : 31
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "Chicago" ],
+  "version" : 32
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "Chicago",
+  "disease" : "Blue",
+  "nbCubes" : 3,
+  "version" : 33
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "Lagos" ],
+  "version" : 34
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "Lagos",
+  "disease" : "Yellow",
+  "nbCubes" : 3,
+  "version" : 35
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "Cairo" ],
+  "version" : 36
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "Cairo",
+  "disease" : "Black",
+  "nbCubes" : 3,
+  "version" : 37
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "Osaka" ],
+  "version" : 38
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "Osaka",
+  "disease" : "Orange",
+  "nbCubes" : 2,
+  "version" : 39
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "BuenosAires" ],
+  "version" : 40
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "BuenosAires",
+  "disease" : "Yellow",
+  "nbCubes" : 2,
+  "version" : 41
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "Paris" ],
+  "version" : 42
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "Paris",
+  "disease" : "Blue",
+  "nbCubes" : 2,
+  "version" : 43
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "Kolkata" ],
+  "version" : 44
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "Kolkata",
+  "disease" : "Black",
+  "nbCubes" : 1,
+  "version" : 45
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "Bogota" ],
+  "version" : 46
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "Bogota",
+  "disease" : "Yellow",
+  "nbCubes" : 1,
+  "version" : 47
+}, {
+  "type" : "infection-draw-pile-card-drawn",
+  "drawPileId" : "InfectionDrawPile~1",
+  "cardDrawn" : [ "city", "Bangkok" ],
+  "version" : 48
+}, {
+  "type" : "city-infected",
+  "worldId" : "World~1",
+  "cityId" : "Bangkok",
+  "disease" : "Orange",
+  "nbCubes" : 1,
+  "version" : 49
+}, {
+  "type" : "research-center-built",
+  "worldId" : "World~1",
+  "cityId" : "Atlanta",
+  "version" : 50
+}, {
+  "type" : "player-moved",
+  "memberId" : "Member~3",
+  "city" : "Atlanta",
+  "moveType" : "Setup",
+  "cardUsed" : null,
+  "version" : 51
+}, {
+  "type" : "player-moved",
+  "memberId" : "Member~1",
+  "city" : "Atlanta",
+  "moveType" : "Setup",
+  "cardUsed" : null,
+  "version" : 52
+}, {
+  "type" : "player-moved",
+  "memberId" : "Member~2",
+  "city" : "Atlanta",
+  "moveType" : "Setup",
+  "cardUsed" : null,
+  "version" : 53
+}, {
+  "type" : "game-started",
+  "worldId" : "World~1",
+  "version" : 54
+}, {
+  "type" : "player-turn-started",
+  "memberId" : "Member~2",
+  "nbActions" : 4,
+  "version" : 55
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "special", "ResilientPopulation" ],
+  "version" : 56
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~2",
+  "card" : [ "special", "ResilientPopulation" ],
+  "version" : 57
+}, {
+  "type" : "player-draw-pile-card-drawn",
+  "drawPileId" : "PlayerDrawPile~1",
+  "cardDrawn" : [ "city", "Paris" ],
+  "version" : 58
+}, {
+  "type" : "player-card-added-to-hand",
+  "memberId" : "Member~2",
+  "card" : [ "city", "Paris" ],
+  "version" : 59
+} ]

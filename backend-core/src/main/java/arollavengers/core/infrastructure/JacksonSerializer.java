@@ -30,7 +30,6 @@ public class JacksonSerializer implements Serializer {
         // typing (type info in json): special management for all DomainEvent
         introspector.registerSubTypes(DomainEvent.class, PolymorphicEventMixIn.collectAllEventClasses());
 
-
         ObjectMapper objectMapper = new ObjectMapper()
                 // default typing for all other except 'DomainEvent' and those that
                 // defines @JsonTypeInfo/@JsonTypeName/@JsonSubTypes

@@ -17,14 +17,14 @@ import java.util.EnumSet;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class OutbreakChain {
-    public static final int OUTBREAK_THRESHOLD = 4;
 
     public static OutbreakChain calculate(CityId chainStart,
                                           Disease disease,
                                           CityGraph cityGraph,
-                                          CityStatesView statesView)
+                                          CityStatesView statesView,
+                                          Conf conf)
     {
-        OutbreakChain chain = new OutbreakChain(disease, cityGraph, statesView);
+        OutbreakChain chain = new OutbreakChain(disease, cityGraph, statesView, conf);
         chain.outbreak(chainStart);
         return chain;
     }
@@ -32,15 +32,18 @@ public class OutbreakChain {
     private final Disease disease;
     private final CityGraph cityGraph;
     private final CityStatesView statesView;
+    private final Conf conf;
     private final EnumSet<CityId> outbreakedCities;
     private final EnumMap<CityId, Integer> resultingInfections;
 
     public OutbreakChain(Disease disease,
                          CityGraph cityGraph,
-                         CityStatesView statesView) {
+                         CityStatesView statesView,
+                         Conf conf) {
         this.disease = disease;
         this.cityGraph = cityGraph;
         this.statesView = statesView;
+        this.conf = conf;
         this.outbreakedCities = EnumSet.noneOf(CityId.class);
         this.resultingInfections = new EnumMap<CityId, Integer>(CityId.class);
     }
@@ -65,7 +68,7 @@ public class OutbreakChain {
 
             int nbActualCubes = resultingInfections.get(linked);
 
-            if (nbActualCubes + 1 >= OUTBREAK_THRESHOLD) {
+            if (nbActualCubes + 1 >= conf.nbCubesOutbreakThreshold()) {
                 // recursive booommm !
                 outbreak(linked);
             }

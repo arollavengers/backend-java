@@ -1,11 +1,11 @@
 package arollavengers.core.events.pandemic;
 
+import arollavengers.core.domain.pandemic.Conf;
 import arollavengers.core.domain.pandemic.Difficulty;
 import arollavengers.core.infrastructure.Id;
 
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 public class WorldCreatedEvent implements PandemicEvent {
 
@@ -21,13 +21,19 @@ public class WorldCreatedEvent implements PandemicEvent {
     @JsonProperty
     private final Difficulty difficulty;
 
+    @JsonProperty
+    private final Conf conf;
+
     @JsonCreator
     public WorldCreatedEvent(@JsonProperty("newWorldId") Id newWorldId,
                              @JsonProperty("ownerId") Id ownerId,
-                             @JsonProperty("difficulty") Difficulty difficulty) {
+                             @JsonProperty("difficulty") Difficulty difficulty,
+                             @JsonProperty("conf") Conf conf)
+    {
         this.newWorldId = newWorldId;
         this.ownerId = ownerId;
         this.difficulty = difficulty;
+        this.conf = conf;
     }
 
     @Override
@@ -53,9 +59,18 @@ public class WorldCreatedEvent implements PandemicEvent {
         return ownerId;
     }
 
+    public Conf conf() {
+        return conf;
+    }
+
     @Override
     public String toString() {
-        return "WorldCreatedEvent[" + newWorldId + ", v" + version + ", owner: " + ownerId + ", difficulty: " + difficulty + "]";
+        return "WorldCreatedEvent[" + newWorldId
+                + ", v" + version
+                + ", owner: " + ownerId
+                + ", difficulty: " + difficulty
+                + ", conf: " + conf
+                + "]";
     }
 
 

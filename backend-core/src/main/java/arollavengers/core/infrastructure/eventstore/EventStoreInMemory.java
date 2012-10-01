@@ -92,8 +92,4 @@ public class EventStoreInMemory implements EventStore {
     public ConcurrentMap<Id, List<DomainEvent>> getEventsPerStream() {
         return eventsPerStream;
     }
-
-    public void setEventsPerStream(Map<Id, List<DomainEvent>> eventsPerStream) {
-        this.eventsPerStream.putAll(eventsPerStream);
-    }
 }

@@ -51,17 +51,15 @@ import java.util.Set;
 
 public class World extends AggregateRoot<PandemicEvent> {
 
-    public static final int MAX_TEAM_SIZE = 4;
-    public static final int MIN_TEAM_SIZE = 2;
-    public static final int NB_ACTIONS = 4;
-    public static final int OUTBREAK_THRESHOLD = OutbreakChain.OUTBREAK_THRESHOLD;
-    public static final int NB_PLAYER_CARDS_PER_TURN = 2;
-
     private final UnitOfWork uow;
     private final EventHandler<PandemicEvent> eventHandler;
 
     // ~~~ World state
     public boolean userCannotBeRegisteredTwice = true;
+
+
+    private Conf conf;
+
     private Id ownerId = Id.undefined();
 
     private Difficulty difficulty;
@@ -83,7 +81,6 @@ public class World extends AggregateRoot<PandemicEvent> {
     private int outbreaks = -1;
     private MemberKey currentMemberKey;
 
-
     public World(Id worldId, UnitOfWork uow) {
         super(worldId);
         this.uow = uow;
@@ -97,10 +94,21 @@ public class World extends AggregateRoot<PandemicEvent> {
      * @param difficulty Difficulty of the game
      */
     public void createWorld(User owner, Difficulty difficulty) {
+        createWorld(owner, difficulty, Conf.getDefault());
+    }
+
+    /**
+     * Create a new world of given id and difficulty owned by a user
+     *
+     * @param owner      Owner of this world
+     * @param difficulty Difficulty of the game
+     * @param conf Configuration of the world/game
+     */
+    public void createWorld(User owner, Difficulty difficulty, Conf conf) {
         ensureValidUser(owner);
         ensureEntityWasNotAlreadyCreated();
 
-        applyNewEvent(new WorldCreatedEvent(entityId(), owner.entityId(), difficulty));
+        applyNewEvent(new WorldCreatedEvent(entityId(), owner.entityId(), difficulty, conf));
     }
 
     private void ensureEntityWasNotAlreadyCreated() {
@@ -113,6 +121,7 @@ public class World extends AggregateRoot<PandemicEvent> {
     private void doCreateWorld(WorldCreatedEvent event) {
         this.difficulty = event.difficulty();
         this.ownerId = event.ownerId();
+        this.conf = event.conf();
         this.cityStates = new CityStates();
         this.eradicatedDiseases = new HashSet<Disease>();
         this.curesDiscovered = new HashSet<Disease>();
@@ -132,7 +141,7 @@ public class World extends AggregateRoot<PandemicEvent> {
         ensureValidUser(user);
         ensureGameIsNotAlreadyStarted();
 
-        if (team().size() >= MAX_TEAM_SIZE) {
+        if (team().size() >= conf.maxTeamSize()) {
             throw new WorldNumberOfRoleLimitReachedException(role);
         }
 
@@ -168,7 +177,7 @@ public class World extends AggregateRoot<PandemicEvent> {
 
     @OnEvent
     private void doEnrole(final WorldMemberJoinedTeamEvent event) {
-        Member newMember = new Member(aggregate(), event.memberId(), event.newComerId(), event.role());
+        Member newMember = new Member(aggregate(), event.memberId(), event.newComerId(), event.role(), conf);
         team.enrole(newMember);
     }
 
@@ -203,9 +212,15 @@ public class World extends AggregateRoot<PandemicEvent> {
 
     /**
      * Start the game. It does the following actions:
-     * - start the game (nobody can register for playing anymore)
-     * - initialize draw cards
-     * - give initial hand to member
+     * <ul>
+     * <li>start the game (nobody can register for playing anymore)</li>
+     * <li>initialize draw piles: player and infection</li>
+     * <li>give initial hand to members</li>
+     * <li>start the first player turn ({@link #designateFirstPlayer(MemberKey) and {@link #startCurrentPlayerTurn()}}</li>
+     * </ul>
+     *
+     * @see #designateFirstPlayer(MemberKey)
+     * @see #startCurrentPlayerTurn()
      */
     public void startGame() {
         ensureWorldIsCreated();
@@ -249,14 +264,45 @@ public class World extends AggregateRoot<PandemicEvent> {
         }
     }
 
+    /**
+     * Infect the city with the given number of cubes and with the city's default disease.
+     *
+     * @see arollavengers.core.domain.pandemic.CityId#defaultDisease()
+     * @see #infectCity(CityId, int, Disease)
+     */
     public void infectCity(CityId cityId, int nbCubes) {
+        infectCity(cityId, nbCubes, cityId.defaultDisease());
+    }
 
-        Disease disease = cityId.defaultDisease();
+    /**
+     * Infect the city with the given number of cubes for the specified disease.
+     * That is add the given number of cubes to the existings ones (if any).<p/>
+     * <p/>
+     * <p>
+     * <strong>Note that the eradication status is not checked by this method,
+     * that is the following rule is not verified:</strong>
+     * <blockquote>If, however, the pictured city is of a color that has been
+     * eradicated, do not add a cube.</blockquote>
+     * </p>
+     * <p/>
+     * <p>
+     * <strong>Whereas the outbreak rule is handled:</strong>
+     * <blockquote>
+     * If a city already has 3 cubes in it of the color being added, instead of
+     * adding a cube to the city, an outbreak occurs in that color.
+     * </blockquote>
+     * </p>
+     *
+     * @param cityId city to infect
+     * @param nbCubes number of cube to add
+     * @param disease disease the cubes belongs to
+     */
+    public void infectCity(CityId cityId, int nbCubes, Disease disease) {
 
         // check for outbreak
         CityState cityState = cityStates.getStateOf(cityId);
         int nbActualCubes = cityState.numberOfCubes(disease);
-        if (nbActualCubes + nbCubes >= OUTBREAK_THRESHOLD) {
+        if (nbActualCubes + nbCubes >= conf.nbCubesOutbreakThreshold()) {
             // booommm !
             OutbreakGenerationChain outbreakChain = OutbreakGenerationChain.calculate(
                     cityId, disease, CityGraph.getInstance(), cityStates);
@@ -315,7 +361,7 @@ public class World extends AggregateRoot<PandemicEvent> {
         applyNewEvent(new PlayerDrawPileCreatedEvent(entityId(), Id.next(PlayerDrawPile.class)));
         playerDrawPile.initialize();
 
-        int nbCardsPerPlayer = nbCardsPerPlayer(team().size());
+        int nbCardsPerPlayer = initialNumberOfCardsPerPlayerBasedOnTeamSize(team().size());
         for (Member member : team()) {
             for (int i = 0; i < nbCardsPerPlayer; i++) {
                 member.addToHand(playerDrawPile.drawTop());
@@ -336,12 +382,12 @@ public class World extends AggregateRoot<PandemicEvent> {
 
     private void ensureTeamSizeIsEnough() {
         final int teamSize = team().size();
-        if (teamSize < MIN_TEAM_SIZE) {
-            throw new NotEnoughPlayerException(teamSize, MIN_TEAM_SIZE);
+        if (teamSize < conf.minTeamSize()) {
+            throw new NotEnoughPlayerException(teamSize, conf.minTeamSize());
         }
     }
 
-    private int nbCardsPerPlayer(int teamSize) {
+    private int initialNumberOfCardsPerPlayerBasedOnTeamSize(int teamSize) {
         return 6 - teamSize;
     }
 
@@ -387,7 +433,7 @@ public class World extends AggregateRoot<PandemicEvent> {
     }
 
     /**
-     * Treat a city by a member of team removing one cube of given disease
+     * Treat a city by a member of team removing one cube of given disease.
      *
      * @param memberKey Action doer
      * @param city      City to treat
@@ -495,10 +541,17 @@ public class World extends AggregateRoot<PandemicEvent> {
         }
     }
 
+    /**
+     * Returns all the roles that are currently assigned within the team.
+     */
     public Set<MemberRole> rolesAssigned() {
         return team().roles();
     }
 
+    /**
+     * Indicates if the given role is already assigned or not.
+     * That is if an other member has already picked it up.
+     */
     public boolean isRoleAssigned(MemberRole role) {
         return team().hasRole(role);
     }
@@ -514,6 +567,9 @@ public class World extends AggregateRoot<PandemicEvent> {
         return playerDrawPile.size();
     }
 
+    /**
+     * Returns the list of the cities that have a research center.
+     */
     public Collection<CityId> citiesWithResearchCenters() {
         return cityStates.citiesWithResearchCenters();
     }
@@ -545,6 +601,10 @@ public class World extends AggregateRoot<PandemicEvent> {
         return team().findMember(currentMemberKey).or(memberNotFoundException(currentMemberKey));
     }
 
+    /**
+     * Indicates the current player has finished its turn and is now playing the infestor.
+     * Once done, the next player's turn automatically starts.
+     */
     public void endCurrentPlayerTurn() {
         Member member = currentPlayer();
 
@@ -585,9 +645,9 @@ public class World extends AggregateRoot<PandemicEvent> {
 
     private void startCurrentPlayerTurn() {
         Member member = currentPlayer();
-        member.startTurn(NB_ACTIONS);
+        member.startTurn(conf.nbPlayerActionsPerTurn());
 
-        for (int i = 0; i < NB_PLAYER_CARDS_PER_TURN; i++) {
+        for (int i = 0; i < conf.nbPlayerCardsPerTurn(); i++) {
             PlayerCard card = playerDrawPile.drawTop();
             if (card.cardType() == PlayerCardType.Epidemic) {
                 triggerEpidemic();
@@ -619,8 +679,10 @@ public class World extends AggregateRoot<PandemicEvent> {
     }
 
     /**
+     * <blockquote>
      * Because Pandemic is a test of cooperation and mettle (and not of memory), players may freely
      * examine the contents of the Player Discard Pile and the Infection Discard Pile at any time.
+     * </blockquote>
      *
      * @return (a copy of) of the cards that have been currently been discarded
      */
@@ -628,6 +690,14 @@ public class World extends AggregateRoot<PandemicEvent> {
         return Lists.newArrayList(infectionDrawPile.getDiscardedCards());
     }
 
+    /**
+     * <blockquote>
+     * Because Pandemic is a test of cooperation and mettle (and not of memory), players may freely
+     * examine the contents of the Player Discard Pile and the Infection Discard Pile at any time.
+     * </blockquote>
+     *
+     * @return (a copy of) of the cards that have been currently been discarded
+     */
     public List<PlayerCard> getPlayerDiscardPile() {
         return Lists.newArrayList(playerDrawPile.getDiscardedCards());
     }
@@ -639,7 +709,7 @@ public class World extends AggregateRoot<PandemicEvent> {
         return (moveType != MoveType.None);
     }
 
-    public void move(MemberKey movedMemberKey, CityId destination, Optional<PlayerCard> cardOpt) {
+    public void move(MemberKey movedMemberKey, CityId destination, Optional<PlayerCard> cardOpt) throws InvalidMoveException {
         Member member = getIfCurrentPlayerAndEnoughActionOrFail(movedMemberKey);
         member.ensurePlayerCardIsPresent(cardOpt);
         MoveType moveType = computeMoveTypeOrFail(member, destination, cardOpt);
@@ -647,7 +717,7 @@ public class World extends AggregateRoot<PandemicEvent> {
         member.moveTo(destination, moveType, cardOpt);
     }
 
-    private MoveType computeMoveTypeOrFail(Member member, CityId destination, Optional<PlayerCard> cardOpt) {
+    private MoveType computeMoveTypeOrFail(Member member, CityId destination, Optional<PlayerCard> cardOpt) throws InvalidMoveException {
         MoveService moveService = getMoveService();
         CityId cityFrom = member.location();
 
@@ -676,5 +746,3 @@ public class World extends AggregateRoot<PandemicEvent> {
     }
 
 }
-
-

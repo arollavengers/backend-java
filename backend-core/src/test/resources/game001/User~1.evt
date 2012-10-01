@@ -1,0 +1,14 @@
+[ {
+  "type" : "user-created",
+  "newUserId" : "User~1",
+  "login" : "Travis",
+  "passwordDigest" : "sQaDsuRUj+bbfAOO8N4yOjYmxTFFXo2NM81eS+31T9QxEyu16YBWi2ioWECN1vEA9C5pmD4oxYnNBfLwIBRLvQ==",
+  "salt" : "sGrC6uDA3d6pVxX3OMQIHHC75SRjS2/h2mc4z2NVKa4=",
+  "version" : 1
+}, {
+  "type" : "game-joined",
+  "userId" : "User~1",
+  "gameId" : "World~1",
+  "gameType" : "Pandemic",
+  "version" : 2
+} ]

@@ -23,12 +23,16 @@ import java.util.List;
 
 public class Member extends Entity<PandemicEvent> {
 
-    public static final int HAND_SIZE_THRESHOLD = 7;
     //
     private final EventHandler<PandemicEvent> eventHandler;
     //
     private final List<PlayerCard> hand = Lists.newArrayList();
+    @Nonnull
     private final MemberKey memberKey;
+
+    @Nonnull
+    private final Conf conf;
+
     private int positionOnTable;
     private int nbActionRemaining;
     private CityId location;
@@ -36,9 +40,11 @@ public class Member extends Entity<PandemicEvent> {
     public Member(@Nonnull Aggregate<PandemicEvent> aggregate,
                   @Nonnull Id entityId,
                   @Nonnull Id userId,
-                  @Nonnull MemberRole role)
+                  @Nonnull MemberRole role,
+                  @Nonnull Conf conf)
     {
         super(aggregate, entityId);
+        this.conf = conf;
         this.eventHandler = new AnnotationBasedEventHandler<PandemicEvent>(this);
         this.memberKey = new MemberKey(userId, role);
     }
@@ -72,7 +78,7 @@ public class Member extends Entity<PandemicEvent> {
      *
      */
     public void addToHand(@Nonnull PlayerCard card) throws HandSizeLimitReachedException {
-        if (handSize() >= HAND_SIZE_THRESHOLD) {
+        if (handSize() >= conf.maxPlayerHandSize()) {
             throw new HandSizeLimitReachedException(entityId(), handSize());
         }
         applyNewEvent(new PlayerCardAddedToHandEvent(entityId(), card));

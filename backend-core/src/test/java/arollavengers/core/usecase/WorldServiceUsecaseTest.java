@@ -1,7 +1,9 @@
 package arollavengers.core.usecase;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 
 import arollavengers.core.TestSettings;
 import arollavengers.core.domain.pandemic.Difficulty;
@@ -22,7 +24,7 @@ import arollavengers.core.infrastructure.UnitOfWorkFactory;
 import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
 import arollavengers.core.service.pandemic.WorldService;
 import arollavengers.core.service.user.UserService;
-import arollavengers.core.testutils.EventStoreInMemoryWriter;
+import arollavengers.core.testutils.EventStoreInMemoryIO;
 import arollavengers.core.testutils.TypeOfEventStore;
 
 import org.junit.Before;
@@ -144,7 +146,7 @@ public class WorldServiceUsecaseTest {
             uow.commit();
 
             if (eventStore instanceof EventStoreInMemory) {
-                new EventStoreInMemoryWriter(testSettings.getProperty("memory.event-store.basedir"))
+                new EventStoreInMemoryIO(testSettings.getProperty("memory.event-store.basedir"))
                         .write((EventStoreInMemory) eventStore);
             }
         }
@@ -164,6 +166,19 @@ public class WorldServiceUsecaseTest {
 
         // When
         collectorListener.dump(System.out);
+    }
+
+    @Test
+    public void reload_game001() throws Exception {
+
+        // Given
+        prepareEnvironment();
+        assumeThat(eventStore, instanceOf(EventStoreInMemory.class));
+        new EventStoreInMemoryIO(testSettings.getProperty("memory.event-store.srcdir") + "/game001")
+                .load((EventStoreInMemory) eventStore);
+
+
+        eventStore.dump(System.out);
     }
 
     // ------------------------------------------------------------------------

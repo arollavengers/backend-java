@@ -37,7 +37,7 @@ public class OutbreakChainTest {
         cubePerCities.put(CityId.Essen, 2);
         cubePerCities.put(CityId.Paris, 2);
 
-        OutbreakChain chain = OutbreakChain.calculate(CityId.London, Disease.Blue, cityGraph, cityStatesView);
+        OutbreakChain chain = OutbreakChain.calculate(CityId.London, Disease.Blue, cityGraph, cityStatesView, Conf.getDefault());
         assertThat(chain).isNotNull();
         assertThat(chain.getOutbreakedCities()).containsOnly(CityId.London, CityId.Madrid, CityId.Essen, CityId.Paris);
 
