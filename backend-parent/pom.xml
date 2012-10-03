@@ -18,6 +18,11 @@
     <maven.compiler.target>1.6</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <!-- groovy -->
+    <gmavenVersion>1.4</gmavenVersion>
+    <gmavenProviderSelection>2.0</gmavenProviderSelection>
+    <groovy.version>2.0.0</groovy.version>
+
     <!-- lib versions -->
     <slf4j.version>1.6.4</slf4j.version>
     <fest-assert.version>2.0M5</fest-assert.version>

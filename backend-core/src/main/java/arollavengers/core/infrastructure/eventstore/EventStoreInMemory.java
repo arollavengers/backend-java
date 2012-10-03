@@ -11,6 +11,7 @@ import arollavengers.core.util.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import org.springframework.stereotype.Repository;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.PrintStream;
@@ -21,6 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@Repository
 public class EventStoreInMemory implements EventStore {
 
     private ConcurrentMap<Id, List<VersionedDomainEvent>> eventsPerStream = Maps.newConcurrentMap();

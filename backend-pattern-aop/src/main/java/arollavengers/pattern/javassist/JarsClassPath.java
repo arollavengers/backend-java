@@ -27,7 +27,7 @@ public class JarsClassPath implements ClassPath {
         jars = new ArrayList<Jar>();
         for (String string : classpath.split("[:;]")) {
             String trimmed = string.trim();
-            if(!trimmed.isEmpty())
+            if(!trimmed.isEmpty() && trimmed.endsWith(".jar"))
                 jars.add(new Jar(trimmed));
         }
         return this;

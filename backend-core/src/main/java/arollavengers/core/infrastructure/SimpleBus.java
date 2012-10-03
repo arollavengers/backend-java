@@ -2,12 +2,14 @@ package arollavengers.core.infrastructure;
 
 import com.google.common.collect.Lists;
 
+import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@Component
 public class SimpleBus implements Bus {
     private CopyOnWriteArrayList<Listener> listeners = Lists.newCopyOnWriteArrayList();
 

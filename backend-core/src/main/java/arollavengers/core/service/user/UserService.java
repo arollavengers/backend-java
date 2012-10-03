@@ -38,6 +38,13 @@ public class UserService {
     }
 
     /**
+     *
+     */
+    public User createUser(@Nonnull UnitOfWork uow, @Nonnull String login, char[] passwordDigest) {
+        return createUser(uow, Id.next(User.class), login, passwordDigest);
+    }
+
+    /**
      * Check the provided credentials and returns the corresponding user's {@link Id} if
      * they are valid.
      *

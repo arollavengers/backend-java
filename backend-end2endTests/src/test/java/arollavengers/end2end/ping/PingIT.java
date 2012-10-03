@@ -35,7 +35,7 @@ public class PingIT {
 
     @Test
     public void pong() throws IOException {
-        HttpGet httpGet = new HttpGet(settings.getBaseURL() + "/rest/ping/Travis");
+        HttpGet httpGet = new HttpGet(settings.getBaseURL() + "/api/ping/Travis");
 
         long before = System.currentTimeMillis();
         HttpResponse response = httpclient.execute(httpGet);

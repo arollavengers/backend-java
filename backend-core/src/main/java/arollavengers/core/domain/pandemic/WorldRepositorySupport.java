@@ -8,6 +8,7 @@ import arollavengers.core.infrastructure.UnitOfWork;
 import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.pattern.annotation.DependencyInjection;
 
+import org.springframework.stereotype.Repository;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -15,6 +16,7 @@ import javax.inject.Inject;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@Repository
 public class WorldRepositorySupport implements WorldRepository {
 
     @Inject

@@ -17,12 +17,14 @@ import arollavengers.core.infrastructure.annotation.OnEvent;
 import arollavengers.pattern.annotation.DependencyInjection;
 import com.google.common.collect.Maps;
 
+import org.springframework.stereotype.Repository;
 import javax.inject.Inject;
 import java.util.SortedMap;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
+@Repository
 public class UserLoginIndexSupport implements UserLoginIndex {
 
     @Inject

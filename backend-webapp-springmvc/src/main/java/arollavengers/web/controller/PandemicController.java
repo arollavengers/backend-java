@@ -9,15 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/world")
-public class WorldController {
+@RequestMapping("/pandemic")
+public class PandemicController {
 
     @Autowired
     WorldService worldService;
 
-    @RequestMapping("/create")
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     public Id create(Id ownerId, Difficulty difficulty) {
 
         Assert.notNull(ownerId, "Owner is mandatory");

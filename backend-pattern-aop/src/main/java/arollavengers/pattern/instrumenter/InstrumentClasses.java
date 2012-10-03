@@ -1,5 +1,6 @@
 package arollavengers.pattern.instrumenter;
 
+import arollavengers.pattern.javassist.DirsClassPath;
 import arollavengers.pattern.javassist.JarsClassPath;
 import javassist.CannotCompileException;
 import javassist.ClassClassPath;
@@ -33,7 +34,9 @@ public class InstrumentClasses {
         return this;
     }
     public InstrumentClasses useClassPath(String classpath) {
+        System.out.println("InstrumentClasses, Classpath: " + classpath);
         this.classPool.appendClassPath(new JarsClassPath().initFromClasspath(classpath));
+        this.classPool.appendClassPath(new DirsClassPath().initFromClasspath(classpath));
         return this;
     }
 
