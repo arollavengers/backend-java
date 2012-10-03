@@ -40,27 +40,32 @@ public class Aggregate<E extends DomainEvent> {
      *
      * @param stream Stream of events to rebuild state from
      */
-    public void loadFromHistory(@Nonnull Stream<E> stream) {
-        stream.consume(new Function<E>() {
-            public void apply(E event) {
+    public void loadFromHistory(@Nonnull Stream<VersionedDomainEvent<E>> stream) {
+        stream.consume(new Function<VersionedDomainEvent<E>>() {
+            public void apply(VersionedDomainEvent<E> event) {
                 applyEvent(event, false);
             }
         });
     }
 
     protected void applyEvent(@Nonnull E event, boolean isNew) {
-        checkEventSequenceOrAssignIt(event, isNew);
+        applyEvent(new VersionedDomainEvent<E>(aggregateRootId, event), isNew);
+    }
 
+    protected void applyEvent(@Nonnull VersionedDomainEvent<E> versionedEvent, boolean isNew) {
+        checkEventSequenceOrAssignIt(versionedEvent, isNew);
+
+        E event = versionedEvent.event();
         Entity<E> entity = getEntityOrFail(event);
 
-        // invoke the event handler that may apply...
-        // ...the event's side effect on the aggregate
+        // invoke the versionedEvent handler that may apply...
+        // ...the versionedEvent's side effect on the aggregate
         entity.internalEventHandler().handle(event);
 
         // ensure aggregate version is the new one
-        version = event.version();
+        version = versionedEvent.version();
         if (isNew) {
-            unitOfWork().registerNew(aggregateRootId, event);
+            unitOfWork().registerNew(versionedEvent);
         }
     }
 
@@ -80,12 +85,12 @@ public class Aggregate<E extends DomainEvent> {
         return entity;
     }
 
-    private void checkEventSequenceOrAssignIt(E event, boolean isNew) {
+    private void checkEventSequenceOrAssignIt(VersionedDomainEvent<E> versionedEvent, boolean isNew) {
         if (isNew) {
-            event.assignVersion(version + 1);
+            versionedEvent.assignVersion(version + 1);
         }
-        else if (event.version() != (version + 1)) {
-            throw new InvalidEventSequenceException(this.aggregateRootId, version, event.version());
+        else if (versionedEvent.version() != (version + 1)) {
+            throw new InvalidEventSequenceException(this.aggregateRootId, version, versionedEvent.version());
         }
     }
 

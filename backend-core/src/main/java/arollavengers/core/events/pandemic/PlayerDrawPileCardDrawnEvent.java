@@ -5,7 +5,6 @@ import arollavengers.core.infrastructure.Id;
 
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -17,9 +16,6 @@ public class PlayerDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
 
     @JsonProperty
     private final PlayerCard cardDrawn;
-
-    @JsonProperty
-    private long version;
 
     @JsonCreator
     public PlayerDrawPileCardDrawnEvent(@JsonProperty("drawPileId") Id drawPileId,
@@ -34,16 +30,6 @@ public class PlayerDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
         return drawPileId;
     }
 
-    @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
     /**
      * @return the card drawn.
      */
@@ -54,7 +40,6 @@ public class PlayerDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
     @Override
     public String toString() {
         return "PlayerDrawPileCardDrawnEvent[" + drawPileId +
-                ", v" + version +
                 ", " + cardDrawn +
                 "]";
     }

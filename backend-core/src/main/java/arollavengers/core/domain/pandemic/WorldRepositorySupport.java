@@ -5,6 +5,7 @@ import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.UnitOfWork;
+import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.pattern.annotation.DependencyInjection;
 
 import javax.annotation.Nonnull;
@@ -42,7 +43,7 @@ public class WorldRepositorySupport implements WorldRepository {
     public World getWorld(@Nonnull UnitOfWork uow, @Nonnull Id worldId) {
         World world = uow.getAggregate(worldId);
         if (world == null) {
-            Stream<PandemicEvent> stream = eventStore.openStream(worldId, PandemicEvent.class);
+            Stream<VersionedDomainEvent<PandemicEvent>> stream = eventStore.openStream(worldId, PandemicEvent.class);
             if (stream == null) {
                 return null;
             }

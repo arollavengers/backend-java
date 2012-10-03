@@ -10,9 +10,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public class WorldMemberJoinedTeamEvent implements PandemicEvent {
 
     @JsonProperty
-    private long version;
-
-    @JsonProperty
     private final Id worldId;
 
     @JsonProperty
@@ -36,16 +33,6 @@ public class WorldMemberJoinedTeamEvent implements PandemicEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(final long version) {
-        this.version = version;
-    }
-
-    @Override
     public Id entityId() {
         return worldId;
     }
@@ -64,7 +51,9 @@ public class WorldMemberJoinedTeamEvent implements PandemicEvent {
 
     @Override
     public String toString() {
-        return "WorldMemberJoinedTeamEvent[" + worldId + ", v" + version + ", " + memberId + ", " + newComerId + ": " + role + "]";
+        return "WorldMemberJoinedTeamEvent[" + worldId
+                + ", " + memberId
+                + ", " + newComerId + ": " + role + "]";
     }
 
 }

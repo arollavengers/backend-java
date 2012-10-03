@@ -12,9 +12,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public class UserCreatedEvent implements UserEvent {
 
     @JsonProperty
-    private long version;
-
-    @JsonProperty
     private final Id newUserId;
 
     @JsonProperty
@@ -39,16 +36,6 @@ public class UserCreatedEvent implements UserEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(final long version) {
-        this.version = version;
-    }
-
-    @Override
     public Id entityId() {
         return newUserId;
     }
@@ -67,6 +54,7 @@ public class UserCreatedEvent implements UserEvent {
 
     @Override
     public String toString() {
-        return "UserCreatedEvent[" + newUserId + ", v" + version + ", " + login + "]";
+        return "UserCreatedEvent[" + newUserId
+                + ", " + login + "]";
     }
 }

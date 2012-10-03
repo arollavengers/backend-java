@@ -6,6 +6,7 @@ import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.Streams;
+import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.core.util.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,13 +23,13 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class EventStoreInMemory implements EventStore {
 
-    private ConcurrentMap<Id, List<DomainEvent>> eventsPerStream = Maps.newConcurrentMap();
+    private ConcurrentMap<Id, List<VersionedDomainEvent>> eventsPerStream = Maps.newConcurrentMap();
 
     @Override
-    public void store(@Nonnull Id streamId, @Nonnull Stream<DomainEvent> stream) {
-        List<DomainEvent> events = eventsPerStream.get(streamId);
+    public void store(@Nonnull Id streamId, @Nonnull Stream<VersionedDomainEvent<?>> stream) {
+        List<VersionedDomainEvent> events = eventsPerStream.get(streamId);
         if (events == null) {
-            List<DomainEvent> newEvents = Lists.newArrayList();
+            List<VersionedDomainEvent> newEvents = Lists.newArrayList();
             events = eventsPerStream.putIfAbsent(streamId, newEvents);
             if (events == null) {
                 events = newEvents;
@@ -39,7 +40,7 @@ public class EventStoreInMemory implements EventStore {
         synchronized (events) {
             long lastVersion = 0;
             if (!events.isEmpty()) {
-                DomainEvent lastEvent = events.get(events.size() - 1);
+                VersionedDomainEvent lastEvent = events.get(events.size() - 1);
                 lastVersion = lastEvent.version();
             }
             stream.consume(listAppender(streamId, lastVersion, events));
@@ -48,8 +49,8 @@ public class EventStoreInMemory implements EventStore {
 
     @Override
     @Nullable
-    public <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, @Nonnull Class<E> eventType) {
-        List<DomainEvent> events = eventsPerStream.get(streamId);
+    public <E extends DomainEvent> Stream<VersionedDomainEvent<E>> openStream(@Nonnull Id streamId, @Nonnull Class<E> eventType) {
+        List<VersionedDomainEvent> events = eventsPerStream.get(streamId);
         if (events == null) {
             //throw new StreamNotFoundException("Stream Id: " + streamId);
             return null;
@@ -57,15 +58,15 @@ public class EventStoreInMemory implements EventStore {
         return Streams.wrapAndCast(Streams.from(events));
     }
 
-    private Function<DomainEvent> listAppender(final Id streamId,
+    private static Function<VersionedDomainEvent<?>> listAppender(final Id streamId,
                                                final long initialVersion,
-                                               final List<DomainEvent> events)
+                                               final List<VersionedDomainEvent> events)
     {
-        return new Function<DomainEvent>() {
+        return new Function<VersionedDomainEvent<?>>() {
             private long lastVersion = initialVersion;
 
             @Override
-            public void apply(DomainEvent domainEvent) {
+            public void apply(VersionedDomainEvent domainEvent) {
                 if (domainEvent.version() != (lastVersion + 1)) {
                     throw new MidAirCollisionException(
                             "Stream Id: " + streamId + ", expected version: " + (lastVersion + 1) + " but got: "
@@ -78,9 +79,9 @@ public class EventStoreInMemory implements EventStore {
     }
 
     public void dump(PrintStream out) {
-        for (Map.Entry<Id, List<DomainEvent>> entry : eventsPerStream.entrySet()) {
+        for (Map.Entry<Id, List<VersionedDomainEvent>> entry : eventsPerStream.entrySet()) {
             out.println(entry.getKey() + ": ");
-            for (DomainEvent event : entry.getValue()) {
+            for (VersionedDomainEvent event : entry.getValue()) {
                 out.println("  . " + event);
             }
         }
@@ -89,7 +90,7 @@ public class EventStoreInMemory implements EventStore {
     /**
      * Caution: return direct access to the underlying data structure.
      */
-    public ConcurrentMap<Id, List<DomainEvent>> getEventsPerStream() {
+    public ConcurrentMap<Id, List<VersionedDomainEvent>> getEventsPerStream() {
         return eventsPerStream;
     }
 }

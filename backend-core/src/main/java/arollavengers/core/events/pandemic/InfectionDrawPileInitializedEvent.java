@@ -20,9 +20,6 @@ public class InfectionDrawPileInitializedEvent implements PlayerDrawPileEvent {
     @JsonProperty
     private final InfectionCard[] cards;
 
-    @JsonProperty
-    private long version;
-
     @JsonCreator
     public InfectionDrawPileInitializedEvent(@JsonProperty("drawPileId") Id drawPileId,
                                              @JsonProperty("cards") InfectionCard[] cards)
@@ -36,16 +33,6 @@ public class InfectionDrawPileInitializedEvent implements PlayerDrawPileEvent {
         return drawPileId;
     }
 
-    @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
     /**
      * @return an copy of the cards.
      */
@@ -56,7 +43,6 @@ public class InfectionDrawPileInitializedEvent implements PlayerDrawPileEvent {
     @Override
     public String toString() {
         return "InfectionDrawPileInitializedEvent[" + entityId() +
-                ", v" + version +
                 ", " + Arrays.toString(cards) +
                 "]";
     }

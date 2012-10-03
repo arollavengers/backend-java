@@ -17,9 +17,6 @@ public class InfectionDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
     @JsonProperty
     private final InfectionCard cardDrawn;
 
-    @JsonProperty
-    private long version;
-
     @JsonCreator
     public InfectionDrawPileCardDrawnEvent(@JsonProperty("drawPileId") Id drawPileId,
                                            @JsonProperty("cardDrawn") InfectionCard cardDrawn)
@@ -33,16 +30,6 @@ public class InfectionDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
         return drawPileId;
     }
 
-    @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
     /**
      * @return the card drawn.
      */
@@ -53,7 +40,6 @@ public class InfectionDrawPileCardDrawnEvent implements PlayerDrawPileEvent {
     @Override
     public String toString() {
         return "PlayerDrawPileCardDrawnEvent[" + drawPileId +
-                ", v" + version +
                 ", " + cardDrawn +
                 "]";
     }

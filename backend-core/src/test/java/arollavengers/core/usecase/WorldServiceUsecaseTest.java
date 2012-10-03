@@ -174,9 +174,16 @@ public class WorldServiceUsecaseTest {
         // Given
         prepareEnvironment();
         assumeThat(eventStore, instanceOf(EventStoreInMemory.class));
+
         new EventStoreInMemoryIO(testSettings.getProperty("memory.event-store.srcdir") + "/game001")
                 .load((EventStoreInMemory) eventStore);
 
+        {
+            UnitOfWork uow = unitOfWorkFactory.create();
+            World world = worldRepository.getWorld(uow, Id.create("World~1"));
+            assertThat(world).isNotNull();
+            assertThat(world.isStarted()).isTrue();
+        }
 
         eventStore.dump(System.out);
     }

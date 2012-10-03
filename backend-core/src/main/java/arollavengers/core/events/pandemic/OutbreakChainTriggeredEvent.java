@@ -17,9 +17,6 @@ import java.util.EnumMap;
 public class OutbreakChainTriggeredEvent implements CityEvent {
 
     @JsonProperty
-    private long version;
-
-    @JsonProperty
     private final Id worldId;
 
     @JsonProperty
@@ -44,18 +41,8 @@ public class OutbreakChainTriggeredEvent implements CityEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
     public Id entityId() {
         return worldId;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
     }
 
     public Disease disease() {
@@ -72,6 +59,8 @@ public class OutbreakChainTriggeredEvent implements CityEvent {
 
     @Override
     public String toString() {
-        return "OutbreakChainTriggeredEvent[" + worldId + ", v" + version + ", " + generationMap + ", " + resultingInfections + "]";
+        return "OutbreakChainTriggeredEvent[" + worldId
+                + ", " + generationMap
+                + ", " + resultingInfections + "]";
     }
 }

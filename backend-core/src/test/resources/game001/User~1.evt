@@ -1,14 +1,20 @@
 [ {
-  "type" : "user-created",
-  "newUserId" : "User~1",
-  "login" : "Travis",
-  "passwordDigest" : "sQaDsuRUj+bbfAOO8N4yOjYmxTFFXo2NM81eS+31T9QxEyu16YBWi2ioWECN1vEA9C5pmD4oxYnNBfLwIBRLvQ==",
-  "salt" : "sGrC6uDA3d6pVxX3OMQIHHC75SRjS2/h2mc4z2NVKa4=",
-  "version" : 1
+  "aggregateId" : "User~1",
+  "version" : 1,
+  "event" : {
+    "type" : "user-created",
+    "newUserId" : "User~1",
+    "login" : "Travis",
+    "passwordDigest" : "moAk4JoLYp1HtEOItgbYIGrtpv6MRop4GnaRoS3xviQLRNykNDqZ7HckZlwXU9NrNW5JpOWHCf+J0sGSzJLRgg==",
+    "salt" : "8cglkmBnq3eYZTCe+ngCt2kHot2+0j0e7KU1TEnEGJQ="
+  }
 }, {
-  "type" : "game-joined",
-  "userId" : "User~1",
-  "gameId" : "World~1",
-  "gameType" : "Pandemic",
-  "version" : 2
+  "aggregateId" : "User~1",
+  "version" : 2,
+  "event" : {
+    "type" : "game-joined",
+    "userId" : "User~1",
+    "gameId" : "World~1",
+    "gameType" : "Pandemic"
+  }
 } ]

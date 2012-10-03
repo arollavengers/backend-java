@@ -21,9 +21,6 @@ public class PlayerDrawPileInitializedEvent implements PlayerDrawPileEvent {
     @JsonProperty
     private final PlayerCard[] cards;
 
-    @JsonProperty
-    private long version;
-
     @JsonCreator
     public PlayerDrawPileInitializedEvent(@JsonProperty("playerDrawPileId") Id playerDrawPileId,
                                           @JsonProperty("cards") PlayerCard[] cards) {
@@ -36,16 +33,6 @@ public class PlayerDrawPileInitializedEvent implements PlayerDrawPileEvent {
         return playerDrawPileId;
     }
 
-    @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
     /**
      * @return an copy of the cards.
      */
@@ -56,7 +43,6 @@ public class PlayerDrawPileInitializedEvent implements PlayerDrawPileEvent {
     @Override
     public String toString() {
         return "PlayerDrawPileInitializedEvent[" + playerDrawPileId +
-                ", v" + version +
                 ", cards=" + Arrays.toString(cards) +
                 "]";
     }

@@ -1,23 +1,35 @@
 [ {
-  "type" : "login-index-created",
-  "indexId" : "user_login_index",
-  "version" : 1
+  "aggregateId" : "user_login_index",
+  "version" : 1,
+  "event" : {
+    "type" : "login-index-created",
+    "indexId" : "user_login_index"
+  }
 }, {
-  "type" : "login-added",
-  "indexId" : "user_login_index",
-  "login" : "Travis",
-  "userId" : "User~1",
-  "version" : 2
+  "aggregateId" : "user_login_index",
+  "version" : 2,
+  "event" : {
+    "type" : "login-added",
+    "indexId" : "user_login_index",
+    "login" : "Travis",
+    "userId" : "User~1"
+  }
 }, {
-  "type" : "login-added",
-  "indexId" : "user_login_index",
-  "login" : "Vlad",
-  "userId" : "User~2",
-  "version" : 3
+  "aggregateId" : "user_login_index",
+  "version" : 3,
+  "event" : {
+    "type" : "login-added",
+    "indexId" : "user_login_index",
+    "login" : "Vlad",
+    "userId" : "User~2"
+  }
 }, {
-  "type" : "login-added",
-  "indexId" : "user_login_index",
-  "login" : "Thundercat",
-  "userId" : "User~3",
-  "version" : 4
+  "aggregateId" : "user_login_index",
+  "version" : 4,
+  "event" : {
+    "type" : "login-added",
+    "indexId" : "user_login_index",
+    "login" : "Thundercat",
+    "userId" : "User~3"
+  }
 } ]

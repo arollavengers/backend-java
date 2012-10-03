@@ -14,7 +14,7 @@ public class UnitOfWorkDefault implements UnitOfWork {
 
     private final Map<Id, Uncommitted> uncommittedMap = Maps.newHashMap();
     private final Map<Id, AggregateRoot<?>> attachedMap = Maps.newHashMap();
-    private final List<Message> unpublishedMessages = Lists.newArrayList();
+    private final List<VersionedDomainEvent> unpublishedMessages = Lists.newArrayList();
     private final Bus bus;
 
     @Inject
@@ -54,10 +54,10 @@ public class UnitOfWorkDefault implements UnitOfWork {
     }
 
     @Override
-    public void registerNew(@Nonnull Id aggregateId, @Nonnull DomainEvent event) {
-        Uncommitted uncommitted = getOrCreateUncommitted(aggregateId);
-        uncommitted.add(event);
-        unpublishedMessages.add(event);
+    public void registerNew(@Nonnull VersionedDomainEvent versionedEvent) {
+        Uncommitted uncommitted = getOrCreateUncommitted(versionedEvent.aggregateId());
+        uncommitted.add(versionedEvent);
+        unpublishedMessages.add(versionedEvent);
     }
 
     private Uncommitted getOrCreateUncommitted(Id id) {
@@ -72,8 +72,8 @@ public class UnitOfWorkDefault implements UnitOfWork {
     /**
      * Return a copy of all uncommitted events for all aggregate roots.
      */
-    public List<DomainEvent> getAllUncommitted() {
-        List<DomainEvent> collected = Lists.newArrayList();
+    public List<VersionedDomainEvent<?>> getAllUncommitted() {
+        List<VersionedDomainEvent<?>> collected = Lists.newArrayList();
         for (Uncommitted uncommitted : uncommittedMap.values()) {
             collected.addAll(uncommitted.events);
         }
@@ -109,7 +109,7 @@ public class UnitOfWorkDefault implements UnitOfWork {
 
     private static class Uncommitted {
         private final Id aggregateId;
-        private final List<DomainEvent> events = Lists.newArrayList();
+        private final List<VersionedDomainEvent<?>> events = Lists.newArrayList();
         private EventStore eventStore;
 
         private Uncommitted(Id aggregateId) {
@@ -125,7 +125,7 @@ public class UnitOfWorkDefault implements UnitOfWork {
             this.eventStore = eventStore;
         }
 
-        public void add(DomainEvent event) {
+        public void add(VersionedDomainEvent<?> event) {
             events.add(event);
         }
 

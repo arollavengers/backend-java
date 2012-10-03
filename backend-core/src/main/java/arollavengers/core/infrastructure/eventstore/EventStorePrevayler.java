@@ -5,6 +5,7 @@ import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.Streams;
+import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.pattern.annotation.DependencyInjection;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -46,16 +47,16 @@ public class EventStorePrevayler implements EventStore {
     private arollavengers.core.infrastructure.Serializer serializer;
 
     @Override
-    public void store(@Nonnull Id streamId, @Nonnull Stream<DomainEvent> stream) {
-        List<DomainEvent> events = Streams.toList(stream);
-        prevayler.execute(new AppendStream(streamId, events.toArray(new DomainEvent[events.size()])));
+    public void store(@Nonnull Id streamId, @Nonnull Stream<VersionedDomainEvent<?>> stream) {
+        List<VersionedDomainEvent<?>> events = Streams.toList(stream);
+        prevayler.execute(new AppendStream(streamId, events.toArray(new VersionedDomainEvent[events.size()])));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, @Nonnull Class<E> eventType) {
+    public <E extends DomainEvent> Stream<VersionedDomainEvent<E>> openStream(@Nonnull Id streamId, @Nonnull Class<E> eventType) {
         try {
-            return (Stream<E>) prevayler.execute(new QueryStream(streamId));
+            return (Stream<VersionedDomainEvent<E>>) prevayler.execute(new QueryStream(streamId));
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -70,9 +71,9 @@ public class EventStorePrevayler implements EventStore {
                 @Override
                 public Object query(Object prevalentSystem, Date executionTime) {
                     PrevalentEventStore eventStore = (PrevalentEventStore) prevalentSystem;
-                    for (Map.Entry<Id, List<DomainEvent>> entry : eventStore.eventsPerStream.entrySet()) {
+                    for (Map.Entry<Id, List<VersionedDomainEvent>> entry : eventStore.eventsPerStream.entrySet()) {
                         out.println(entry.getKey() + ": ");
-                        for (DomainEvent event : entry.getValue()) {
+                        for (VersionedDomainEvent event : entry.getValue()) {
                             out.println("  . " + event);
                         }
                     }
@@ -125,14 +126,14 @@ public class EventStorePrevayler implements EventStore {
     }
 
     public static final class PrevalentEventStore implements Serializable {
-        private Map<Id, List<DomainEvent>> eventsPerStream = Maps.newHashMap();
+        private Map<Id, List<VersionedDomainEvent>> eventsPerStream = Maps.newHashMap();
 
-        public void appendOrCreate(Id streamId, DomainEvent... stream) {
+        public void appendOrCreate(Id streamId, VersionedDomainEvent... stream) {
             appendOrCreate(streamId, Arrays.asList(stream));
         }
 
-        public void appendOrCreate(Id streamId, List<DomainEvent> stream) {
-            List<DomainEvent> events = eventsPerStream.get(streamId);
+        public void appendOrCreate(Id streamId, List<VersionedDomainEvent> stream) {
+            List<VersionedDomainEvent> events = eventsPerStream.get(streamId);
             if (events == null) {
                 events = Lists.newArrayList();
                 eventsPerStream.put(streamId, events);
@@ -140,8 +141,8 @@ public class EventStorePrevayler implements EventStore {
             events.addAll(stream);
         }
 
-        public <E extends DomainEvent> Stream<E> openStream(Id streamId) {
-            List<DomainEvent> events = eventsPerStream.get(streamId);
+        public <E extends DomainEvent> Stream<VersionedDomainEvent<E>> openStream(Id streamId) {
+            List<VersionedDomainEvent> events = eventsPerStream.get(streamId);
             if (events == null) {
                 //throw new StreamNotFoundException("Stream Id: " + streamId);
                 return null;
@@ -178,12 +179,12 @@ public class EventStorePrevayler implements EventStore {
         private final Id streamId;
 
         @JsonProperty
-        private final DomainEvent[] events;
+        private final VersionedDomainEvent[] events;
 
         @JsonCreator
         public AppendStream(
                 @JsonProperty("streamId") Id streamId,
-                @JsonProperty("events") DomainEvent[] events)
+                @JsonProperty("events") VersionedDomainEvent[] events)
         {
             this.streamId = streamId;
             this.events = events;

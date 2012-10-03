@@ -32,7 +32,8 @@ public class LoginAddedEvent extends LoginEvent {
 
     @Override
     public String toString() {
-        return "LoginAddedEvent[" + entityId() + ", v" + version() + ", " + login() + "]";
+        return "LoginAddedEvent[" + entityId()
+                + ", " + login() + "]";
     }
 
     public Id userId() {

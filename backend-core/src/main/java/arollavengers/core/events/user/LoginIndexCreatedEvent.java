@@ -17,6 +17,7 @@ public class LoginIndexCreatedEvent extends LoginEvent {
 
     @Override
     public String toString() {
-        return "LoginIndexCreatedEvent[" + entityId() + ", v" + version() + "]";
+        return "LoginIndexCreatedEvent[" + entityId()
+                + "]";
     }
 }

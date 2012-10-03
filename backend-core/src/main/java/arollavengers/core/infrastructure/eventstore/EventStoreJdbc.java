@@ -7,10 +7,10 @@ import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Serializer;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.Streams;
+import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.pattern.annotation.DependencyInjection;
 
 import org.apache.commons.lang3.StringUtils;
-import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -62,7 +63,7 @@ public class EventStoreJdbc implements EventStore {
     }
 
     @Override
-    public void store(@Nonnull final Id streamId, @Nonnull final Stream<DomainEvent> stream) {
+    public void store(@Nonnull final Id streamId, @Nonnull final Stream<VersionedDomainEvent<?>> stream) {
         jdbcTemplate.execute(new ConnectionCallback<Object>() {
             @Override
             public Object doInConnection(Connection connection) throws SQLException, DataAccessException {
@@ -89,17 +90,19 @@ public class EventStoreJdbc implements EventStore {
         });
     }
 
-    private void store(Connection connection, Id streamId, Stream<DomainEvent> stream) throws SQLException,
-                                                                                              IOException
+    private void store(Connection connection,
+                       Id streamId,
+                       Stream<VersionedDomainEvent<?>> stream) throws SQLException,
+                                                                      IOException
     {
-        List<DomainEvent> events = Streams.toList(stream);
+        List<VersionedDomainEvent<?>> events = Streams.toList(stream);
         if (events.isEmpty()) {
             logger.warn("No events to store for stream {}", streamId);
             return;
         }
 
-        DomainEvent firstEvent = events.get(0);
-        DomainEvent lastEvent = events.get(events.size() - 1);
+        VersionedDomainEvent<?> firstEvent = events.get(0);
+        VersionedDomainEvent<?> lastEvent = events.get(events.size() - 1);
 
         // if it is the first event of the aggregate, it is a new aggregate
         if (firstEvent.version() == 1) {
@@ -136,7 +139,7 @@ public class EventStoreJdbc implements EventStore {
 
         PreparedStatement pStmt = connection.prepareStatement("insert into stream_events (stream_id, event_id, event_data) values (?,?,?)");
         try {
-            for (DomainEvent event : events) {
+            for (VersionedDomainEvent<?> event : events) {
                 String eventAsString = serializer.serializeAsString(event);
 
                 pStmt.setString(1, streamId.asString());
@@ -157,15 +160,15 @@ public class EventStoreJdbc implements EventStore {
 
     @Override
     @Nullable
-    public <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, Class<E> eventType) {
+    public <E extends DomainEvent> Stream<VersionedDomainEvent<E>> openStream(@Nonnull Id streamId, Class<E> eventType) {
         String sql = "select stream_id, event_id, event_data from stream_events where stream_id = ? order by event_id";
-        List<E> events = jdbcTemplate.query(sql, new RowMapper<E>() {
+        List<VersionedDomainEvent<E>> events = jdbcTemplate.query(sql, new RowMapper<VersionedDomainEvent<E>>() {
             @SuppressWarnings("unchecked")
             @Override
-            public E mapRow(ResultSet rs, int rowNum) throws SQLException {
+            public VersionedDomainEvent<E> mapRow(ResultSet rs, int rowNum) throws SQLException {
                 String eventData = rs.getString(3);
                 try {
-                    return (E) serializer.deserializeFomString(eventData, DomainEvent.class);
+                    return (VersionedDomainEvent<E>) serializer.deserializeFomString(eventData, VersionedDomainEvent.class);
                 }
                 catch (Serializer.SerializationException e) {
                     // TODO better exception...
@@ -174,8 +177,9 @@ public class EventStoreJdbc implements EventStore {
             }
         }, streamId.asString());
 
-        if(events.isEmpty())
+        if (events.isEmpty()) {
             return null;
+        }
         return Streams.from(events);
     }
 

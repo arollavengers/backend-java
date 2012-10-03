@@ -12,6 +12,7 @@ import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.UnitOfWork;
+import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.core.infrastructure.annotation.OnEvent;
 import arollavengers.pattern.annotation.DependencyInjection;
 import com.google.common.collect.Maps;
@@ -27,7 +28,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
     @Inject
     private EventStore eventStore;
 
-    private Id loginIndexAggregateId = Id.create("user_login_index.evt");
+    private Id loginIndexAggregateId = Id.create("user_login_index");
 
     @Override
     public void useLogin(UnitOfWork uow, String login, Id userId) {
@@ -50,7 +51,7 @@ public class UserLoginIndexSupport implements UserLoginIndex {
 
     private Index getIndex(UnitOfWork uow) {
         Index index = new Index(loginIndexAggregateId, uow);
-        Stream<LoginEvent> stream = eventStore.openStream(loginIndexAggregateId, LoginEvent.class);
+        Stream<VersionedDomainEvent<LoginEvent>> stream = eventStore.openStream(loginIndexAggregateId, LoginEvent.class);
         if (stream != null && stream.hasRemaining()) // first time the stream is null or empty
         {
             index.loadFromHistory(stream);

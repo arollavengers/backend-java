@@ -5,6 +5,7 @@ import arollavengers.core.infrastructure.EventStore;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Stream;
 import arollavengers.core.infrastructure.UnitOfWork;
+import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.pattern.annotation.DependencyInjection;
 
 import javax.annotation.Nonnull;
@@ -42,7 +43,7 @@ public class UserRepositorySupport implements UserRepository {
     public User getUser(@Nonnull UnitOfWork uow, @Nonnull Id userId) {
         User user = uow.getAggregate(userId);
         if (user == null) {
-            Stream<UserEvent> stream = eventStore.openStream(userId, UserEvent.class);
+            Stream<VersionedDomainEvent<UserEvent>> stream = eventStore.openStream(userId, UserEvent.class);
             if (stream == null) {
                 return null;
             }

@@ -17,9 +17,6 @@ public class PlayerPositionOnTableDefinedEvent implements MemberEvent {
     @JsonProperty
     private final int positionOnTable;
 
-    @JsonProperty
-    private long version;
-
     @JsonCreator
     public PlayerPositionOnTableDefinedEvent(@JsonProperty("memberId") Id memberId,
                                              @JsonProperty("positionOnTable") int positionOnTable) {
@@ -32,16 +29,6 @@ public class PlayerPositionOnTableDefinedEvent implements MemberEvent {
         return memberId;
     }
 
-    @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
     public int positionOnTable() {
         return positionOnTable;
     }
@@ -49,7 +36,6 @@ public class PlayerPositionOnTableDefinedEvent implements MemberEvent {
     @Override
     public String toString() {
         return "PlayerPositionOnTableDefinedEvent[" + entityId() +
-                ", v" + version +
                 ", positionOnTable: " + positionOnTable +
                 "]";
     }

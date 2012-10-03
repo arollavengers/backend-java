@@ -4,10 +4,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import arollavengers.core.events.user.UserCreatedEvent;
 import arollavengers.core.infrastructure.Bus;
-import arollavengers.core.infrastructure.DomainEvent;
-import arollavengers.core.infrastructure.UnitOfWorkDefault;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.SimpleBus;
+import arollavengers.core.infrastructure.UnitOfWorkDefault;
+import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.core.usecase.CollectorListener;
 
 import org.junit.Before;
@@ -38,11 +38,11 @@ public class UserTest {
         User user = new User(userId, uow);
         user.createUser("Travis", "Pacman".toCharArray(), "hop".getBytes());
 
-        List<DomainEvent> allUncommitted = uow.getAllUncommitted();
+        List<VersionedDomainEvent<?>> allUncommitted = uow.getAllUncommitted();
 
         assertThat(allUncommitted).hasSize(1);
-        assertThat(allUncommitted.get(0)).isInstanceOf(UserCreatedEvent.class);
-        UserCreatedEvent createdEvent = (UserCreatedEvent) allUncommitted.get(0);
+        assertThat(allUncommitted.get(0).event()).isInstanceOf(UserCreatedEvent.class);
+        UserCreatedEvent createdEvent = (UserCreatedEvent) allUncommitted.get(0).event();
         assertThat(createdEvent.login()).isEqualTo("Travis");
         assertThat(createdEvent.passwordDigest()).isNotEqualTo("Pacman".getBytes());
     }

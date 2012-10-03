@@ -34,18 +34,8 @@ public class WorldCityCuredEvent implements PandemicEvent {
     }
 
     @Override
-    public long version() {
-        throw new RuntimeException("not implemented");
-    }
-
-    @Override
     public Id entityId() {
         return worldId;
-    }
-
-    @Override
-    public void assignVersion(final long l) {
-        throw new RuntimeException("not implemented");
     }
 
     public CityId city() {

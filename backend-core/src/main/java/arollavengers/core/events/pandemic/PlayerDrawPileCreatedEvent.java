@@ -17,9 +17,6 @@ public class PlayerDrawPileCreatedEvent implements PandemicEvent {
     @JsonProperty
     private final Id drawPileId;
 
-    @JsonProperty
-    private long version;
-
     @JsonCreator
     public PlayerDrawPileCreatedEvent(@JsonProperty("worldId") Id worldId,
                                       @JsonProperty("drawPileId") Id drawPileId)
@@ -29,18 +26,8 @@ public class PlayerDrawPileCreatedEvent implements PandemicEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
     public Id entityId() {
         return worldId;
-    }
-
-    @Override
-    public void assignVersion(final long version) {
-        this.version = version;
     }
 
     public Id drawPileId() {
@@ -50,7 +37,6 @@ public class PlayerDrawPileCreatedEvent implements PandemicEvent {
     @Override
     public String toString() {
         return "PlayerDrawPileCreatedEvent[" + worldId +
-                ", v" + version +
                 ", " + drawPileId +
                 "]";
     }

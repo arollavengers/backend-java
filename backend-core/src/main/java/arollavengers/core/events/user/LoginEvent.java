@@ -11,9 +11,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public abstract class LoginEvent implements DomainEvent {
 
     @JsonProperty
-    private long version;
-
-    @JsonProperty
     private final Id indexId;
 
     public LoginEvent(Id indexId) {
@@ -21,14 +18,6 @@ public abstract class LoginEvent implements DomainEvent {
             throw new IllegalArgumentException("Id is undefied!");
         }
         this.indexId = indexId;
-    }
-
-    public long version() {
-        return version;
-    }
-
-    public void assignVersion(final long version) {
-        this.version = version;
     }
 
     @Override

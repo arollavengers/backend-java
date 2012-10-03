@@ -13,9 +13,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public class GameJoinedEvent implements UserEvent {
 
     @JsonProperty
-    private long version;
-
-    @JsonProperty
     private final Id userId;
 
     @JsonProperty
@@ -34,16 +31,6 @@ public class GameJoinedEvent implements UserEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(final long version) {
-        this.version = version;
-    }
-
-    @Override
     public Id entityId() {
         return userId;
     }
@@ -58,6 +45,7 @@ public class GameJoinedEvent implements UserEvent {
 
     @Override
     public String toString() {
-        return "GameJoinedEvent[" + userId + ", v" + version + ", " + gameType + "/" + gameId + "]";
+        return "GameJoinedEvent[" + userId
+                + ", " + gameType + "/" + gameId + "]";
     }
 }

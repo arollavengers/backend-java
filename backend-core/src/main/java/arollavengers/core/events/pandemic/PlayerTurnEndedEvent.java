@@ -4,15 +4,11 @@ import arollavengers.core.infrastructure.Id;
 
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class PlayerTurnEndedEvent implements MemberEvent {
-
-    @JsonProperty
-    private long version;
 
     @JsonProperty
     private final Id memberId;
@@ -28,19 +24,8 @@ public class PlayerTurnEndedEvent implements MemberEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
-    @Override
     public String toString() {
         return "PlayerTurnEndedEvent[" + memberId +
-                ", v" + version +
                 "]";
     }
 }

@@ -21,9 +21,6 @@ public class IntensityOfInfectionIncreasedEvent implements PlayerDrawPileEvent {
     @JsonProperty
     private final InfectionCard[] cards;
 
-    @JsonProperty
-    private long version;
-
     @JsonCreator
     public IntensityOfInfectionIncreasedEvent(@JsonProperty("drawPileId") Id drawPileId,
                                               @JsonProperty("cards") InfectionCard[] cards)
@@ -37,16 +34,6 @@ public class IntensityOfInfectionIncreasedEvent implements PlayerDrawPileEvent {
         return drawPileId;
     }
 
-    @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
     /**
      * @return an copy of the cards.
      */
@@ -57,7 +44,6 @@ public class IntensityOfInfectionIncreasedEvent implements PlayerDrawPileEvent {
     @Override
     public String toString() {
         return "IntensityOfInfectionIncreasedEvent[" + entityId() +
-                ", v" + version +
                 ", " + Arrays.toString(cards) +
                 "]";
     }

@@ -9,9 +9,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public class GameStartedEvent implements PandemicEvent {
 
     @JsonProperty
-    private long version;
-
-    @JsonProperty
     private final Id worldId;
 
     @JsonCreator
@@ -20,23 +17,13 @@ public class GameStartedEvent implements PandemicEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
     public Id entityId() {
         return worldId;
     }
 
     @Override
-    public void assignVersion(final long version) {
-        this.version = version;
-    }
-
-    @Override
     public String toString() {
-        return "GameStartedEvent[" + worldId + ", v" + version + "]";
+        return "GameStartedEvent[" + worldId + "]";
     }
 
 }

@@ -25,6 +25,6 @@ public class LoginRemovedEvent extends LoginEvent {
 
     @Override
     public String toString() {
-        return "LoginRemovedEvent[" + entityId() + ", v" + version() + ", " + login() + "]";
+        return "LoginRemovedEvent[" + entityId() + ", " + login() + "]";
     }
 }

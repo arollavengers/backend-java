@@ -55,7 +55,6 @@ public class LearnJacksonByTest {
     public void deserialize_event_annotationMixin() throws IOException {
         String event = "{\n" +
                 "  \"@class\" : \"arollavengers.core.infrastructure.LearnJacksonByTest$MyEvent\",\n" +
-                "  \"version\" : 0,\n" +
                 "  \"id\" : \"4241febf-4901-43b6-b8ed-c9a75770fbb6\",\n" +
                 "  \"login\" : \"Travis\",\n" +
                 "  \"password\" : \"Pacman\"\n" +
@@ -78,7 +77,6 @@ public class LearnJacksonByTest {
     public void deserialize_event_customDeserializer() throws IOException {
         String event = "{\n" +
                 "  \"@class\" : \"arollavengers.core.infrastructure.LearnJacksonByTest$MyEvent\",\n" +
-                "  \"version\" : 0,\n" +
                 "  \"id\" :  \"4241febf-4901-43b6-b8ed-c9a75770fbb6\",\n" +
                 "  \"login\" : \"Travis\",\n" +
                 "  \"password\" : \"Pacman\"\n" +
@@ -102,7 +100,6 @@ public class LearnJacksonByTest {
     public void deserialize_event_programaticMixin() throws IOException {
         String event = "{\n" +
                 "  \"type\" : \"create\",\n" +
-                "  \"version\" : 0,\n" +
                 "  \"id\" : \"4241febf-4901-43b6-b8ed-c9a75770fbb6\",\n" +
                 "  \"login\" : \"Travis\",\n" +
                 "  \"password\" : \"Pacman\"\n" +
@@ -136,7 +133,6 @@ public class LearnJacksonByTest {
     public void deserialize_event_annotationMixin_withName() throws IOException {
         String event = "{\n" +
                 "  \"type\" : \"create\",\n" +
-                "  \"version\" : 0,\n" +
                 "  \"id\" : \"4241febf-4901-43b6-b8ed-c9a75770fbb6\",\n" +
                 "  \"login\" : \"Travis\",\n" +
                 "  \"password\" : \"Pacman\"\n" +
@@ -174,7 +170,6 @@ public class LearnJacksonByTest {
 
         String event = "{\n" +
                 "  \"type\" : \"create-event\",\n" +
-                "  \"version\" : 0,\n" +
                 "  \"id\" : \"4241febf-4901-43b6-b8ed-c9a75770fbb6\",\n" +
                 "  \"login\" : \"Travis\",\n" +
                 "  \"password\" : \"Pacman\"\n" +
@@ -270,9 +265,6 @@ public class LearnJacksonByTest {
     public static class MyEvent implements DomainEvent {
 
         @JsonProperty
-        private long version;
-
-        @JsonProperty
         private Id id = Id.next(MyEvent.class);
 
         @JsonProperty
@@ -288,18 +280,8 @@ public class LearnJacksonByTest {
         }
 
         @Override
-        public long version() {
-            return version;
-        }
-
-        @Override
         public Id entityId() {
             return id;
-        }
-
-        @Override
-        public void assignVersion(long newVersion) {
-            this.version = newVersion;
         }
 
         public String login() {
@@ -314,9 +296,6 @@ public class LearnJacksonByTest {
     public static abstract class AbstractDomainEvent implements DomainEvent {
         protected static final String ENTITY_ID_KEY = "id";
 
-        @JsonProperty
-        private long version;
-
         @JsonProperty(ENTITY_ID_KEY)
         private final Id entityId;
 
@@ -325,19 +304,10 @@ public class LearnJacksonByTest {
         }
 
         @Override
-        public long version() {
-            return version;
-        }
-
-        @Override
         public Id entityId() {
             return entityId;
         }
 
-        @Override
-        public void assignVersion(long newVersion) {
-            this.version = newVersion;
-        }
     }
 
     @JsonTypeName("create")

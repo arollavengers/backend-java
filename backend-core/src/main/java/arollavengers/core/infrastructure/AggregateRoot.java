@@ -21,13 +21,12 @@ public abstract class AggregateRoot<E extends DomainEvent> extends Entity<E> {
      *
      * @param stream Stream of events to rebuild state from
      */
-    public void loadFromHistory(@Nonnull Stream<E> stream) {
+    public void loadFromHistory(@Nonnull Stream<VersionedDomainEvent<E>> stream) {
         aggregate().loadFromHistory(stream);
     }
 
     /**
      * Returns the current unit of work this aggregate root belongs to.
-     * @return
      */
     protected abstract UnitOfWork unitOfWork();
 }

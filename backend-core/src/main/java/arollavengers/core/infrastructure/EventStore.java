@@ -16,7 +16,7 @@ public interface EventStore {
      * @param streamId the id of the stream the events will be appended to
      * @param stream the stream of event to store
      */
-    void store(@Nonnull Id streamId, @Nonnull Stream<DomainEvent> stream);
+    void store(@Nonnull Id streamId, @Nonnull Stream<VersionedDomainEvent<?>> stream);
 
     /**
      *
@@ -24,12 +24,13 @@ public interface EventStore {
      * @param eventType type of the events (for generics...)
      */
     @Nullable
-    <E extends DomainEvent> Stream<E> openStream(@Nonnull Id streamId, Class<E> eventType);
+    <E extends DomainEvent> Stream<VersionedDomainEvent<E>> openStream(@Nonnull Id streamId, Class<E> eventType);
 
     /**
      * Debug method that dump the content of the event store.
      *
-     * @param out
+     * @param out output
      */
+    // TODO move me in a more generic interface e.g. Debugable
     void dump(PrintStream out);
 }

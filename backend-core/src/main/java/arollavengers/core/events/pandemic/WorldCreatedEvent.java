@@ -10,9 +10,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class WorldCreatedEvent implements PandemicEvent {
 
     @JsonProperty
-    private long version;
-
-    @JsonProperty
     private final Id newWorldId;
 
     @JsonProperty
@@ -37,16 +34,6 @@ public class WorldCreatedEvent implements PandemicEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(final long version) {
-        this.version = version;
-    }
-
-    @Override
     public Id entityId() {
         return newWorldId;
     }
@@ -66,7 +53,6 @@ public class WorldCreatedEvent implements PandemicEvent {
     @Override
     public String toString() {
         return "WorldCreatedEvent[" + newWorldId
-                + ", v" + version
                 + ", owner: " + ownerId
                 + ", difficulty: " + difficulty
                 + ", conf: " + conf

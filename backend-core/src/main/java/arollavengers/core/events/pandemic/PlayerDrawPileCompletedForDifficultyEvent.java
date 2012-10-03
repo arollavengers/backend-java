@@ -21,9 +21,6 @@ public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPile
     @JsonProperty
     private final PlayerCard[] cards;
 
-    @JsonProperty
-    private long version;
-
     @JsonCreator
     public PlayerDrawPileCompletedForDifficultyEvent(@JsonProperty("drawPileId") Id drawPileId,
                                                      @JsonProperty("cards") PlayerCard[] cards)
@@ -37,16 +34,6 @@ public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPile
         return drawPileId;
     }
 
-    @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
     /**
      * @return an copy of the cards.
      */
@@ -57,7 +44,6 @@ public class PlayerDrawPileCompletedForDifficultyEvent implements PlayerDrawPile
     @Override
     public String toString() {
         return "PlayerDrawPileInitializedEvent[" + drawPileId +
-                ", v" + version +
                 ", " + Arrays.toString(cards) +
                 "]";
     }

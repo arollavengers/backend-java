@@ -1,8 +1,8 @@
 package arollavengers.core.testutils;
 
-import arollavengers.core.infrastructure.DomainEvent;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.JacksonSerializer;
+import arollavengers.core.infrastructure.VersionedDomainEvent;
 import arollavengers.core.infrastructure.eventstore.EventStoreInMemory;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,11 +34,11 @@ public class EventStoreInMemoryIO {
         JacksonSerializer serializer = new JacksonSerializer();
         serializer.postConstruct();
 
-        ConcurrentMap<Id, List<DomainEvent>> eventsPerStream = eventStore.getEventsPerStream();
-        for (Map.Entry<Id, List<DomainEvent>> stream : eventsPerStream.entrySet()) {
+        ConcurrentMap<Id, List<VersionedDomainEvent>> eventsPerStream = eventStore.getEventsPerStream();
+        for (Map.Entry<Id, List<VersionedDomainEvent>> stream : eventsPerStream.entrySet()) {
             FileOutputStream streamOut = new FileOutputStream(new File(basedir, stream.getKey().asString() + ".evt"));
-            List<DomainEvent> events = stream.getValue();
-            serializer.writeObject(streamOut, events.toArray(new DomainEvent[events.size()]));
+            List<VersionedDomainEvent> events = stream.getValue();
+            serializer.writeObject(streamOut, events.toArray(new VersionedDomainEvent[events.size()]));
             streamOut.close();
         }
     }
@@ -51,7 +51,7 @@ public class EventStoreInMemoryIO {
         JacksonSerializer serializer = new JacksonSerializer();
         serializer.postConstruct();
 
-        ConcurrentMap<Id, List<DomainEvent>> eventsPerStream = eventStore.getEventsPerStream();
+        ConcurrentMap<Id, List<VersionedDomainEvent>> eventsPerStream = eventStore.getEventsPerStream();
         for (File entityFile : basedir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -61,7 +61,7 @@ public class EventStoreInMemoryIO {
         {
             String entityId = StringUtils.remove(entityFile.getName(), ".evt");
             FileInputStream streamIn = new FileInputStream(entityFile);
-            DomainEvent[] events = (DomainEvent[]) serializer.readObject(streamIn, DomainEvent[].class);
+            VersionedDomainEvent[] events = (VersionedDomainEvent[]) serializer.readObject(streamIn, VersionedDomainEvent[].class);
             eventsPerStream.put(Id.create(entityId), Arrays.asList(events));
         }
     }

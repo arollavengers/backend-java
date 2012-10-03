@@ -14,13 +14,14 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public class CityInfectedEvent implements CityEvent {
 
     @JsonProperty
-    private long version;
-    @JsonProperty
     private final Id worldId;
+
     @JsonProperty
     private final CityId cityId;
+
     @JsonProperty
     private final Disease disease;
+
     @JsonProperty
     private final Integer nbCubes;
 
@@ -35,20 +36,9 @@ public class CityInfectedEvent implements CityEvent {
         this.disease = disease;
         this.nbCubes = nbCubes;
     }
-
-    @Override
-    public long version() {
-        return version;
-    }
-
     @Override
     public Id entityId() {
         return worldId;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
     }
 
     public Disease disease() {
@@ -65,6 +55,6 @@ public class CityInfectedEvent implements CityEvent {
 
     @Override
     public String toString() {
-        return "CityInfectedEvent[" + worldId + ", v" + version + ", " + cityId + ", " + nbCubes + "]";
+        return "CityInfectedEvent[" + worldId + ", " + cityId + ", " + nbCubes + "]";
     }
 }

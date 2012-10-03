@@ -23,7 +23,7 @@ public interface UnitOfWork {
 
     void rollback();
 
-    void registerNew(@Nonnull Id aggregateId, @Nonnull DomainEvent event);
+    void registerNew(@Nonnull VersionedDomainEvent<?> event);
 
     /**
      * Register the event store that must be used to store the event for the given
@@ -60,4 +60,5 @@ public interface UnitOfWork {
      */
     @Nullable
     <T extends AggregateRoot<?>> T getAggregate(@Nonnull Id id);
+
 }

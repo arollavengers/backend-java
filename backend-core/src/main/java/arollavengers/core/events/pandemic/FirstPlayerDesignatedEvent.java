@@ -13,9 +13,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public class FirstPlayerDesignatedEvent implements MemberEvent {
 
     @JsonProperty
-    private long version;
-
-    @JsonProperty
     private final Id worldId;
 
     @JsonProperty
@@ -39,19 +36,8 @@ public class FirstPlayerDesignatedEvent implements MemberEvent {
     }
 
     @Override
-    public long version() {
-        return version;
-    }
-
-    @Override
-    public void assignVersion(long version) {
-        this.version = version;
-    }
-
-    @Override
     public String toString() {
         return "FirstPlayerDesignatedEvent[" + entityId() +
-                ", v" + version +
                 ", " + memberKey +
                 "]";
     }
