@@ -25,7 +25,7 @@ public class WorldCityCuredEvent implements PandemicEvent {
     @JsonCreator
     public WorldCityCuredEvent(@JsonProperty("worldId") Id worldId,
                                @JsonProperty("memberId") Id memberId,
-                               @JsonProperty("city") CityId city, final Disease disease) {
+                               @JsonProperty("cityId") CityId city, final Disease disease) {
         this.worldId = worldId;
         this.memberId = memberId;
         this.city = city;

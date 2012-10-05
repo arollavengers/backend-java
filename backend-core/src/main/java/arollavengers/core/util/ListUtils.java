@@ -9,6 +9,14 @@ import java.util.List;
  */
 public class ListUtils {
 
+    public static <E, R> R foldLeft(Iterable<E> elements, R initial, Function2<R, E, R> foldFunction) {
+        R value = initial;
+        for (E element : elements) {
+            value = foldFunction.apply(value, element);
+        }
+        return value;
+    }
+
     public static <E> List<List<E>> split(List<E> elements, int nbParts) {
         int pileSize = elements.size() / nbParts;
         int remaining = elements.size() % nbParts;

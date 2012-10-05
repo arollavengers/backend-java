@@ -8,5 +8,5 @@ public interface EventHandler<E> {
     /**
      * @param event the event that must be handled
      */
-    void handle(final E event);
+    void handle(final E event, Object...args);
 }
