@@ -128,8 +128,10 @@ public class CityView {
 
     @Embeddable
     public static class PK implements Serializable {
+
         @Column(name = "world_id")
         public String worldId;
+
         @Column(name = "city_id")
         public String cityId;
 
@@ -151,15 +153,7 @@ public class CityView {
             }
 
             PK pk = (PK) o;
-
-            if (!cityId.equals(pk.cityId)) {
-                return false;
-            }
-            if (!worldId.equals(pk.worldId)) {
-                return false;
-            }
-
-            return true;
+            return cityId.equals(pk.cityId) && worldId.equals(pk.worldId);
         }
 
         @Override
