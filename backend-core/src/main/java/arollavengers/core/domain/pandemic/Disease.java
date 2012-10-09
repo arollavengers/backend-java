@@ -7,5 +7,5 @@ public enum Disease {
     Black,
     Yellow,
     Orange,
-    Blue;
+    Blue
 }

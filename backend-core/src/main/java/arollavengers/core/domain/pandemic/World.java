@@ -429,7 +429,7 @@ public class World extends AggregateRoot<PandemicEvent> {
 
     @OnEvent
     private void doBuildResearchCenter(final ResearchCenterBuiltEvent event) {
-        cityStates.buildResearchCenter(event.city());
+        cityStates.buildResearchCenter(event.cityId());
     }
 
     /**

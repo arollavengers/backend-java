@@ -27,7 +27,7 @@ public class ResearchCenterBuiltEvent implements PandemicEvent {
         return worldId;
     }
 
-    public CityId city() {
+    public CityId cityId() {
         return cityId;
     }
 

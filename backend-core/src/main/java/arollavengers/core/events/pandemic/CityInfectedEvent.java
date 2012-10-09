@@ -36,8 +36,16 @@ public class CityInfectedEvent implements CityEvent {
         this.disease = disease;
         this.nbCubes = nbCubes;
     }
+
+    /**
+     * @see #worldId()
+     */
     @Override
     public Id entityId() {
+        return worldId;
+    }
+
+    public Id worldId() {
         return worldId;
     }
 

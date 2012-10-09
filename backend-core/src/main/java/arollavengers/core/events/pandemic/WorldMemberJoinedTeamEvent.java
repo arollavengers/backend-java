@@ -32,8 +32,15 @@ public class WorldMemberJoinedTeamEvent implements PandemicEvent {
         this.role = role;
     }
 
+    /**
+     * @see #worldId()
+     */
     @Override
     public Id entityId() {
+        return worldId;
+    }
+
+    public Id worldId() {
         return worldId;
     }
 

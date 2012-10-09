@@ -1,4 +1,4 @@
-package arollavengers.behavior.infra;
+package arollavengers.core.util.spring;
 
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

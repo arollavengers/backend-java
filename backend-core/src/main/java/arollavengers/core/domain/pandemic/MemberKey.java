@@ -5,6 +5,7 @@ import arollavengers.pattern.annotation.ValueObject;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import javax.annotation.Nonnull;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -65,5 +66,19 @@ public class MemberKey {
                 "userId=" + userId +
                 ", role=" + role +
                 '}';
+    }
+
+    public String asString () {
+        return userId().asString() + "/" + role.name();
+    }
+
+    public static MemberKey fromString(@Nonnull String memberKeyAsString) {
+        String[] split = memberKeyAsString.split("/");
+        if(split.length != 2) {
+            throw new IllegalArgumentException("Invalid MemberKey string representation of <" + memberKeyAsString + ">");
+        }
+        Id id = Id.create(split[0]);
+        MemberRole role = MemberRole.valueOf(split[1]);
+        return new MemberKey(id, role);
     }
 }

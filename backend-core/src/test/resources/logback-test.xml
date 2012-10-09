@@ -8,6 +8,7 @@
 	</appender>
 
 	<logger name="arollavengers" level="warn" />
+	<logger name="arollavengers.core" level="info" />
 	<logger name="org.springframework.jdbc" level="warn" />
 
 	<root level="warn">

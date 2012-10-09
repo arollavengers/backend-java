@@ -18,8 +18,8 @@ public class PlayerMovedEvent implements MemberEvent {
     @JsonProperty
     private final Id memberId;
 
-    @JsonProperty
-    private final CityId city;
+    @JsonProperty("city")
+    private final CityId cityId;
 
     @JsonProperty
     private final MoveType moveType;
@@ -29,12 +29,12 @@ public class PlayerMovedEvent implements MemberEvent {
 
     @JsonCreator
     public PlayerMovedEvent(@Nonnull @JsonProperty("memberId") Id memberId,
-                            @Nonnull @JsonProperty("city") CityId city,
+                            @Nonnull @JsonProperty("city") CityId cityId,
                             @Nonnull @JsonProperty("moveType") MoveType moveType,
                             @Nullable @JsonProperty("cardUsed") PlayerCard cardUsed)
     {
         this.memberId = memberId;
-        this.city = city;
+        this.cityId = cityId;
         this.moveType = moveType;
         this.cardUsed = cardUsed;
     }
@@ -44,8 +44,8 @@ public class PlayerMovedEvent implements MemberEvent {
         return memberId;
     }
 
-    public CityId cityId() {
-        return city;
+    public CityId cityId () {
+        return cityId;
     }
 
     public PlayerCard cardUsed() {
@@ -55,7 +55,7 @@ public class PlayerMovedEvent implements MemberEvent {
     @Override
     public String toString() {
         return "PlayerMovedEvent[" + entityId() +
-                ", " + city + "/" + moveType +
+                ", " + cityId + "/" + moveType +
                 ", card: " + cardUsed +
                 "]";
     }
