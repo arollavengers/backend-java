@@ -1,4 +1,4 @@
-package arollavengers.web.controller;
+package arollavengers.web.controller.pandemic;
 
 import arollavengers.core.domain.pandemic.Difficulty;
 import arollavengers.core.domain.pandemic.World;
@@ -28,4 +28,9 @@ public class PandemicController {
         worldService.createWorld(worldId, ownerId, difficulty);
         return worldId;
     }
+
+//    @RequestMapping(value = "/cities", method = RequestMethod.GET)
+//    public CityView[] cityViews() {
+//
+//    }
 }
