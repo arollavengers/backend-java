@@ -50,10 +50,11 @@ public class AnnotationBasedEventHandler<E> implements EventHandler<E> {
         Method method = shared.getMethodFor(target.getClass(), event, args);
         try {
             if (method != null) {
-                if (args != null && args.length>0) {
-                    Object[] params = new Object[args.length + 1];
+                int argLen = (args!=null?args.length:0);
+                if (argLen>0 && method.getParameterTypes().length>1) {
+                    Object[] params = new Object[argLen + 1];
                     params[0] = event;
-                    System.arraycopy(args, 0, params, 1, args.length);
+                    System.arraycopy(args, 0, params, 1, argLen);
                     method.invoke(target, params);
                 }
                 else {

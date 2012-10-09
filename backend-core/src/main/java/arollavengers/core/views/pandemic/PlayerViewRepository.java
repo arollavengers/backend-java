@@ -36,4 +36,11 @@ public class PlayerViewRepository {
         else
             updater.apply(view);
     }
+
+    @Transactional
+    public void forAll(Function<PlayerView> function) {
+        for(Object row : manager.createQuery("from PlayerView").getResultList()) {
+            function.apply((PlayerView)row);
+        }
+    }
 }

@@ -20,10 +20,12 @@ import arollavengers.core.infrastructure.Id;
 import arollavengers.core.infrastructure.Message;
 import arollavengers.core.infrastructure.SimpleBus;
 import arollavengers.core.infrastructure.VersionedDomainEvent;
+import arollavengers.core.util.Function;
 import arollavengers.core.util.spring.SpringContextBuilder;
 import arollavengers.core.views.pandemic.CityView;
 import arollavengers.core.views.pandemic.CityViewProjection;
 import arollavengers.core.views.pandemic.CityViewRepository;
+import arollavengers.core.views.pandemic.PlayerView;
 import arollavengers.core.views.pandemic.PlayerViewProjection;
 import arollavengers.core.views.pandemic.PlayerViewRepository;
 import arollavengers.core.views.pandemic.ViewErrorHandler;
@@ -37,16 +39,16 @@ import javax.inject.Inject;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class CityViewUsecaseTest {
+public class PandemicViewsUsecaseTest {
 
     // initialized in @Before
     private AnnotationConfigApplicationContext applicationContext;
 
     @Inject
-    private CityViewRepository repository;
+    private CityViewRepository cityViewRepository;
 
     @Inject
-    private CityViewProjection projection;
+    private PlayerViewRepository playerViewRepository;
 
     @Inject
     private Bus bus;
@@ -79,9 +81,9 @@ public class CityViewUsecaseTest {
         view.setId(worldId, CityId.Paris);
         view.setResearchCenter(true);
 
-        repository.save(view);
+        cityViewRepository.save(view);
 
-        CityView cityView = repository.find(CityView.pk(worldId, CityId.Paris));
+        CityView cityView = cityViewRepository.find(CityView.pk(worldId, CityId.Paris));
         assertThat(cityView).isNotNull();
         assertThat(cityView.getCityId()).isEqualTo(CityId.Paris);
         assertThat(cityView.getWorldId()).isEqualTo(worldId);
@@ -92,12 +94,12 @@ public class CityViewUsecaseTest {
     public void city_views_are_initialized_on_game_start() {
         Id worldId = Id.next(World.class);
 
-        CityView cityViewBefore = repository.find(CityView.pk(worldId, CityId.Paris));
+        CityView cityViewBefore = cityViewRepository.find(CityView.pk(worldId, CityId.Paris));
         assertThat(cityViewBefore).isNull();
 
         bus.publish(toVersioned(worldId, new GameStartedEvent(worldId)));
 
-        CityView cityViewAfter = repository.find(CityView.pk(worldId, CityId.Paris));
+        CityView cityViewAfter = cityViewRepository.find(CityView.pk(worldId, CityId.Paris));
         assertThat(cityViewAfter).isNotNull();
         assertThat(cityViewAfter.hasResearchCenter()).isFalse();
         for (Disease disease : Disease.values()) {
@@ -111,7 +113,7 @@ public class CityViewUsecaseTest {
 
         bus.publish(toVersioned(worldId, new ResearchCenterBuiltEvent(worldId, CityId.Paris)));
 
-        CityView cityView = repository.find(CityView.pk(worldId, CityId.Paris));
+        CityView cityView = cityViewRepository.find(CityView.pk(worldId, CityId.Paris));
         assertThat(cityView).isNull();
     }
 
@@ -122,7 +124,7 @@ public class CityViewUsecaseTest {
         bus.publish(toVersioned(worldId, new GameStartedEvent(worldId)));
         bus.publish(toVersioned(worldId, new ResearchCenterBuiltEvent(worldId, CityId.Paris)));
 
-        CityView cityView = repository.find(CityView.pk(worldId, CityId.Paris));
+        CityView cityView = cityViewRepository.find(CityView.pk(worldId, CityId.Paris));
         assertThat(cityView).isNotNull();
         assertThat(cityView.hasResearchCenter()).isTrue();
     }
@@ -137,10 +139,18 @@ public class CityViewUsecaseTest {
         bus.publish(toVersioned(worldId, new GameStartedEvent(worldId)));
         bus.publish(toVersioned(worldId, new ResearchCenterBuiltEvent(worldId, CityId.Paris)));
         bus.publish(toVersioned(worldId, new WorldMemberJoinedTeamEvent(worldId, memberId, userId, MemberRole.Medic)));
+
+        PlayerView playerView = playerViewRepository.find(PlayerView.pk(worldId, memberId));
+        assertThat(playerView).isNotNull();
+        assertThat(playerView.getLocation()).isEqualTo(CityId.Atlanta);
+
+
         bus.publish(toVersioned(worldId, new PlayerMovedEvent(memberId, CityId.Paris, MoveType.Drive, null)));
         bus.publish(toVersioned(worldId, new CityInfectedEvent(worldId, CityId.London, Disease.Orange, 2)));
 
-
+        playerView = playerViewRepository.find(PlayerView.pk(worldId, memberId));
+        assertThat(playerView).isNotNull();
+        assertThat(playerView.getLocation()).isEqualTo(CityId.Paris);
     }
 
     private static Message toVersioned(Id aggregateId, PandemicEvent event) {

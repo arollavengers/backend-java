@@ -61,6 +61,14 @@ public class PlayerView {
         return CityId.valueOf(location);
     }
 
+    @Override
+    public String toString() {
+        return "PlayerView{" +
+                "pk=" + pk +
+                ", location='" + location + '\'' +
+                '}';
+    }
+
     @Embeddable
     public static class PK implements Serializable {
         @Column(name = "world_id")
