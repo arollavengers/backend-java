@@ -105,6 +105,10 @@ public class PandemicViewsUsecaseTest {
         for (Disease disease : Disease.values()) {
             assertThat(cityViewAfter.getNbCubes(disease)).isEqualTo(0);
         }
+
+        for(CityView view : cityViewRepository.listAllInWorld(worldId)) {
+            System.out.println(view);
+        }
     }
 
     @Test

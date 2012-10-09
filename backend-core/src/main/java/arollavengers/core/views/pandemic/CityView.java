@@ -114,6 +114,18 @@ public class CityView {
         return CityId.valueOf(pk.cityId);
     }
 
+    @Override
+    public String toString() {
+        return "CityView{" +
+                "pk=" + pk +
+                ", researchCenter=" + researchCenter +
+                ", nbBlueCubes=" + nbBlueCubes +
+                ", nbBlackCubes=" + nbBlackCubes +
+                ", nbOrangeCubes=" + nbOrangeCubes +
+                ", nbYellowCubes=" + nbYellowCubes +
+                '}';
+    }
+
     @Embeddable
     public static class PK implements Serializable {
         @Column(name = "world_id")
