@@ -4,6 +4,7 @@ import arollavengers.core.domain.pandemic.Difficulty;
 import arollavengers.core.domain.pandemic.World;
 import arollavengers.core.infrastructure.Id;
 import arollavengers.core.service.pandemic.WorldService;
+import arollavengers.web.dto.ResultDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,18 +20,19 @@ public class PandemicController {
     WorldService worldService;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public Id create(Id ownerId, Difficulty difficulty) {
+    public ResultDto create(Id ownerId, Difficulty difficulty) {
 
         Assert.notNull(ownerId, "Owner is mandatory");
         Assert.notNull(difficulty, "difficulty is mandatory");
 
         Id worldId = Id.next(World.class);
         worldService.createWorld(worldId, ownerId, difficulty);
-        return worldId;
+        return ResultDto.ok(worldId);
     }
 
-//    @RequestMapping(value = "/cities", method = RequestMethod.GET)
-//    public CityView[] cityViews() {
-//
-//    }
+    @RequestMapping(value = "/cities", method = RequestMethod.GET)
+    public ResultDto cityViews() {
+        //CityView[]
+        return ResultDto.ok(null);
+    }
 }
